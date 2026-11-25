@@ -123,17 +123,17 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
     <div className="mx-auto max-w-2xl space-y-5 animate-fade-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-extrabold text-[#174D35]">
+          <h1 className="text-xl font-extrabold text-brand-primary">
             {mode === 'complete' ? 'تکمیل پروفایل کاربری' : 'ویرایش پروفایل'}
           </h1>
-          <p className="mt-1 text-sm text-[#505E50]">
+          <p className="mt-1 text-sm text-brand-text/70">
             تکمیل شهر، محدوده و مهارت‌ها به پیدا کردن همیاری‌های نزدیک‌تر کمک می‌کند.
           </p>
         </div>
         {mode === 'edit' ? (
           <Link
             to="/profile"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#F6F7F2]"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-brand-surface bg-white px-3.5 py-2 text-xs font-bold text-brand-primary hover:bg-brand-bg"
           >
             <ArrowRight className="h-4 w-4" />
             بازگشت
@@ -141,7 +141,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
         ) : (
           <Link
             to="/"
-            className="rounded-xl px-3 py-2 text-xs font-semibold text-[#556455] hover:text-[#174D35]"
+            className="rounded-xl px-3 py-2 text-xs font-semibold text-brand-text/70 hover:text-brand-primary"
           >
             تکمیل در زمان دیگر
           </Link>
@@ -150,10 +150,10 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:space-y-6 sm:p-7"
+        className="space-y-5 rounded-2xl border border-brand-surface bg-white p-4 sm:space-y-6 sm:p-7"
       >
         {errorMsg && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+          <div className="rounded-xl border border-brand-text/30 bg-brand-bg px-4 py-3 text-sm font-medium text-brand-text">
             {errorMsg}
           </div>
         )}
@@ -165,17 +165,17 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
               <ProtectedImage
                 src={previewSrc}
                 alt="تصویر پروفایل"
-                wrapperClassName="relative block h-20 w-20 overflow-hidden rounded-3xl border-2 border-[#DCEBDD]"
+                wrapperClassName="relative block h-20 w-20 overflow-hidden rounded-2xl border-2 border-brand-surface"
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-[#DCEBDD] text-xl font-extrabold text-[#174D35]">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-surface text-xl font-extrabold text-brand-primary">
                 {getInitials(displayName)}
               </div>
             )}
             <label
               htmlFor="avatar-upload"
-              className="absolute -bottom-1 -left-1 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-[#174D35] text-white shadow hover:bg-[#26734B]"
+              className="absolute -bottom-1 -left-1 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-brand-primary text-white shadow-xs hover:bg-brand-green"
               title="تغییر تصویر پروفایل"
             >
               <Camera className="h-4 w-4" />
@@ -189,8 +189,8 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
             </label>
           </div>
 
-          <div className="text-xs leading-6 text-[#556455]">
-            <p className="font-bold text-[#202820]">تصویر پروفایل (اختیاری)</p>
+          <div className="text-xs leading-6 text-brand-text/70">
+            <p className="font-bold text-brand-text">تصویر پروفایل (اختیاری)</p>
             <p>فرمت‌های مجاز: JPG، PNG یا WebP — حداکثر ۲ مگابایت</p>
             {previewSrc && (
               <button
@@ -200,7 +200,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
                   setAvatarPreview(null);
                   setAvatarUrl(null);
                 }}
-                className="mt-1 inline-flex items-center gap-1 font-semibold text-rose-600 hover:underline"
+                className="mt-1 inline-flex items-center gap-1 font-semibold text-brand-text hover:underline"
               >
                 <X className="h-3.5 w-3.5" />
                 حذف تصویر
@@ -210,7 +210,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
         </div>
 
         <div>
-          <label htmlFor="prof-name" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+          <label htmlFor="prof-name" className="mb-1.5 block text-sm font-semibold text-brand-text">
             نام نمایشی *
           </label>
           <input
@@ -218,14 +218,14 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+            className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-4 py-3 text-sm outline-none focus:border-brand-green focus:bg-white"
             required
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="prof-province" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+            <label htmlFor="prof-province" className="mb-1.5 block text-sm font-semibold text-brand-text">
               استان
             </label>
             <select
@@ -236,7 +236,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
                 setProvince(nextProv);
                 setCity((IRAN_PROVINCES_CITIES[nextProv] ?? ['سایر شهرها'])[0]);
               }}
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+              className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-3.5 py-3 text-sm outline-none focus:border-brand-green focus:bg-white"
             >
               {PROVINCES_LIST.map((prov) => (
                 <option key={prov} value={prov}>
@@ -247,14 +247,14 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
           </div>
 
           <div>
-            <label htmlFor="prof-city" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+            <label htmlFor="prof-city" className="mb-1.5 block text-sm font-semibold text-brand-text">
               شهر
             </label>
             <select
               id="prof-city"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+              className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-3.5 py-3 text-sm outline-none focus:border-brand-green focus:bg-white"
             >
               {citiesForProvince.map((c) => (
                 <option key={c} value={c}>
@@ -266,7 +266,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
         </div>
 
         <div>
-          <label htmlFor="prof-neighborhood" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+          <label htmlFor="prof-neighborhood" className="mb-1.5 block text-sm font-semibold text-brand-text">
             محدوده فعالیت یا محله (تقریبی)
           </label>
           <input
@@ -275,15 +275,15 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
             value={neighborhood}
             onChange={(e) => setNeighborhood(e.target.value)}
             placeholder="مثلاً: محدوده بلوار معلم یا مهرشهر"
-            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
+            className="min-h-[44px] w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-4 py-3 text-[15px] outline-none focus:border-brand-green focus:bg-white sm:text-sm"
           />
-          <p className="mt-1 text-[11px] text-[#667466]">
+          <p className="mt-1 text-[11px] text-brand-text/70">
             برای حفظ حریم خصوصی از نوشتن آدرس دقیق یا پلاک خودداری کنید.
           </p>
         </div>
 
         <div>
-          <label htmlFor="prof-bio" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+          <label htmlFor="prof-bio" className="mb-1.5 block text-sm font-semibold text-brand-text">
             معرفی کوتاه
           </label>
           <textarea
@@ -292,12 +292,12 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="کوتاه درباره خودتان و زمینه‌هایی که می‌توانید کمک کنید بنویسید..."
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] leading-6 outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
+            className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-4 py-3 text-[15px] leading-6 outline-none focus:border-brand-green focus:bg-white sm:text-sm"
           />
         </div>
 
         <div className="space-y-3">
-          <span className="block text-sm font-semibold text-[#202820]">
+          <span className="block text-sm font-semibold text-brand-text">
             مهارت‌ها و زمینه‌های مشارکت
           </span>
           <div className="flex flex-wrap gap-2">
@@ -310,8 +310,8 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
                   onClick={() => toggleSkill(skill)}
                   className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
                     active
-                      ? 'border-[#174D35] bg-[#174D35] text-white'
-                      : 'border-[#DCEBDD] bg-[#F6F7F2] text-[#202820] hover:border-[#78B98A]'
+                      ? 'border-brand-primary bg-brand-primary text-white'
+                      : 'border-brand-surface bg-brand-bg text-brand-text hover:border-brand-soft'
                   }`}
                 >
                   {active && <Check className="h-3.5 w-3.5" />}
@@ -333,12 +333,12 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
                 }
               }}
               placeholder="افزودن مهارت دلخواه..."
-              className="flex-1 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2 text-xs outline-none focus:border-[#26734B] focus:bg-white"
+              className="flex-1 rounded-xl border border-brand-surface bg-brand-bg/60 px-3.5 py-2 text-xs outline-none focus:border-brand-green focus:bg-white"
             />
             <button
               type="button"
               onClick={addCustomSkill}
-              className="inline-flex items-center gap-1 rounded-xl border border-[#DCEBDD] bg-[#DCEBDD]/60 px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]"
+              className="inline-flex items-center gap-1 rounded-xl border border-brand-surface bg-brand-surface/60 px-3.5 py-2 text-xs font-bold text-brand-primary hover:bg-brand-surface"
             >
               <Plus className="h-3.5 w-3.5" />
               افزودن
@@ -352,7 +352,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
                 .map((skill) => (
                   <span
                     key={skill}
-                    className="inline-flex items-center gap-1 rounded-xl bg-[#DCEBDD] px-3 py-1 text-xs font-semibold text-[#174D35]"
+                    className="inline-flex items-center gap-1 rounded-xl bg-brand-surface px-3 py-1 text-xs font-semibold text-brand-primary"
                   >
                     {skill}
                     <button
@@ -371,7 +371,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
         <button
           type="submit"
           disabled={saving}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#174D35] py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#26734B] disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-primary py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-green disabled:opacity-60"
         >
           <Save className="h-4 w-4" />
           {saving ? 'در حال ذخیره...' : 'ذخیره اطلاعات پروفایل'}

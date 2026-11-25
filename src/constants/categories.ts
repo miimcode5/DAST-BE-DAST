@@ -25,9 +25,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'روزمره',
     description: 'خرید مایحتاج، کارهای ضروری، جابه‌جایی و همراهی در امور روزانه',
     examples: ['خرید مایحتاج', 'انجام کارهای ضروری', 'جابه‌جایی وسایل', 'همراهی در امور'],
-    accentBg: 'bg-[#DCEBDD]/65',
-    accentText: 'text-[#174D35]',
-    accentBorder: 'border-[#78B98A]/45',
+    accentBg: 'bg-brand-surface',
+    accentText: 'text-brand-primary',
+    accentBorder: 'border-brand-soft/45',
   },
   {
     id: 'education',
@@ -35,9 +35,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'آموزش',
     description: 'تدریس دروس، آموزش زبان، آموزش مهارت، مشاوره تحصیلی و کلاس رایگان',
     examples: ['تدریس دروس', 'آموزش زبان', 'آموزش مهارت', 'مشاوره تحصیلی'],
-    accentBg: 'bg-[#DCEBDD]/65',
-    accentText: 'text-[#174D35]',
-    accentBorder: 'border-[#78B98A]/45',
+    accentBg: 'bg-brand-surface',
+    accentText: 'text-brand-primary',
+    accentBorder: 'border-brand-soft/45',
   },
   {
     id: 'repair',
@@ -45,9 +45,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'فنی و تعمیرات',
     description: 'تعمیر وسایل خانگی، خدمات برق، لوله‌کشی و تعمیر تجهیزات',
     examples: ['تعمیر وسایل خانگی', 'خدمات برق', 'خدمات لوله‌کشی', 'تعمیر تجهیزات'],
-    accentBg: 'bg-[#DCEBDD]/65',
-    accentText: 'text-[#174D35]',
-    accentBorder: 'border-[#78B98A]/45',
+    accentBg: 'bg-brand-surface',
+    accentText: 'text-brand-primary',
+    accentBorder: 'border-brand-soft/45',
   },
   {
     id: 'donation',
@@ -55,9 +55,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'اهدای کالا',
     description: 'لباس، کتاب، لوازم منزل، لوازم تحریر، تجهیزات آموزشی و کالاهای قابل استفاده',
     examples: ['لباس و پوشاک', 'کتاب و لوازم تحریر', 'لوازم منزل', 'تجهیزات آموزشی'],
-    accentBg: 'bg-[#DCEBDD]/65',
-    accentText: 'text-[#174D35]',
-    accentBorder: 'border-[#78B98A]/45',
+    accentBg: 'bg-brand-surface',
+    accentText: 'text-brand-primary',
+    accentBorder: 'border-brand-soft/45',
   },
   {
     id: 'elderly',
@@ -65,9 +65,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'سالمندان',
     description: 'خرید روزانه، همراهی، انجام امور بیرون از منزل و کمک در امور روزمره سالمندان',
     examples: ['خرید روزانه', 'همراهی به مراکز درمانی', 'امور اداری و بیرون از منزل'],
-    accentBg: 'bg-[#DCEBDD]/65',
-    accentText: 'text-[#174D35]',
-    accentBorder: 'border-[#78B98A]/45',
+    accentBg: 'bg-brand-surface',
+    accentText: 'text-brand-primary',
+    accentBorder: 'border-brand-soft/45',
   },
   {
     id: 'voluntary',
@@ -75,9 +75,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'داوطلبانه',
     description: 'پاک‌سازی محیط، فعالیت‌های محله‌محور، برنامه‌های اجتماعی و کارهای گروهی',
     examples: ['پاک‌سازی محیط', 'فعالیت محله‌محور', 'برنامه اجتماعی', 'همیاری گروهی'],
-    accentBg: 'bg-[#DCEBDD]/65',
-    accentText: 'text-[#174D35]',
-    accentBorder: 'border-[#78B98A]/45',
+    accentBg: 'bg-brand-surface',
+    accentText: 'text-brand-primary',
+    accentBorder: 'border-brand-soft/45',
   },
   {
     id: 'urgent',
@@ -85,9 +85,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'فوری و محلی',
     description: 'نیازهای ضروری، کمک در شرایط دشوار و مشارکت سریع همسایگان',
     examples: ['نیاز ضروری', 'شرایط دشوار', 'کمک فوری همسایگی'],
-    accentBg: 'bg-[#E9B949]/20',
-    accentText: 'text-[#6F4E06]',
-    accentBorder: 'border-[#E9B949]/50',
+    accentBg: 'bg-brand-gold/15',
+    accentText: 'text-brand-text',
+    accentBorder: 'border-brand-gold/60',
   },
   {
     id: 'specialized',
@@ -95,9 +95,9 @@ export const HELP_CATEGORIES: CategoryMeta[] = [
     shortLabel: 'تخصصی',
     description: 'مشاوره، خدمات طراحی، خدمات دیجیتال، خدمات اداری و تخصص‌های حرفه‌ای',
     examples: ['مشاوره تخصصی', 'خدمات دیجیتال و رایانه', 'طراحی و گرافیک', 'راهنمایی اداری'],
-    accentBg: 'bg-[#DCEBDD]/65',
-    accentText: 'text-[#174D35]',
-    accentBorder: 'border-[#78B98A]/45',
+    accentBg: 'bg-brand-surface',
+    accentText: 'text-brand-primary',
+    accentBorder: 'border-brand-soft/45',
   },
 ];
 
@@ -137,23 +137,23 @@ export const REQUEST_STATUS_META: Record<
 > = {
   open: {
     label: 'باز و نیازمند همیاری',
-    badgeClass: 'bg-[#DCEBDD] text-[#174D35] border-[#78B98A]/50',
-    dotClass: 'bg-[#26734B]',
+    badgeClass: 'bg-white text-brand-primary border-brand-soft',
+    dotClass: 'bg-brand-green',
   },
   in_progress: {
     label: 'در حال انجام',
-    badgeClass: 'bg-[#E9B949]/20 text-[#7A5807] border-[#E9B949]/60',
-    dotClass: 'bg-[#E9B949]',
+    badgeClass: 'bg-brand-gold/15 text-brand-text border-brand-gold/60',
+    dotClass: 'bg-brand-gold',
   },
   completed: {
     label: 'تکمیل‌شده',
-    badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-    dotClass: 'bg-emerald-600',
+    badgeClass: 'bg-brand-surface text-brand-primary border-brand-soft',
+    dotClass: 'bg-brand-primary',
   },
   cancelled: {
     label: 'لغوشده',
-    badgeClass: 'bg-stone-100 text-stone-600 border-stone-300',
-    dotClass: 'bg-stone-400',
+    badgeClass: 'bg-brand-bg text-brand-text/70 border-brand-surface',
+    dotClass: 'bg-brand-soft/60',
   },
 };
 
@@ -163,32 +163,32 @@ export const RESPONSE_STATUS_META: Record<
 > = {
   pending: {
     label: 'در انتظار بررسی',
-    badgeClass: 'bg-amber-50 text-amber-900 border-amber-200',
+    badgeClass: 'bg-white text-brand-green border-brand-surface',
     description: 'ثبت‌کننده درخواست به‌زودی اعلام آمادگی شما را بررسی می‌کند.',
   },
   accepted: {
     label: 'پذیرفته‌شده',
-    badgeClass: 'bg-[#DCEBDD] text-[#174D35] border-[#78B98A]',
+    badgeClass: 'bg-brand-surface text-brand-primary border-brand-soft',
     description: 'اعلام آمادگی شما پذیرفته شد و آماده هماهنگی است.',
   },
   in_progress: {
     label: 'در حال انجام',
-    badgeClass: 'bg-[#E9B949]/20 text-[#7A5807] border-[#E9B949]',
+    badgeClass: 'bg-brand-gold/15 text-brand-text border-brand-gold/60',
     description: 'همکاری میان داوطلب و درخواست‌کننده در جریان است.',
   },
   completed: {
     label: 'تکمیل‌شده و تأییدشده',
-    badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+    badgeClass: 'bg-brand-primary text-white border-brand-primary',
     description: 'این همیاری با موفقیت انجام و توسط درخواست‌کننده تأیید شد.',
   },
   rejected: {
     label: 'پذیرفته نشد',
-    badgeClass: 'bg-stone-100 text-stone-600 border-stone-200',
+    badgeClass: 'bg-brand-bg text-brand-text/70 border-brand-surface',
     description: 'درخواست‌کننده داوطلب دیگری را انتخاب کرد یا پاسخ را نپذیرفت.',
   },
   cancelled: {
     label: 'لغوشده',
-    badgeClass: 'bg-stone-100 text-stone-500 border-stone-200',
+    badgeClass: 'bg-brand-bg text-brand-text/65 border-brand-surface',
     description: 'این اعلام آمادگی لغو شده است.',
   },
 };
@@ -215,22 +215,22 @@ export const CONVERSATION_STATUS_META: Record<
 > = {
   active: {
     label: 'گفت‌وگوی فعال',
-    badgeClass: 'bg-[#DCEBDD] text-[#174D35] border-[#78B98A]/60',
+    badgeClass: 'bg-brand-surface text-brand-primary border-brand-soft/60',
     helperNote: 'امکان ارسال پیام و هماهنگی بین درخواست‌کننده و داوطلب برقرار است.',
   },
   completed: {
     label: 'همیاری تکمیل‌شده',
-    badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+    badgeClass: 'bg-brand-primary text-white border-brand-primary',
     helperNote: 'این همیاری با موفقیت تکمیل شده است؛ تاریخچه گفت‌وگو فقط برای مشاهده نگهداری می‌شود.',
   },
   cancelled: {
     label: 'لغوشده',
-    badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+    badgeClass: 'bg-brand-bg text-brand-text/70 border-brand-surface',
     helperNote: 'درخواست یا اعلام آمادگی این گفت‌وگو لغو شده و ارسال پیام جدید بسته است.',
   },
   closed: {
     label: 'بسته‌شده',
-    badgeClass: 'bg-stone-100 text-stone-700 border-stone-300',
+    badgeClass: 'bg-brand-bg text-brand-text/70 border-brand-surface',
     helperNote: 'این گفت‌وگو بسته شده است؛ پیام‌های قبلی همچنان قابل مرور هستند.',
   },
 };

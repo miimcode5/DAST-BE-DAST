@@ -1,267 +1,214 @@
 import { useEffect, useState } from 'react';
-import {
-  ArrowLeft,
-  CheckCircle2,
-  HandHeart,
-  Link2,
-  MapPin,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+import { ArrowDown, ArrowLeft, CheckCircle2, HeartHandshake, Link2, MapPin, Plus, Sparkles, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EmptyState } from '../components/EmptyState';
-import { KindnessIllustration } from '../components/KindnessIllustration';
 import { LoadingState } from '../components/LoadingState';
 import { ProtectedImage } from '../components/ProtectedImage';
 import { CategoryBadge } from '../components/StatusBadge';
-import { useAuth } from '../contexts/AuthContext';
 import { formatDateFa, getInitials, toPersianDigits } from '../lib/formatters';
 import { getKindnessChain } from '../services/statsService';
 import type { KindnessChainData } from '../types/database';
 
 export function KindnessChainPage() {
-  const { user } = useAuth();
   const [data, setData] = useState<KindnessChainData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    async function load() {
-      setLoading(true);
-      setErrorMsg(null);
-      try {
-        const res = await getKindnessChain();
+    getKindnessChain()
+      .then((res) => {
         if (active) setData(res);
-      } catch (err) {
+      })
+      .catch((err) => {
         if (active) setErrorMsg(err instanceof Error ? err.message : 'خطا در بارگذاری زنجیره مهربانی');
-      } finally {
+      })
+      .finally(() => {
         if (active) setLoading(false);
-      }
-    }
-    void load();
+      });
+
     return () => {
       active = false;
     };
   }, []);
 
   if (loading) {
-    return <LoadingState label="در حال بارگذاری پیوندهای زنجیره مهربانی..." />;
-  }
-
-  if (errorMsg || !data) {
-    return (
-      <div className="rounded-3xl border border-rose-200 bg-rose-50 p-6 text-center text-sm text-rose-800">
-        {errorMsg ?? 'دریافت اطلاعات زنجیره مهربانی ناموفق بود.'}
-      </div>
-    );
+    return <LoadingState label="در حال دریافت حلقه‌های واقعی زنجیره مهربانی..." />;
   }
 
   return (
-    <div className="space-y-6 animate-fade-up">
-      {/* Visual Spotlight Hero */}
-      <section className="overflow-hidden rounded-3xl border border-[#DCEBDD] bg-white p-5 shadow-[0_2px_12px_rgba(23,77,53,0.04)] sm:p-7">
-        <div className="grid items-center gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#DCEBDD] px-3 py-1 text-xs font-semibold text-[#174D35]">
-              <Link2 className="h-3.5 w-3.5" />
-              <span>زنجیره زنده مهربانی دست‌به‌دست</span>
+    <div className="space-y-7 animate-fade-up">
+      {/* Header Banner — Clean white card with official brand greens */}
+      <section className="rounded-2xl border border-brand-surface bg-white p-6 sm:p-9">
+        <div className="max-w-2xl space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-brand-surface px-3.5 py-1 text-xs font-bold text-brand-primary">
+            <Sparkles className="h-4 w-4 text-brand-gold" />
+            اثر گسترش کمک‌های مردمی
+          </div>
+          <h1 className="text-2xl font-extrabold text-brand-primary sm:text-3xl">زنجیره مهربانی دست‌به‌دست</h1>
+          <p className="text-sm leading-7 text-brand-text/80">
+            این بخش فقط کمک‌های واقعی و تأییدشده توسط دریافت‌کنندگان را نمایش می‌دهد؛ وقتی فردی کمکی دریافت می‌کند و سپس خود به دیگری یاری می‌رساند، حلقه‌های زنجیره به هم متصل می‌شوند.
+          </p>
+        </div>
+      </section>
+
+      {errorMsg && (
+        <div className="rounded-2xl border border-brand-text/25 bg-white px-4 py-3 text-sm text-brand-text">
+          {errorMsg}
+        </div>
+      )}
+
+      {/* Real Verified Metrics */}
+      {data && (
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-2xl border border-brand-surface bg-white p-4 text-center">
+            <CheckCircle2 className="mx-auto mb-1.5 h-6 w-6 text-brand-green" />
+            <div className="text-2xl font-extrabold text-brand-primary">
+              {toPersianDigits(data.summary.verified_helps)}
             </div>
+            <div className="mt-0.5 text-xs font-medium text-brand-text/70">کمک معتبر تأییدشده</div>
+          </div>
 
-            <h1 className="text-xl font-bold leading-9 text-[#174D35] sm:text-2xl sm:leading-10">
-              کمکی که می‌گیرید، آغازگر کمکی تازه است
-            </h1>
+          <div className="rounded-2xl border border-brand-surface bg-white p-4 text-center">
+            <Users className="mx-auto mb-1.5 h-6 w-6 text-brand-green" />
+            <div className="text-2xl font-extrabold text-brand-primary">
+              {toPersianDigits(data.summary.unique_helpers)}
+            </div>
+            <div className="mt-0.5 text-xs font-medium text-brand-text/70">داوطلب یاری‌گر</div>
+          </div>
 
-            <p className="max-w-xl text-sm font-normal leading-7 text-[#465346]">
-              در دست‌به‌دست هر کمک تأییدشده یک حلقه واقعی می‌سازد؛ نه امتیاز و رتبه‌بندی رقابتی. وقتی کسی امروز دست دیگری را می‌گیرد، فردا همان هم‌شهری می‌تواند گره‌ای از کار دیگری باز کند.
-            </p>
+          <div className="rounded-2xl border border-brand-surface bg-white p-4 text-center">
+            <Link2 className="mx-auto mb-1.5 h-6 w-6 text-brand-gold" />
+            <div className="text-2xl font-extrabold text-brand-primary">
+              {toPersianDigits(data.summary.connected_chains)}
+            </div>
+            <div className="mt-0.5 text-xs font-medium text-brand-text/70">پیوندهای زنجیره‌ساز</div>
+          </div>
 
-            <div className="flex flex-wrap gap-2.5 pt-1">
+          <div className="rounded-2xl border border-brand-surface bg-white p-4 text-center">
+            <MapPin className="mx-auto mb-1.5 h-6 w-6 text-brand-green" />
+            <div className="text-2xl font-extrabold text-brand-primary">
+              {toPersianDigits(data.summary.cities_count)}
+            </div>
+            <div className="mt-0.5 text-xs font-medium text-brand-text/70">شهر فعال در زنجیره</div>
+          </div>
+        </section>
+      )}
+
+      {/* Real Kindness Links Visualization OR Empty State */}
+      {!data || data.links.length === 0 ? (
+        <EmptyState
+          icon={<HeartHandshake className="h-8 w-8 animate-soft-float" />}
+          title="زنجیره مهربانی منتظر اولین حلقه واقعی شماست"
+          description="هنوز هیچ همیاری تکمیل‌شده و تأییدشده‌ای ثبت نشده است. هیچ داده ساختگی اینجا نمایش داده نمی‌شود؛ با مشارکت در یک درخواست و تأیید تکمیل آن، اولین حلقه زنجیره را بسازید."
+          action={
+            <div className="flex flex-wrap justify-center gap-3">
               <Link
                 to="/requests"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#26734B]"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-brand-primary px-5 py-3 text-sm font-bold text-white hover:bg-brand-green"
               >
-                <HandHeart className="h-4 w-4 text-[#E9B949]" />
-                <span>ساخت حلقه جدید</span>
-              </Link>
-              <Link
-                to={user ? '/requests/new' : '/auth/register'}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2.5 text-sm font-semibold text-[#174D35] hover:border-[#78B98A]"
-              >
-                <span>{user ? 'ثبت درخواست کمک' : 'پیوستن به زنجیره'}</span>
+                کمک به دیگران
                 <ArrowLeft className="h-4 w-4" />
               </Link>
-            </div>
-          </div>
-
-          <KindnessIllustration
-            verifiedCount={data.summary.verified_helps}
-            connectedChains={data.summary.connected_chains}
-          />
-        </div>
-      </section>
-
-      {/* Real Computed Stats Summary */}
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#556455]">همیاری تأییدشده</span>
-            <CheckCircle2 className="h-4 w-4 text-[#26734B]" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-[#174D35]">
-            {toPersianDigits(data.summary.verified_helps)}
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#556455]">حلقه‌های پیوسته</span>
-            <Sparkles className="h-4 w-4 text-[#E9B949]" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-[#174D35]">
-            {toPersianDigits(data.summary.connected_chains)}
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#556455]">داوطلبان فعال</span>
-            <Users className="h-4 w-4 text-[#26734B]" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-[#174D35]">
-            {toPersianDigits(data.summary.unique_helpers)}
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#556455]">شهرهای مشارکت‌کننده</span>
-            <MapPin className="h-4 w-4 text-[#26734B]" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-[#174D35]">
-            {toPersianDigits(data.summary.cities_count)}
-          </div>
-        </div>
-      </section>
-
-      {/* Chain Links Timeline */}
-      <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 className="text-base font-bold text-[#174D35] sm:text-lg">
-              مسیر واقعی حلقه‌های ثبت‌شده
-            </h2>
-            <p className="text-xs font-normal text-[#556455]">
-              آخرین همیاری‌های تأییدشده توسط دریافت‌کننده و داوطلب
-            </p>
-          </div>
-          <span className="rounded-full bg-[#DCEBDD] px-3 py-1 text-xs font-semibold text-[#174D35]">
-            {toPersianDigits(data.links.length)} حلقه نمایش‌داده‌شده
-          </span>
-        </div>
-
-        {data.links.length === 0 ? (
-          <EmptyState
-            icon={Link2}
-            title="هنوز همیاری تکمیل‌شده‌ای ثبت نشده است"
-            description="اولین درخواست کمک تکمیل‌شده و تأییدشده، نخستین حلقه واقعی زنجیره مهربانی را اینجا روشن می‌کند."
-            action={
               <Link
-                to="/requests"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B]"
+                to="/requests/new"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-brand-primary bg-white px-5 py-3 text-sm font-bold text-brand-primary hover:bg-brand-surface/40"
               >
-                مشاهده درخواست‌های باز
+                <Plus className="h-4 w-4" />
+                ثبت درخواست کمک
               </Link>
-            }
-          />
-        ) : (
-          <div className="grid gap-3.5 sm:grid-cols-2">
+            </div>
+          }
+        />
+      ) : (
+        <section className="space-y-4">
+          <h2 className="text-base font-extrabold text-brand-primary">
+            حلقه‌های واقعی و تأییدشده مهربانی
+          </h2>
+          <div className="space-y-3.5">
             {data.links.map((link) => (
-              <article
+              <div
                 key={link.response_id}
-                className="flex flex-col justify-between gap-3.5 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-[0_2px_10px_rgba(23,77,53,0.03)] transition hover:border-[#78B98A] sm:p-5"
+                className="relative overflow-hidden rounded-2xl border border-brand-surface bg-white p-5 transition hover:border-brand-soft"
               >
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <CategoryBadge category={link.category} />
-                    {link.chain_continued && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[#E9B949]/25 px-2.5 py-1 text-[11px] font-bold text-[#6F4E06]">
-                        <Sparkles className="h-3 w-3 text-[#E9B949]" />
-                        ادامه زنجیره مهربانی
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Helper -> Recipient visual node */}
-                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-[#F6F7F2] p-3">
-                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                  {/* Helper -> Recipient visual link */}
+                  <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+                    <div className="flex items-center gap-2 rounded-xl bg-brand-surface/70 px-3 py-2">
                       {link.helper_avatar ? (
                         <ProtectedImage
                           src={link.helper_avatar}
                           alt={link.helper_name}
-                          wrapperClassName="relative block h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-[#DCEBDD]"
+                          wrapperClassName="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full"
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#174D35] text-xs font-bold text-white">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white">
                           {getInitials(link.helper_name)}
                         </div>
                       )}
-                      <div className="min-w-0">
-                        <div className="truncate text-xs font-semibold text-[#202820]">
-                          {link.helper_name}
-                        </div>
-                        <div className="text-[10px] font-normal text-[#556455]">یاری‌رسان</div>
+                      <div>
+                        <div className="text-[10px] font-semibold text-brand-green">داوطلب یاری‌گر</div>
+                        <div className="text-xs font-bold text-brand-primary">{link.helper_name}</div>
                       </div>
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-1 text-[#26734B]">
-                      <span className="h-px w-4 bg-[#78B98A]" />
-                      <ArrowLeft className="h-4 w-4" />
+                    <div className="flex items-center justify-center gap-1.5 py-0.5 text-brand-green sm:py-0">
+                      <ArrowDown className="h-4 w-4 text-brand-primary sm:hidden" />
+                      <span className="hidden h-2 w-2 rounded-full bg-brand-soft animate-pulse-ring sm:block" />
+                      <span className="hidden h-0.5 w-8 bg-brand-soft sm:block" />
+                      <ArrowLeft className="hidden h-4 w-4 text-brand-primary sm:block" />
                     </div>
 
-                    <div className="flex min-w-0 flex-1 items-center justify-end gap-2 text-left">
-                      <div className="min-w-0">
-                        <div className="truncate text-xs font-semibold text-[#202820]">
-                          {link.recipient_name}
-                        </div>
-                        <div className="text-[10px] font-normal text-[#556455]">هم‌شهری</div>
-                      </div>
+                    <div className="flex items-center gap-2 rounded-xl border border-brand-surface bg-brand-bg px-3 py-2">
                       {link.recipient_avatar ? (
                         <ProtectedImage
                           src={link.recipient_avatar}
                           alt={link.recipient_name}
-                          wrapperClassName="relative block h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-[#DCEBDD]"
+                          wrapperClassName="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full"
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#DCEBDD] text-xs font-bold text-[#174D35]">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-surface text-xs font-bold text-brand-primary">
                           {getInitials(link.recipient_name)}
                         </div>
                       )}
+                      <div>
+                        <div className="text-[10px] font-semibold text-brand-text/70">دریافت‌کننده کمک</div>
+                        <div className="text-xs font-bold text-brand-text">{link.recipient_name}</div>
+                      </div>
                     </div>
+
+                    {link.chain_continued && (
+                      <span className="inline-flex items-center justify-center gap-1 rounded-full border border-brand-gold/60 bg-brand-gold/15 px-2.5 py-1 text-[11px] font-bold text-brand-text">
+                        <Sparkles className="h-3.5 w-3.5 text-brand-gold" />
+                        ادامه‌دهنده زنجیره
+                      </span>
+                    )}
                   </div>
 
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CategoryBadge category={link.category} />
+                    <span className="rounded-full bg-brand-bg px-2.5 py-1 text-[11px] font-medium text-brand-text/80">
+                      {link.city} · {formatDateFa(link.completed_at)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-3 border-t border-brand-surface/50 pt-2.5 text-xs text-brand-text/80">
+                  موضوع همیاری:{' '}
                   <Link
                     to={`/requests/${link.request_id}`}
-                    className="block text-sm font-semibold leading-6 text-[#174D35] hover:text-[#26734B] hover:underline"
+                    className="font-bold text-brand-primary hover:underline"
                   >
                     {link.request_title}
                   </Link>
                 </div>
-
-                <div className="flex items-center justify-between border-t border-[#F6F7F2] pt-2.5 text-[11px] font-light text-[#556455]">
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5 text-[#26734B]" />
-                    {link.city}
-                  </span>
-                  <span>{formatDateFa(link.completed_at)}</span>
-                </div>
-              </article>
+              </div>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
     </div>
   );
 }

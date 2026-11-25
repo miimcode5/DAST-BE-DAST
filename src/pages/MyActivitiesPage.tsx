@@ -228,16 +228,16 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
 
   return (
     <div className="space-y-5 animate-fade-up">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-[0_2px_10px_rgba(23,77,53,0.03)] sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-bold text-[#174D35] sm:text-2xl">فعالیت‌های من</h1>
-          <p className="mt-1 text-xs font-normal text-[#505E50] sm:text-sm">
+          <h1 className="text-xl font-extrabold text-brand-primary">فعالیت‌های من</h1>
+          <p className="mt-1 text-sm text-brand-text/70">
             پیگیری درخواست‌ها، اعلام آمادگی‌های داوطلبانه، کمک‌های در جریان و موارد ذخیره‌شده
           </p>
         </div>
         <Link
           to="/requests/new"
-          className="inline-flex min-h-[42px] items-center gap-1.5 rounded-2xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B]"
+          className="inline-flex items-center gap-1.5 rounded-2xl bg-brand-primary px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-green"
         >
           <Plus className="h-4 w-4" />
           ثبت درخواست جدید
@@ -246,49 +246,49 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
 
       {/* Offline Pending Sync Queue */}
       {pendingOffline.length > 0 && (
-        <section className="space-y-3 rounded-3xl border border-[#E9B949] bg-amber-50/75 p-4 sm:p-5">
+        <section className="space-y-3 rounded-2xl border border-brand-gold/60 bg-white p-4 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-sm font-extrabold text-[#7A5807]">
-              <Clock className="h-4 w-4" />
+            <div className="flex items-center gap-2 text-sm font-extrabold text-brand-primary">
+              <Clock className="h-4 w-4 text-brand-gold" />
               <span>درخواست‌های در انتظار همگام‌سازی ({toPersianDigits(pendingOffline.length)})</span>
             </div>
             {isOnline && (
               <button
                 type="button"
                 onClick={() => void handleSyncNow()}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-3.5 py-1.5 text-xs font-bold text-white hover:bg-[#26734B]"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-brand-primary px-3.5 py-1.5 text-xs font-bold text-white hover:bg-brand-green"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
                 ارسال به سرور
               </button>
             )}
           </div>
-          <p className="text-xs text-[#6E5314]">
+          <p className="text-xs text-brand-text/75">
             این موارد هنوز در سرور ثبت نشده‌اند و پس از برقراری ارتباط پایدار ارسال می‌شوند.
           </p>
           <div className="space-y-2">
             {pendingOffline.map((item) => (
               <div
                 key={item.clientMutationId}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-white p-3.5"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-surface bg-brand-bg p-3.5"
               >
                 <div>
-                  <div className="text-sm font-bold text-[#202820]">{item.payload.title}</div>
-                  <div className="mt-0.5 text-xs text-[#556455]">
+                  <div className="text-sm font-bold text-brand-text">{item.payload.title}</div>
+                  <div className="mt-0.5 text-xs text-brand-text/70">
                     {CATEGORY_MAP[item.payload.category]?.label} · {item.payload.city} ({item.payload.area})
                   </div>
                   {item.lastError && (
-                    <div className="mt-1 text-xs font-medium text-rose-700">{item.lastError}</div>
+                    <div className="mt-1 text-xs font-medium text-brand-text">{item.lastError}</div>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-900">
+                  <span className="rounded-full border border-brand-gold/60 bg-white px-2.5 py-1 text-[11px] font-bold text-brand-text">
                     در انتظار همگام‌سازی
                   </span>
                   <button
                     type="button"
                     onClick={() => void handleRemovePending(item.clientMutationId)}
-                    className="rounded-lg p-1.5 text-rose-600 hover:bg-rose-50"
+                    className="rounded-lg p-1.5 text-brand-text/70 hover:bg-white hover:text-brand-text"
                     title="حذف از صف آفلاین"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -309,14 +309,14 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
             onClick={() => setTab(t.id)}
             className={`inline-flex shrink-0 items-center gap-2 rounded-2xl border px-4 py-2 text-xs font-bold transition ${
               tab === t.id
-                ? 'border-[#174D35] bg-[#174D35] text-white shadow-xs'
-                : 'border-[#DCEBDD] bg-white text-[#202820] hover:border-[#78B98A]'
+                ? 'border-brand-primary bg-brand-primary text-white'
+                : 'border-brand-surface bg-white text-brand-text hover:border-brand-soft'
             }`}
           >
             <span>{t.label}</span>
             <span
               className={`rounded-full px-2 py-0.5 text-[11px] ${
-                tab === t.id ? 'bg-white/20 text-white' : 'bg-[#DCEBDD]/70 text-[#174D35]'
+                tab === t.id ? 'bg-white/20 text-white' : 'bg-brand-surface/70 text-brand-primary'
               }`}
             >
               {toPersianDigits(t.count)}
@@ -326,7 +326,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
       </div>
 
       {errorMsg && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+        <div className="rounded-xl border border-brand-text/30 bg-white px-4 py-3 text-sm text-brand-text">
           {errorMsg}
         </div>
       )}
@@ -342,7 +342,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
               action={
                 <Link
                   to="/requests/new"
-                  className="rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B]"
+                  className="rounded-2xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-green"
                 >
                   ثبت درخواست کمک
                 </Link>
@@ -374,7 +374,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
               action={
                 <Link
                   to="/requests"
-                  className="rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B]"
+                  className="rounded-2xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-green"
                 >
                   مشاهده درخواست‌ها
                 </Link>
@@ -387,29 +387,29 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                 .map((resp) => (
                   <div
                     key={resp.id}
-                    className="flex flex-col justify-between gap-3.5 rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:flex-row sm:items-center sm:gap-4 sm:p-5"
+                    className="flex flex-col justify-between gap-3.5 rounded-2xl border border-brand-surface bg-white p-4 sm:flex-row sm:items-center sm:gap-4 sm:p-5"
                   >
                     <div className="min-w-0 space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <ResponseStatusBadge status={resp.status} />
                         {resp.request && <CategoryBadge category={resp.request.category} />}
-                        <span className="text-xs text-[#667466]">
+                        <span className="text-xs text-brand-text/70">
                           {formatRelativeTimeFa(resp.updated_at)}
                         </span>
                       </div>
                       <Link
                         to={`/requests/${resp.request_id}`}
-                        className="block text-[15px] font-bold text-[#174D35] hover:underline sm:text-base"
+                        className="block text-[15px] font-bold text-brand-primary hover:underline sm:text-base"
                       >
                         {resp.request?.title ?? 'مشاهده درخواست'}
                       </Link>
                       {resp.request && (
-                        <p className="text-xs text-[#556455]">
+                        <p className="text-xs text-brand-text/70">
                           {resp.request.city}، {resp.request.area} · ثبت‌کننده: {resp.request.requester_name}
                         </p>
                       )}
                       {resp.message && (
-                        <p className="rounded-xl bg-[#F6F7F2] px-3 py-2 text-xs text-[#202820]">
+                        <p className="rounded-xl bg-brand-bg px-3 py-2 text-xs text-brand-text">
                           پیام شما: {resp.message}
                         </p>
                       )}
@@ -419,19 +419,19 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                       <button
                         type="button"
                         onClick={() => void openChatForResponse(resp.id)}
-                        className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] sm:flex-initial"
+                        className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-primary px-4 py-2 text-xs font-bold text-white hover:bg-brand-green sm:flex-initial"
                       >
-                        <MessageCircle className="h-3.5 w-3.5 text-[#E9B949]" />
+                        <MessageCircle className="h-3.5 w-3.5 text-brand-gold" />
                         <span>ادامه گفت‌وگو</span>
                         {(convByResponseId[resp.id]?.unread_count ?? 0) > 0 && (
-                          <span className="rounded-full bg-[#E9B949] px-1.5 py-0.5 text-[10px] font-extrabold text-[#174D35]">
+                          <span className="rounded-full bg-brand-gold px-1.5 py-0.5 text-[10px] font-extrabold text-brand-primary">
                             {toPersianDigits(convByResponseId[resp.id].unread_count)}
                           </span>
                         )}
                       </button>
                       <Link
                         to={`/requests/${resp.request_id}`}
-                        className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-xl bg-[#DCEBDD]/80 px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#174D35] hover:text-white sm:flex-initial"
+                        className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-xl bg-brand-surface/80 px-4 py-2 text-xs font-bold text-brand-primary hover:bg-brand-primary hover:text-white sm:flex-initial"
                       >
                         صفحه درخواست
                       </Link>
@@ -439,7 +439,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                         <button
                           type="button"
                           onClick={() => setWithdrawTargetId(resp.id)}
-                          className="min-h-[40px] w-full rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 sm:w-auto"
+                          className="min-h-[40px] w-full rounded-xl border border-brand-text/25 bg-white px-3.5 py-2 text-xs font-bold text-brand-text hover:bg-brand-bg sm:w-auto"
                         >
                           لغو اعلام آمادگی
                         </button>
@@ -464,7 +464,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
             <>
               {inProgressItems.asRequester.length > 0 && (
                 <div className="space-y-3">
-                  <h2 className="text-sm font-extrabold text-[#174D35]">
+                  <h2 className="text-sm font-extrabold text-brand-primary">
                     درخواست‌های در جریان شما (به‌عنوان درخواست‌کننده)
                   </h2>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -481,7 +481,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                                   ? `/messages/${activeConv.id}`
                                   : `/requests/${req.id}`
                               }
-                              className="flex items-center justify-center gap-1.5 rounded-2xl border border-[#78B98A] bg-[#DCEBDD]/60 px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]"
+                              className="flex items-center justify-center gap-1.5 rounded-2xl border border-brand-soft bg-brand-surface/60 px-4 py-2 text-xs font-bold text-brand-primary hover:bg-brand-surface"
                             >
                               <MessageCircle className="h-3.5 w-3.5" />
                               <span>
@@ -498,25 +498,25 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
 
               {inProgressItems.asVolunteer.length > 0 && (
                 <div className="space-y-3">
-                  <h2 className="text-sm font-extrabold text-[#174D35]">
+                  <h2 className="text-sm font-extrabold text-brand-primary">
                     کمک‌های در جریان شما (به‌عنوان داوطلب)
                   </h2>
                   <div className="space-y-3">
                     {inProgressItems.asVolunteer.map((resp) => (
                       <div
                         key={resp.id}
-                        className="flex flex-col justify-between gap-3 rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:flex-row sm:items-center sm:p-5"
+                        className="flex flex-col justify-between gap-3 rounded-2xl border border-brand-surface bg-white p-4 sm:flex-row sm:items-center sm:p-5"
                       >
                         <div>
                           <div className="mb-1 flex items-center gap-2">
                             <ResponseStatusBadge status={resp.status} />
-                            <span className="text-xs text-[#556455]">
+                            <span className="text-xs text-brand-text/70">
                               {resp.request?.city} · {resp.request?.area}
                             </span>
                           </div>
                           <Link
                             to={`/requests/${resp.request_id}`}
-                            className="text-[15px] font-bold text-[#174D35] hover:underline sm:text-base"
+                            className="text-[15px] font-bold text-brand-primary hover:underline sm:text-base"
                           >
                             {resp.request?.title ?? 'جزئیات همکاری'}
                           </Link>
@@ -525,19 +525,19 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                           <button
                             type="button"
                             onClick={() => void openChatForResponse(resp.id)}
-                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] sm:flex-initial"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-primary px-4 py-2 text-xs font-bold text-white hover:bg-brand-green sm:flex-initial"
                           >
-                            <MessageCircle className="h-3.5 w-3.5 text-[#E9B949]" />
+                            <MessageCircle className="h-3.5 w-3.5 text-brand-gold" />
                             <span>ادامه گفت‌وگو</span>
                             {(convByResponseId[resp.id]?.unread_count ?? 0) > 0 && (
-                              <span className="rounded-full bg-[#E9B949] px-1.5 py-0.5 text-[10px] font-extrabold text-[#174D35]">
+                              <span className="rounded-full bg-brand-gold px-1.5 py-0.5 text-[10px] font-extrabold text-brand-primary">
                                 {toPersianDigits(convByResponseId[resp.id].unread_count)}
                               </span>
                             )}
                           </button>
                           <Link
                             to={`/requests/${resp.request_id}`}
-                            className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2 text-xs font-bold text-[#174D35] hover:border-[#78B98A] sm:flex-initial"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-xl border border-brand-surface bg-brand-bg px-4 py-2 text-xs font-bold text-brand-primary hover:border-brand-soft sm:flex-initial"
                           >
                             مدیریت همکاری
                           </Link>
@@ -564,7 +564,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
             <>
               {completedItems.asRequester.length > 0 && (
                 <div className="space-y-3">
-                  <h2 className="text-sm font-extrabold text-[#174D35]">
+                  <h2 className="text-sm font-extrabold text-brand-primary">
                     درخواست‌های تکمیل‌شده من
                   </h2>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -577,25 +577,25 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
 
               {completedItems.asVolunteer.length > 0 && (
                 <div className="space-y-3">
-                  <h2 className="text-sm font-extrabold text-[#174D35]">
+                  <h2 className="text-sm font-extrabold text-brand-primary">
                     کمک‌هایی که به‌عنوان داوطلب تکمیل کردید
                   </h2>
                   <div className="space-y-3">
                     {completedItems.asVolunteer.map((resp) => (
                       <div
                         key={resp.id}
-                        className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-emerald-200 bg-white p-5"
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-soft bg-white p-5"
                       >
                         <div>
                           <div className="mb-1 flex items-center gap-2">
                             <ResponseStatusBadge status={resp.status} />
-                            <span className="text-xs text-[#556455]">
+                            <span className="text-xs text-brand-text/70">
                               {formatRelativeTimeFa(resp.updated_at)}
                             </span>
                           </div>
                           <Link
                             to={`/requests/${resp.request_id}`}
-                            className="text-base font-bold text-[#174D35] hover:underline"
+                            className="text-base font-bold text-brand-primary hover:underline"
                           >
                             {resp.request?.title ?? 'مشاهده جزئیات'}
                           </Link>
@@ -604,14 +604,14 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                           <button
                             type="button"
                             onClick={() => void openChatForResponse(resp.id)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-3.5 py-2 text-xs font-bold text-[#174D35] hover:border-[#78B98A]"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-brand-surface bg-brand-bg px-3.5 py-2 text-xs font-bold text-brand-primary hover:border-brand-soft"
                           >
                             <MessageCircle className="h-3.5 w-3.5" />
                             تاریخچه گفت‌وگو
                           </button>
                           <Link
                             to="/kindness-chain"
-                            className="rounded-xl bg-[#DCEBDD] px-4 py-2 text-xs font-bold text-[#174D35]"
+                            className="rounded-xl bg-brand-surface px-4 py-2 text-xs font-bold text-brand-primary"
                           >
                             مشاهده در زنجیره مهربانی
                           </Link>
@@ -636,7 +636,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
               action={
                 <Link
                   to="/requests"
-                  className="rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white"
+                  className="rounded-2xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white"
                 >
                   مرور درخواست‌ها
                 </Link>
@@ -671,23 +671,23 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
               {cancelledItems.reqs.map((req) => (
                 <div
                   key={req.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#DCEBDD] bg-white p-4"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-surface bg-white p-4"
                 >
                   <div>
                     <div className="mb-1 flex items-center gap-2">
                       <RequestStatusBadge status={req.status} />
-                      <span className="text-xs text-[#667466]">{req.city}</span>
+                      <span className="text-xs text-brand-text/70">{req.city}</span>
                     </div>
                     <Link
                       to={`/requests/${req.id}`}
-                      className="text-sm font-bold text-[#202820] hover:text-[#174D35]"
+                      className="text-sm font-bold text-brand-text hover:text-brand-primary"
                     >
                       {req.title}
                     </Link>
                   </div>
                   <Link
                     to={`/requests/${req.id}`}
-                    className="rounded-xl border border-[#DCEBDD] px-3.5 py-2 text-xs font-bold text-[#174D35]"
+                    className="rounded-xl border border-brand-surface px-3.5 py-2 text-xs font-bold text-brand-primary"
                   >
                     جزئیات / بازگشایی
                   </Link>
@@ -697,18 +697,18 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
               {cancelledItems.resps.map((resp) => (
                 <div
                   key={resp.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#DCEBDD] bg-white p-4"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-surface bg-white p-4"
                 >
                   <div>
                     <div className="mb-1 flex items-center gap-2">
                       <ResponseStatusBadge status={resp.status} />
-                      <span className="text-xs text-[#667466]">
+                      <span className="text-xs text-brand-text/70">
                         {formatRelativeTimeFa(resp.updated_at)}
                       </span>
                     </div>
                     <Link
                       to={`/requests/${resp.request_id}`}
-                      className="text-sm font-bold text-[#202820] hover:text-[#174D35]"
+                      className="text-sm font-bold text-brand-text hover:text-brand-primary"
                     >
                       {resp.request?.title ?? 'درخواست مرتبط'}
                     </Link>
@@ -717,14 +717,14 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                     <button
                       type="button"
                       onClick={() => void openChatForResponse(resp.id)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-3.5 py-2 text-xs font-bold text-[#174D35]"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-brand-surface bg-brand-bg px-3.5 py-2 text-xs font-bold text-brand-primary"
                     >
                       <MessageCircle className="h-3.5 w-3.5" />
                       تاریخچه گفت‌وگو
                     </button>
                     <Link
                       to={`/requests/${resp.request_id}`}
-                      className="rounded-xl border border-[#DCEBDD] px-3.5 py-2 text-xs font-bold text-[#174D35]"
+                      className="rounded-xl border border-brand-surface px-3.5 py-2 text-xs font-bold text-brand-primary"
                     >
                       مشاهده درخواست
                     </Link>

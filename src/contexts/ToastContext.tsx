@@ -39,10 +39,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       >
         {toasts.map((toast) => {
           const styles: Record<ToastTone, string> = {
-            success: 'border-[#78B98A] bg-[#174D35] text-white',
-            error: 'border-rose-300 bg-rose-700 text-white',
-            warning: 'border-[#E9B949] bg-[#FFFBEB] text-[#7A5807]',
-            info: 'border-[#DCEBDD] bg-white text-[#202820]',
+            success: 'border-brand-soft bg-brand-primary text-white',
+            error: 'border-brand-text bg-brand-text text-white',
+            warning: 'border-brand-gold/70 bg-white text-brand-text',
+            info: 'border-brand-surface bg-white text-brand-text',
           };
 
           const Icon =
@@ -56,7 +56,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={toast.id}
               role="status"
-              className={`pointer-events-auto flex w-full max-w-sm items-start gap-2.5 rounded-2xl border px-4 py-3 text-sm font-medium shadow-lg transition-all animate-fade-up ${styles[toast.tone]}`}
+              className={`pointer-events-auto flex w-full max-w-sm items-start gap-2.5 rounded-2xl border px-4 py-3 text-sm font-medium shadow-sm transition-all animate-fade-up ${styles[toast.tone]}`}
             >
               <Icon className="mt-0.5 h-5 w-5 shrink-0" />
               <p className="flex-1 leading-6">{toast.message}</p>

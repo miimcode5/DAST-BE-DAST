@@ -40,14 +40,14 @@ function RecoveryWatcher() {
 function NotFoundPage() {
   return (
     <div className="mx-auto max-w-md py-10 text-center">
-      <div className="rounded-3xl border border-[#DCEBDD] bg-white p-8">
-        <h1 className="mb-2 text-2xl font-extrabold text-[#174D35]">صفحه پیدا نشد</h1>
-        <p className="mb-5 text-sm text-[#556455]">
+      <div className="rounded-2xl border border-brand-surface bg-white p-8">
+        <h1 className="mb-2 text-2xl font-extrabold text-brand-primary">صفحه پیدا نشد</h1>
+        <p className="mb-5 text-sm text-brand-text/70">
           نشانی موردنظر وجود ندارد یا جابه‌جا شده است.
         </p>
         <Link
           to="/"
-          className="inline-flex rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B]"
+          className="inline-flex rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-green"
         >
           بازگشت به خانه
         </Link>

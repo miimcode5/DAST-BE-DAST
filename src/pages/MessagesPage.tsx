@@ -1,203 +1,333 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  HandHelping,
+  CheckCheck,
   MessageCircle,
   Search,
-  ShieldCheck,
   Sparkles,
+  WifiOff,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ConversationListPane } from '../components/ConversationListPane';
-import { EmptyState } from '../components/EmptyState';
-import { ListRowSkeleton } from '../components/LoadingState';
+import { LoadingState } from '../components/LoadingState';
+import { ProtectedImage } from '../components/ProtectedImage';
+import { CategoryBadge, ConversationStatusBadge } from '../components/StatusBadge';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
-import { toPersianDigits } from '../lib/formatters';
-import { supabase } from '../lib/supabase';
+import { usePwa } from '../contexts/PwaContext';
+import { formatRelativeTimeFa, getInitials, toPersianDigits } from '../lib/formatters';
 import { getMyConversations } from '../services/chatService';
 import type { ConversationItem } from '../types/database';
 
+type FilterTab = 'all' | 'unread' | 'active';
+
+function ChatEmptyIllustration() {
+  return (
+    <div className="mx-auto mb-5 flex h-28 w-28 items-center justify-center rounded-full bg-brand-surface/70 p-4">
+      <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
+        <rect x="14" y="20" width="64" height="44" rx="14" fill="var(--color-primary)" />
+        <path d="M28 64 L22 76 L40 64 Z" fill="var(--color-primary)" />
+        <circle cx="34" cy="42" r="4" fill="var(--color-surface-green)" />
+        <circle cx="46" cy="42" r="4" fill="var(--color-surface-green)" />
+        <circle cx="58" cy="42" r="4" fill="var(--color-surface-green)" />
+
+        <rect x="42" y="54" width="64" height="42" rx="14" fill="var(--color-white)" stroke="var(--color-soft-green)" strokeWidth="3" />
+        <path d="M92 96 L98 106 L80 96 Z" fill="var(--color-white)" stroke="var(--color-soft-green)" strokeWidth="3" strokeLinejoin="round" />
+        <rect x="54" y="68" width="40" height="5" rx="2.5" fill="var(--color-green)" opacity="0.85" />
+        <rect x="64" y="79" width="30" height="5" rx="2.5" fill="var(--color-soft-green)" />
+        <circle cx="98" cy="24" r="6" fill="var(--color-gold)" />
+      </svg>
+    </div>
+  );
+}
+
 export function MessagesPage() {
   const { user } = useAuth();
-  const { refreshUnreadCount } = useChat();
+  const { chatRevision, unreadCount } = useChat();
+  const { isOnline } = usePwa();
 
-  const [items, setItems] = useState<ConversationItem[]>([]);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [fromOfflineCache, setFromOfflineCache] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [unreadOnly, setUnreadOnly] = useState(false);
+  const [filterTab, setFilterTab] = useState<FilterTab>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const loadConversations = useCallback(async () => {
-    if (!user) return;
-    setErrorMsg(null);
-    try {
-      const res = await getMyConversations(user.id);
-      setItems(res.items);
-      setFromOfflineCache(res.fromOfflineCache);
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'خطا در بارگذاری گفت‌وگوها');
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    void loadConversations();
-    void refreshUnreadCount();
-  }, [loadConversations, refreshUnreadCount]);
-
-  useEffect(() => {
-    if (!user) return;
-    const channel = supabase
-      .channel(`messages-list-${user.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
-        void loadConversations();
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, () => {
-        void loadConversations();
-      })
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [user, loadConversations]);
-
-  const filteredItems = useMemo(() => {
-    const q = search.trim();
-    return items.filter((item) => {
-      if (unreadOnly && item.unread_count === 0) return false;
-      if (!q) return true;
-      return (
-        item.other_user_name.includes(q) ||
-        item.request_title.includes(q) ||
-        (item.last_message_preview?.includes(q) ?? false)
-      );
-    });
-  }, [items, search, unreadOnly]);
-
-  const totalUnread = useMemo(
-    () => items.reduce((sum, item) => sum + item.unread_count, 0),
-    [items]
+  const loadConversations = useCallback(
+    async (silent = false) => {
+      if (!user) return;
+      if (!silent) setLoading(true);
+      setErrorMsg(null);
+      try {
+        const { items, fromOfflineCache: cached } = await getMyConversations(user.id);
+        setConversations(items);
+        setFromOfflineCache(cached);
+      } catch (err) {
+        setErrorMsg(err instanceof Error ? err.message : 'خطا در دریافت فهرست گفت‌وگوها');
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    },
+    [user]
   );
 
+  useEffect(() => {
+    void loadConversations(false);
+  }, [loadConversations]);
+
+  // Real-time refresh without page reload when messages or conversations update
+  useEffect(() => {
+    if (chatRevision > 0) {
+      void loadConversations(true);
+    }
+  }, [chatRevision, loadConversations]);
+
+  const filteredConversations = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return conversations.filter((conv) => {
+      if (filterTab === 'unread' && conv.unread_count === 0) return false;
+      if (filterTab === 'active' && conv.status !== 'active') return false;
+      if (!q) return true;
+      return (
+        conv.other_user_name.toLowerCase().includes(q) ||
+        conv.request_title.toLowerCase().includes(q) ||
+        (conv.last_message_preview ?? '').toLowerCase().includes(q)
+      );
+    });
+  }, [conversations, filterTab, searchQuery]);
+
+  if (loading) {
+    return <LoadingState label="در حال بارگذاری گفت‌وگوهای خصوصی..." />;
+  }
+
   return (
-    <div className="space-y-5 animate-fade-up">
-      {/* Header */}
-      <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-[0_2px_10px_rgba(23,77,53,0.03)] sm:p-6">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#26734B]">
-            <MessageCircle className="h-4 w-4 text-[#E9B949]" />
-            <span>گفت‌وگوهای خصوصی</span>
+    <div className="mx-auto max-w-3xl space-y-5 animate-fade-up">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-extrabold text-brand-primary">پیام‌ها</h1>
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-brand-primary px-2.5 py-0.5 text-xs font-bold text-white">
+                {toPersianDigits(unreadCount)} خوانده‌نشده
+              </span>
+            )}
           </div>
-          <h1 className="text-lg font-bold text-[#174D35] sm:text-2xl">پیام‌ها و هماهنگی</h1>
-          <p className="text-xs font-normal text-[#505E50] sm:text-sm">
-            گفت‌وگوها مستقیماً برای هر اعلام آمادگی ساخته می‌شوند تا با آرامش هماهنگ شوید.
+          <p className="mt-1 text-sm text-brand-text/70">
+            گفت‌وگوهای خصوصی و مجزا برای هر درخواست کمک و هر داوطلب
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {totalUnread > 0 && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E9B949]/25 px-3 py-1.5 text-xs font-bold text-[#6F4E06]">
-              <span>{toPersianDigits(totalUnread)} پیام خوانده‌نشده</span>
-            </span>
-          )}
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#F6F7F2] px-3 py-1.5 text-xs font-medium text-[#174D35]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#26734B]" />
-            <span>گفت‌وگوی امن و خصوصی</span>
-          </div>
-        </div>
-      </header>
+        <Link
+          to="/requests"
+          className="inline-flex items-center gap-1.5 rounded-2xl border border-brand-surface bg-white px-4 py-2 text-xs font-bold text-brand-primary hover:border-brand-soft"
+        >
+          <Sparkles className="h-4 w-4 text-brand-gold" />
+          مرور درخواست‌ها
+        </Link>
+      </div>
 
-      {fromOfflineCache && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-medium text-amber-900">
-          در حال نمایش فهرست ذخیره‌شده گفت‌وگوها در حالت آفلاین هستید. برای مشاهده پیام‌های جدید به اینترنت متصل شوید.
+      {(!isOnline || fromOfflineCache) && (
+        <div className="flex items-center gap-2 rounded-xl border border-brand-soft/60 bg-brand-surface/50 px-4 py-3 text-xs font-medium text-brand-primary">
+          <WifiOff className="h-4 w-4 shrink-0" />
+          <span>
+            نسخه ذخیره‌شده گفت‌وگوها نمایش داده می‌شود. برای دریافت پیام‌های لحظه‌ای و ارسال پیام، اینترنت را متصل کنید.
+          </span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-800 sm:text-sm">
-          {errorMsg}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-text/30 bg-white px-4 py-3 text-sm text-brand-text">
+          <span>{errorMsg}</span>
+          <button
+            type="button"
+            onClick={() => void loadConversations(false)}
+            className="rounded-xl bg-brand-primary px-3.5 py-1.5 text-xs font-bold text-white hover:bg-brand-green"
+          >
+            تلاش مجدد
+          </button>
         </div>
       )}
 
-      {loading ? (
-        <div className="space-y-2.5">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <ListRowSkeleton key={idx} />
-          ))}
-        </div>
-      ) : items.length === 0 ? (
-        <EmptyState
-          icon={MessageCircle}
-          title="هنوز گفت‌وگویی آغاز نشده است"
-          description="وقتی برای درخواستی اعلام آمادگی کنید یا داوطلبی برای درخواست شما پیام بگذارد، گفت‌وگوی خصوصی آن اینجا نمایش داده می‌شود."
-          action={
-            <Link
-              to="/requests"
-              className="inline-flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B]"
-            >
-              <HandHelping className="h-4 w-4 text-[#E9B949]" />
-              مشاهده درخواست‌های نیازمند کمک
-            </Link>
-          }
-        />
-      ) : (
-        <div className="grid gap-5 lg:grid-cols-[390px_1fr] lg:items-start">
-          {/* Conversation list */}
-          <div className="space-y-3">
-            {/* Search & unread filter */}
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#627062]" />
-                <input
-                  type="search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="جست‌وجو در نام یا عنوان..."
-                  className="min-h-[42px] w-full rounded-2xl border border-[#DCEBDD] bg-white pr-10 pl-3 text-xs font-normal outline-none focus:border-[#26734B] sm:text-sm"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setUnreadOnly((v) => !v)}
-                className={`min-h-[42px] shrink-0 rounded-2xl border px-3.5 text-xs font-semibold transition ${
-                  unreadOnly
-                    ? 'border-[#174D35] bg-[#174D35] text-white'
-                    : 'border-[#DCEBDD] bg-white text-[#202820] hover:border-[#78B98A]'
-                }`}
-              >
-                خوانده‌نشده
-              </button>
-            </div>
-
-            {filteredItems.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[#DCEBDD] bg-white p-6 text-center text-xs text-[#556455]">
-                گفت‌وگویی با این فیلتر پیدا نشد.
-              </div>
-            ) : (
-              <ConversationListPane
-                items={filteredItems}
-                loading={false}
-                currentUserId={user?.id}
-              />
-            )}
+      {conversations.length > 0 && (
+        <div className="space-y-3 rounded-2xl border border-brand-surface bg-white p-3.5 sm:p-4">
+          <div className="relative">
+            <Search className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-text/70" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="جست‌وجو بر اساس نام، درخواست یا متن پیام..."
+              className="min-h-[44px] w-full rounded-2xl border border-brand-surface bg-brand-bg/70 py-2.5 pr-10 pl-4 text-[15px] outline-none focus:border-brand-green focus:bg-white sm:text-sm"
+            />
           </div>
 
-          {/* Desktop split welcome pane */}
-          <aside className="hidden rounded-3xl border border-[#DCEBDD] bg-white p-8 text-center lg:block">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#DCEBDD]/70 text-[#174D35]">
-              <Sparkles className="h-7 w-7 text-[#26734B]" />
-            </div>
-            <h2 className="text-base font-bold text-[#174D35]">یک گفت‌وگو را انتخاب کنید</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm font-normal leading-7 text-[#505E50]">
-              با انتخاب هر مورد از فهرست سمت راست، گفت‌وگوی خصوصی باز می‌شود و می‌توانید زمان، مکان و جزئیات همیاری را با آرامش هماهنگ کنید.
-            </p>
-            <div className="mx-auto mt-6 max-w-sm rounded-2xl bg-[#F6F7F2] px-4 py-3 text-xs leading-6 text-[#344634]">
-              شماره تماس و اطلاعات شخصی خود را فقط در صورت اطمینان کامل و نیاز واقعی در گفت‌وگو به اشتراک بگذارید.
-            </div>
-          </aside>
+          <div className="no-scrollbar flex flex-nowrap gap-2 overflow-x-auto pb-0.5 sm:flex-wrap">
+            {(
+              [
+                { id: 'all', label: 'همه گفت‌وگوها', count: conversations.length },
+                {
+                  id: 'unread',
+                  label: 'خوانده‌نشده',
+                  count: conversations.filter((c) => c.unread_count > 0).length,
+                },
+                {
+                  id: 'active',
+                  label: 'فعال',
+                  count: conversations.filter((c) => c.status === 'active').length,
+                },
+              ] as { id: FilterTab; label: string; count: number }[]
+            ).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setFilterTab(t.id)}
+                className={`inline-flex min-h-[36px] shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition ${
+                  filterTab === t.id
+                    ? 'border-brand-primary bg-brand-primary text-white'
+                    : 'border-brand-surface bg-brand-bg text-brand-text hover:border-brand-soft'
+                }`}
+              >
+                <span>{t.label}</span>
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] ${
+                    filterTab === t.id ? 'bg-white/20 text-white' : 'bg-brand-surface text-brand-primary'
+                  }`}
+                >
+                  {toPersianDigits(t.count)}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {conversations.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-brand-soft/70 bg-white px-6 py-12 text-center">
+          <ChatEmptyIllustration />
+          <h2 className="text-lg font-extrabold text-brand-primary">هنوز گفت‌وگویی آغاز نشده است</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-brand-text/75">
+            وقتی برای یک درخواست کمک گزینه «من می‌توانم کمک کنم» را ثبت کنید یا داوطلبی برای درخواست شما اعلام آمادگی کند، گفت‌وگوی خصوصی و لحظه‌ای شما اینجا ساخته می‌شود.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link
+              to="/requests"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-primary px-5 py-3 text-sm font-bold text-white hover:bg-brand-green"
+            >
+              <MessageCircle className="h-4 w-4" />
+              مشاهده درخواست‌های کمک
+            </Link>
+            <Link
+              to="/requests/new"
+              className="inline-flex items-center gap-2 rounded-xl border border-brand-primary px-5 py-3 text-sm font-bold text-brand-primary hover:bg-brand-surface/40"
+            >
+              ثبت درخواست جدید
+            </Link>
+          </div>
+        </div>
+      ) : filteredConversations.length === 0 ? (
+        <div className="rounded-2xl border border-brand-surface bg-white p-8 text-center">
+          <p className="text-sm font-semibold text-brand-text/75">
+            گفت‌وگویی با این فیلتر یا عبارت جست‌وجو پیدا نشد.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredConversations.map((conv) => {
+            const isRequester = conv.requester_id === user?.id;
+            const roleLabel = isRequester ? 'داوطلب' : 'درخواست‌کننده';
+            const lastTime = conv.last_message_at ?? conv.created_at;
+            const sentByMe = conv.last_message_sender_id === user?.id;
+
+            return (
+              <Link
+                key={conv.id}
+                to={`/messages/${conv.id}`}
+                className={`block rounded-2xl border bg-white p-4 transition hover:border-brand-soft hover:shadow-xs sm:p-5 ${
+                  conv.unread_count > 0
+                    ? 'border-brand-green ring-1 ring-brand-soft/40'
+                    : 'border-brand-surface'
+                }`}
+              >
+                <div className="flex items-start gap-3.5">
+                  {/* Avatar */}
+                  <div className="relative shrink-0">
+                    {conv.other_user_avatar ? (
+                      <ProtectedImage
+                        src={conv.other_user_avatar}
+                        alt={conv.other_user_name}
+                        wrapperClassName="relative block h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-brand-surface"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-surface text-sm font-extrabold text-brand-primary">
+                        {getInitials(conv.other_user_name)}
+                      </div>
+                    )}
+                    {conv.unread_count > 0 && (
+                      <span className="absolute -left-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1.5 text-[11px] font-extrabold text-white ring-2 ring-white">
+                        {toPersianDigits(conv.unread_count)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Body */}
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                        <span className="truncate text-sm font-extrabold text-brand-text">
+                          {conv.other_user_name}
+                        </span>
+                        <span className="shrink-0 rounded-lg bg-brand-bg px-2 py-0.5 text-[10px] font-semibold text-brand-green">
+                          {roleLabel}
+                        </span>
+                      </div>
+                      <span className="shrink-0 text-[11px] font-medium text-brand-text/70">
+                        {formatRelativeTimeFa(lastTime)}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="truncate text-xs font-bold text-brand-primary">
+                        {conv.request_title}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <CategoryBadge category={conv.request_category} />
+                        <ConversationStatusBadge status={conv.status} />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 pt-0.5">
+                      <p
+                        className={`truncate text-xs leading-6 ${
+                          conv.unread_count > 0
+                            ? 'font-bold text-brand-text'
+                            : 'text-brand-text/70'
+                        }`}
+                      >
+                        {conv.last_message_preview ? (
+                          <>
+                            {sentByMe && (
+                              <span className="ml-1 inline-flex items-center gap-0.5 text-brand-green">
+                                <CheckCheck className="inline h-3.5 w-3.5" />
+                                شما:
+                              </span>
+                            )}
+                            {conv.last_message_preview}
+                          </>
+                        ) : (
+                          'گفت‌وگو ایجاد شد — برای هماهنگی پیام بنویسید'
+                        )}
+                      </p>
+
+                      {conv.unread_count > 0 && (
+                        <span className="shrink-0 rounded-full border border-brand-gold/60 bg-brand-gold/15 px-2 py-0.5 text-[10px] font-extrabold text-brand-text">
+                          پیام جدید
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
