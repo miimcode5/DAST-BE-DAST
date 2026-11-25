@@ -101,3 +101,16 @@ export function detectSensitivePrivacyText(text: string): {
 
   return { hasPhoneNumber, hasExactAddressHint };
 }
+
+export const MAX_CHAT_MESSAGE_LENGTH = 2000;
+
+export function validateChatMessage(content: string): string | null {
+  const trimmed = content.trim();
+  if (!trimmed) {
+    return 'لطفاً متن پیام را بنویسید.';
+  }
+  if (trimmed.length > MAX_CHAT_MESSAGE_LENGTH) {
+    return 'طول پیام نباید بیش از ۲۰۰۰ کاراکتر باشد.';
+  }
+  return null;
+}

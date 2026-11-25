@@ -1,10 +1,11 @@
 /**
  * Architecture extension types reserved for future versions (v2+):
- * - Abuse / Violation Reporting (Section 6.8 & 23.9)
+ * - General Request / Profile Violation Reporting (Section 6.8 & 23.9)
  * - Achievements & Non-monetary Points (Section 8 & 21)
- * - Notifications & Group Activities (Section 21 & 32)
+ * - Web Push Notifications & Group Activities (Section 21 & 32)
  *
- * Kept strictly as typed contracts in MVP to avoid premature schema bloat (Section 21).
+ * Note: Real-time Private Chat & Conversation Reporting (`conversations`, `messages`,
+ * `conversation_reports`) have been promoted and implemented as core MVP features.
  */
 
 export type ReportTargetType = 'request' | 'profile' | 'response';

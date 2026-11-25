@@ -133,3 +133,65 @@ export interface KindnessChainData {
   };
   links: KindnessChainLink[];
 }
+
+export type ConversationStatus = 'active' | 'completed' | 'cancelled' | 'closed';
+
+export type ConversationReportReason =
+  | 'harassment'
+  | 'privacy_violation'
+  | 'spam'
+  | 'fraud'
+  | 'other';
+
+export interface ConversationItem {
+  id: string;
+  request_id: string;
+  response_id: string | null;
+  requester_id: string;
+  volunteer_id: string;
+  status: ConversationStatus;
+  last_message_preview: string | null;
+  last_message_at: string | null;
+  last_message_sender_id: string | null;
+  created_at: string;
+  updated_at: string;
+  request_title: string;
+  request_status: RequestStatus;
+  request_category: HelpCategory;
+  request_city: string;
+  response_status: ResponseStatus | null;
+  other_user_id: string;
+  other_user_name: string;
+  other_user_avatar: string | null;
+  other_user_city: string | null;
+  other_user_completed_helps: number;
+  unread_count: number;
+}
+
+export interface ChatMessage {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface PendingOutgoingMessage {
+  clientTempId: string;
+  content: string;
+  createdAt: string;
+  status: 'sending' | 'failed';
+  errorMessage?: string;
+}
+
+export interface ConversationReport {
+  id: string;
+  conversation_id: string;
+  reporter_id: string;
+  reported_user_id: string;
+  reason: ConversationReportReason;
+  details: string | null;
+  status: 'open' | 'reviewed' | 'resolved';
+  created_at: string;
+}

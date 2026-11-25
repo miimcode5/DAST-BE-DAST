@@ -1,5 +1,12 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import type { HelpCategory, HelpRequestFeedItem, HelpType, PlatformStats, Profile } from '../types/database';
+import type {
+  ConversationItem,
+  HelpCategory,
+  HelpRequestFeedItem,
+  HelpType,
+  PlatformStats,
+  Profile,
+} from '../types/database';
 
 export interface PendingCreateRequest {
   clientMutationId: string;
@@ -44,6 +51,14 @@ interface DastBeDastDB extends DBSchema {
       updatedAt: string;
     };
   };
+  conversations_cache: {
+    key: string;
+    value: {
+      userId: string;
+      items: ConversationItem[];
+      updatedAt: string;
+    };
+  };
   pending_requests: {
     key: string;
     value: PendingCreateRequest;
@@ -55,7 +70,7 @@ let dbPromise: Promise<IDBPDatabase<DastBeDastDB>> | null = null;
 
 function getDb() {
   if (!dbPromise) {
-    dbPromise = openDB<DastBeDastDB>('dast-be-dast-offline-v1', 1, {
+    dbPromise = openDB<DastBeDastDB>('dast-be-dast-offline-v1', 2, {
       upgrade(db) {
         if (!db.objectStoreNames.contains('requests_cache')) {
           db.createObjectStore('requests_cache', { keyPath: 'key' });
@@ -65,6 +80,9 @@ function getDb() {
         }
         if (!db.objectStoreNames.contains('profiles_cache')) {
           db.createObjectStore('profiles_cache', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('conversations_cache')) {
+          db.createObjectStore('conversations_cache', { keyPath: 'userId' });
         }
         if (!db.objectStoreNames.contains('pending_requests')) {
           const store = db.createObjectStore('pending_requests', { keyPath: 'clientMutationId' });
@@ -231,4 +249,28 @@ export async function clearOfflineCache(): Promise<void> {
   await db.clear('requests_cache');
   await db.clear('stats_cache');
   await db.clear('profiles_cache');
+  await db.clear('conversations_cache');
+}
+
+export async function cacheUserConversations(userId: string, items: ConversationItem[]): Promise<void> {
+  try {
+    const db = await getDb();
+    await db.put('conversations_cache', {
+      userId,
+      items: items.slice(0, 60),
+      updatedAt: new Date().toISOString(),
+    });
+  } catch {
+    // ignore
+  }
+}
+
+export async function getCachedUserConversations(userId: string): Promise<ConversationItem[]> {
+  try {
+    const db = await getDb();
+    const record = await db.get('conversations_cache', userId);
+    return record?.items ?? [];
+  } catch {
+    return [];
+  }
 }

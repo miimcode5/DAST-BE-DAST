@@ -5,12 +5,13 @@ import {
   ClipboardList,
   Clock,
   HandHelping,
+  MessageCircle,
   Plus,
   RefreshCw,
   Trash2,
   XCircle,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
@@ -18,6 +19,7 @@ import { RequestCard } from '../components/RequestCard';
 import { CategoryBadge, RequestStatusBadge, ResponseStatusBadge } from '../components/StatusBadge';
 import { CATEGORY_MAP } from '../constants/categories';
 import { useAuth } from '../contexts/AuthContext';
+import { useChat } from '../contexts/ChatContext';
 import { usePwa } from '../contexts/PwaContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatRelativeTimeFa, toPersianDigits } from '../lib/formatters';
@@ -26,10 +28,15 @@ import {
   removePendingOfflineRequest,
   type PendingCreateRequest,
 } from '../lib/offlineDb';
+import { ensureConversationForResponse, getMyConversations } from '../services/chatService';
 import { listMyRequests } from '../services/requestsService';
 import { getMyResponses, withdrawVolunteerResponse } from '../services/responsesService';
 import { getSavedRequestsFeed, toggleSavedRequest } from '../services/savedService';
-import type { HelpRequestFeedItem, VolunteerResponseWithRequest } from '../types/database';
+import type {
+  ConversationItem,
+  HelpRequestFeedItem,
+  VolunteerResponseWithRequest,
+} from '../types/database';
 
 export type ActivityTab =
   | 'requests'
@@ -41,13 +48,16 @@ export type ActivityTab =
 
 export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: ActivityTab }) {
   const { user } = useAuth();
+  const { notifyMessagesChanged } = useChat();
   const { isOnline, triggerSync, refreshPendingCount } = usePwa();
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const [tab, setTab] = useState<ActivityTab>(defaultTab);
   const [myRequests, setMyRequests] = useState<HelpRequestFeedItem[]>([]);
   const [myResponses, setMyResponses] = useState<VolunteerResponseWithRequest[]>([]);
   const [savedRequests, setSavedRequests] = useState<HelpRequestFeedItem[]>([]);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [pendingOffline, setPendingOffline] = useState<PendingCreateRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -71,15 +81,17 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
         return;
       }
 
-      const [reqs, resps, saved] = await Promise.all([
+      const [reqs, resps, saved, convResult] = await Promise.all([
         listMyRequests(user.id),
         getMyResponses(user.id),
         getSavedRequestsFeed(user.id),
+        getMyConversations(user.id).catch(() => ({ items: [] as ConversationItem[] })),
       ]);
 
       setMyRequests(reqs);
       setMyResponses(resps);
       setSavedRequests(saved);
+      setConversations(convResult.items);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'خطا در بارگذاری فعالیت‌ها');
     } finally {
@@ -92,6 +104,37 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
   }, [loadData]);
 
   const savedIdsSet = useMemo(() => new Set(savedRequests.map((s) => s.id)), [savedRequests]);
+
+  const convByResponseId = useMemo(() => {
+    const map: Record<string, ConversationItem> = {};
+    for (const c of conversations) {
+      if (c.response_id) map[c.response_id] = c;
+    }
+    return map;
+  }, [conversations]);
+
+  const convsByRequestId = useMemo(() => {
+    const map: Record<string, ConversationItem[]> = {};
+    for (const c of conversations) {
+      if (!map[c.request_id]) map[c.request_id] = [];
+      map[c.request_id].push(c);
+    }
+    return map;
+  }, [conversations]);
+
+  const openChatForResponse = async (responseId: string) => {
+    const existing = convByResponseId[responseId];
+    if (existing) {
+      navigate(`/messages/${existing.id}`);
+      return;
+    }
+    try {
+      const convId = await ensureConversationForResponse(responseId);
+      navigate(`/messages/${convId}`);
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'باز کردن گفت‌وگو ناموفق بود', 'error');
+    }
+  };
 
   const activeRequests = useMemo(
     () => myRequests.filter((r) => r.status === 'open' || r.status === 'in_progress'),
@@ -136,6 +179,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
     try {
       await withdrawVolunteerResponse(withdrawTargetId);
       setWithdrawTargetId(null);
+      notifyMessagesChanged();
       showToast('اعلام آمادگی شما لغو شد.', 'info');
       await loadData();
     } catch (err) {
@@ -372,6 +416,19 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                     </div>
 
                     <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => void openChatForResponse(resp.id)}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B]"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5 text-[#E9B949]" />
+                        <span>ادامه گفت‌وگو</span>
+                        {(convByResponseId[resp.id]?.unread_count ?? 0) > 0 && (
+                          <span className="rounded-full bg-[#E9B949] px-1.5 py-0.5 text-[10px] font-extrabold text-[#174D35]">
+                            {toPersianDigits(convByResponseId[resp.id].unread_count)}
+                          </span>
+                        )}
+                      </button>
                       <Link
                         to={`/requests/${resp.request_id}`}
                         className="rounded-xl bg-[#DCEBDD]/80 px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#174D35] hover:text-white"
@@ -411,9 +468,30 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                     درخواست‌های در جریان شما (به‌عنوان درخواست‌کننده)
                   </h2>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {inProgressItems.asRequester.map((req) => (
-                      <RequestCard key={req.id} request={req} isOwn />
-                    ))}
+                    {inProgressItems.asRequester.map((req) => {
+                      const reqConvs = convsByRequestId[req.id] ?? [];
+                      const activeConv = reqConvs.find((c) => c.status === 'active') ?? reqConvs[0];
+                      return (
+                        <div key={req.id} className="space-y-2">
+                          <RequestCard request={req} isOwn />
+                          {activeConv && (
+                            <Link
+                              to={
+                                reqConvs.length === 1
+                                  ? `/messages/${activeConv.id}`
+                                  : `/requests/${req.id}`
+                              }
+                              className="flex items-center justify-center gap-1.5 rounded-2xl border border-[#78B98A] bg-[#DCEBDD]/60 px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]"
+                            >
+                              <MessageCircle className="h-3.5 w-3.5" />
+                              <span>
+                                {reqConvs.length === 1 ? 'ادامه گفت‌وگو با داوطلب' : 'گفت‌وگوها و داوطلبان'}
+                              </span>
+                            </Link>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -443,12 +521,27 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                             {resp.request?.title ?? 'جزئیات همکاری'}
                           </Link>
                         </div>
-                        <Link
-                          to={`/requests/${resp.request_id}`}
-                          className="rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B]"
-                        >
-                          مدیریت همکاری
-                        </Link>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void openChatForResponse(resp.id)}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B]"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5 text-[#E9B949]" />
+                            <span>ادامه گفت‌وگو</span>
+                            {(convByResponseId[resp.id]?.unread_count ?? 0) > 0 && (
+                              <span className="rounded-full bg-[#E9B949] px-1.5 py-0.5 text-[10px] font-extrabold text-[#174D35]">
+                                {toPersianDigits(convByResponseId[resp.id].unread_count)}
+                              </span>
+                            )}
+                          </button>
+                          <Link
+                            to={`/requests/${resp.request_id}`}
+                            className="rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2 text-xs font-bold text-[#174D35] hover:border-[#78B98A]"
+                          >
+                            مدیریت همکاری
+                          </Link>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -507,12 +600,22 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                             {resp.request?.title ?? 'مشاهده جزئیات'}
                           </Link>
                         </div>
-                        <Link
-                          to="/kindness-chain"
-                          className="rounded-xl bg-[#DCEBDD] px-4 py-2 text-xs font-bold text-[#174D35]"
-                        >
-                          مشاهده در زنجیره مهربانی
-                        </Link>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void openChatForResponse(resp.id)}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-3.5 py-2 text-xs font-bold text-[#174D35] hover:border-[#78B98A]"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" />
+                            تاریخچه گفت‌وگو
+                          </button>
+                          <Link
+                            to="/kindness-chain"
+                            className="rounded-xl bg-[#DCEBDD] px-4 py-2 text-xs font-bold text-[#174D35]"
+                          >
+                            مشاهده در زنجیره مهربانی
+                          </Link>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -610,12 +713,22 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                       {resp.request?.title ?? 'درخواست مرتبط'}
                     </Link>
                   </div>
-                  <Link
-                    to={`/requests/${resp.request_id}`}
-                    className="rounded-xl border border-[#DCEBDD] px-3.5 py-2 text-xs font-bold text-[#174D35]"
-                  >
-                    مشاهده درخواست
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void openChatForResponse(resp.id)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-3.5 py-2 text-xs font-bold text-[#174D35]"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      تاریخچه گفت‌وگو
+                    </button>
+                    <Link
+                      to={`/requests/${resp.request_id}`}
+                      className="rounded-xl border border-[#DCEBDD] px-3.5 py-2 text-xs font-bold text-[#174D35]"
+                    >
+                      مشاهده درخواست
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

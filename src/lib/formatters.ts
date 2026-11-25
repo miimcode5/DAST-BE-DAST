@@ -37,6 +37,33 @@ export function formatDateFa(isoString: string): string {
   }
 }
 
+export function formatTimeFa(isoString: string): string {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+  try {
+    return new Intl.DateTimeFormat('fa-IR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  } catch {
+    return toPersianDigits(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  }
+}
+
+export function formatChatDayLabelFa(isoString: string): string {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startOfTarget = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  const diffDays = Math.round((startOfToday - startOfTarget) / 86_400_000);
+
+  if (diffDays === 0) return 'امروز';
+  if (diffDays === 1) return 'دیروز';
+  return formatDateFa(isoString);
+}
+
 export function getInitials(name: string | null | undefined): string {
   const clean = (name ?? '').trim();
   if (!clean) return 'د';

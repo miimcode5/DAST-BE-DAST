@@ -5,6 +5,7 @@ import {
   Home,
   Info,
   LogIn,
+  MessageCircle,
   Plus,
   RefreshCw,
   Search,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useChat } from '../contexts/ChatContext';
 import { usePwa } from '../contexts/PwaContext';
 import { toPersianDigits } from '../lib/formatters';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -21,6 +23,7 @@ import { BrandLogo } from './BrandLogo';
 
 export function Layout() {
   const { user, profile } = useAuth();
+  const { unreadCount } = useChat();
   const {
     isOnline,
     isInstalled,
@@ -40,7 +43,7 @@ export function Layout() {
     }`;
 
   const mobileNavClass = ({ isActive }: { isActive: boolean }) =>
-    `flex flex-col items-center justify-center gap-1 py-1.5 text-[11px] font-semibold transition-colors ${
+    `relative flex flex-col items-center justify-center gap-1 py-1.5 text-[11px] font-semibold transition-colors ${
       isActive ? 'text-[#174D35]' : 'text-[#5A695A]'
     }`;
 
@@ -91,7 +94,7 @@ export function Layout() {
       {/* Desktop / Tablet Top Navigation */}
       <header className="sticky top-0 z-30 border-b border-[#DCEBDD] bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <Link to="/" aria-label="صفحه اصلی دست‌به‌دست">
               <BrandLogo />
             </Link>
@@ -104,6 +107,15 @@ export function Layout() {
               <NavLink to="/requests" className={navLinkClass}>
                 <Search className="h-4 w-4" />
                 درخواست‌ها
+              </NavLink>
+              <NavLink to="/messages" className={navLinkClass}>
+                <MessageCircle className="h-4 w-4" />
+                <span>پیام‌ها</span>
+                {unreadCount > 0 && (
+                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#174D35] px-1.5 text-[10px] font-extrabold text-white">
+                    {toPersianDigits(unreadCount > 99 ? '99+' : unreadCount)}
+                  </span>
+                )}
               </NavLink>
               <NavLink to="/my-activities" className={navLinkClass}>
                 <ClipboardList className="h-4 w-4" />
@@ -140,6 +152,17 @@ export function Layout() {
               ثبت درخواست کمک
             </Link>
 
+            {user && (
+              <Link
+                to="/my-activities"
+                aria-label="فعالیت‌های من"
+                className="inline-flex items-center gap-1 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-2.5 py-1.5 text-xs font-semibold text-[#174D35] md:hidden"
+              >
+                <ClipboardList className="h-4 w-4" />
+                <span>فعالیت‌ها</span>
+              </Link>
+            )}
+
             {user ? (
               <Link
                 to="/profile"
@@ -154,7 +177,7 @@ export function Layout() {
                 ) : (
                   <User className="h-4 w-4" />
                 )}
-                <span className="max-w-[110px] truncate">
+                <span className="max-w-[96px] truncate sm:max-w-[110px]">
                   {profile?.display_name ?? 'پروفایل'}
                 </span>
               </Link>
@@ -188,6 +211,9 @@ export function Layout() {
             <Link to="/welcome" className="hover:text-[#174D35]">
               معرفی پلتفرم
             </Link>
+            <Link to="/messages" className="hover:text-[#174D35]">
+              پیام‌ها
+            </Link>
             <Link to="/kindness-chain" className="hover:text-[#174D35]">
               زنجیره مهربانی
             </Link>
@@ -201,7 +227,7 @@ export function Layout() {
         </div>
       </footer>
 
-      {/* Mobile Fixed Bottom Navigation (5 exact items, elevated center CTA) */}
+      {/* Mobile Fixed Bottom Navigation (5 exact items, elevated center CTA + Messages unread badge) */}
       <nav
         aria-label="ناوبری موبایل"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DCEBDD] bg-white/95 px-2 pb-[max(0.45rem,env(safe-area-inset-bottom))] pt-1 shadow-[0_-6px_24px_rgba(23,77,53,0.08)] backdrop-blur-md md:hidden"
@@ -219,7 +245,7 @@ export function Layout() {
 
           <Link
             to="/requests/new"
-            className="flex flex-col items-center justify-center -mt-5"
+            className="-mt-5 flex flex-col items-center justify-center"
             aria-label="ثبت درخواست کمک"
           >
             <span className="flex h-13 w-13 items-center justify-center rounded-2xl border-4 border-[#F6F7F2] bg-[#174D35] text-white shadow-lg ring-1 ring-[#E9B949]/60 transition active:scale-95">
@@ -228,9 +254,16 @@ export function Layout() {
             <span className="mt-1 text-[11px] font-extrabold text-[#174D35]">ثبت کمک</span>
           </Link>
 
-          <NavLink to="/my-activities" className={mobileNavClass}>
-            <ClipboardList className="h-5 w-5" />
-            <span>فعالیت‌های من</span>
+          <NavLink to="/messages" className={mobileNavClass}>
+            <span className="relative inline-flex">
+              <MessageCircle className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -left-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#174D35] px-1 text-[9px] font-extrabold text-white ring-2 ring-white">
+                  {toPersianDigits(unreadCount > 99 ? '99+' : unreadCount)}
+                </span>
+              )}
+            </span>
+            <span>پیام‌ها</span>
           </NavLink>
 
           <NavLink to="/profile" className={mobileNavClass}>

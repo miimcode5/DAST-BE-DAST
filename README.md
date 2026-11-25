@@ -18,6 +18,12 @@
   - ثبت «من می‌توانم کمک کنم» از طریق تابع امن دیتابیس (`submit_volunteer_response`)
   - جلوگیری از اعلام آمادگی برای درخواست خود و جلوگیری از ثبت تکراری (`UNIQUE(request_id, volunteer_id)`)
   - پذیرش/رد داوطلب، شروع همکاری، اعلام انجام از طرف داوطلب و تأیید نهایی تکمیل کمک توسط درخواست‌کننده
+- **گفت‌وگوی خصوصی و لحظه‌ای (Real-time Private Chat)**:
+  - ایجاد خودکار گفت‌وگوی خصوصی میان درخواست‌کننده و هر داوطلب هنگام ثبت اعلام آمادگی (گفت‌وگوی مجزا و مستقل برای هر داوطلب)
+  - ارسال و دریافت پیام به‌صورت لحظه‌ای با **Supabase Realtime** بدون نیاز به رفرش صفحه
+  - صفحه اختصاصی «پیام‌ها» با مرتب‌سازی بر اساس جدیدترین پیام، نشانگر پیام‌های خوانده‌نشده در ناوبری موبایل/دسکتاپ و ثبت وضعیت خوانده‌شدن (`read_at`)
+  - همگام‌سازی کامل چت با چرخه درخواست (حفظ تاریخچه هنگام تکمیل یا لغو و کنترل دسترسی ارسال)
+  - گزارش گفت‌وگو یا کاربر نامناسب (`conversation_reports`) و محافظت کامل با RLS و تریگرهای پایگاه‌داده
 - **فعالیت‌های من و ذخیره‌سازی**: مدیریت درخواست‌های من، اعلام آمادگی‌ها، همکاری‌های در حال انجام، تکمیل‌شده‌ها، ذخیره‌شده‌ها و لغوشده‌ها.
 - **آمار واقعی مشارکت و زنجیره مهربانی**: نمایش آمار زنده بدون داده‌های ساختگی و نمایش پیوندهای واقعی کمک‌های تأییدشده.
 - **PWA و قابلیت نصب روی اندروید + حالت آفلاین**:
@@ -31,7 +37,7 @@
 
 - **Frontend:** React 19, TypeScript, Vite 6, Tailwind CSS v4, React Router v7, Lucide Icons
 - **Typography:** فونت محلی `@fontsource/vazirmatn` (بدون وابستگی اجباری به سرویس خارجی)
-- **Backend & Database:** Supabase (PostgreSQL 17, Supabase Auth, Supabase Storage, Row Level Security & `SECURITY DEFINER` RPCs)
+- **Backend & Database:** Supabase (PostgreSQL 17, Supabase Auth, Supabase Realtime, Supabase Storage, Row Level Security & `SECURITY DEFINER` RPCs)
 - **PWA & Offline:** `vite-plugin-pwa` (Workbox), Web App Manifest, Service Worker, `idb` (IndexedDB)
 - **Testing:** Vitest
 

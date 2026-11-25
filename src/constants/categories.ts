@@ -1,4 +1,11 @@
-import type { HelpCategory, HelpType, RequestStatus, ResponseStatus } from '../types/database';
+import type {
+  ConversationReportReason,
+  ConversationStatus,
+  HelpCategory,
+  HelpType,
+  RequestStatus,
+  ResponseStatus,
+} from '../types/database';
 
 export interface CategoryMeta {
   id: HelpCategory;
@@ -200,4 +207,38 @@ export const SUGGESTED_SKILLS = [
   'کارهای اداری و ثبت‌نام',
   'خیاطی و تعمیرات پوشاک',
   'فعالیت‌های جهادی و گروهی',
+];
+
+export const CONVERSATION_STATUS_META: Record<
+  ConversationStatus,
+  { label: string; badgeClass: string; helperNote: string }
+> = {
+  active: {
+    label: 'گفت‌وگوی فعال',
+    badgeClass: 'bg-[#DCEBDD] text-[#174D35] border-[#78B98A]/60',
+    helperNote: 'امکان ارسال پیام و هماهنگی بین درخواست‌کننده و داوطلب برقرار است.',
+  },
+  completed: {
+    label: 'همیاری تکمیل‌شده',
+    badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+    helperNote: 'این همیاری با موفقیت تکمیل شده است؛ تاریخچه گفت‌وگو فقط برای مشاهده نگهداری می‌شود.',
+  },
+  cancelled: {
+    label: 'لغوشده',
+    badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+    helperNote: 'درخواست یا اعلام آمادگی این گفت‌وگو لغو شده و ارسال پیام جدید بسته است.',
+  },
+  closed: {
+    label: 'بسته‌شده',
+    badgeClass: 'bg-stone-100 text-stone-700 border-stone-300',
+    helperNote: 'این گفت‌وگو بسته شده است؛ پیام‌های قبلی همچنان قابل مرور هستند.',
+  },
+};
+
+export const CONVERSATION_REPORT_REASONS: { id: ConversationReportReason; label: string }[] = [
+  { id: 'privacy_violation', label: 'درخواست اطلاعات شخصی یا نقض حریم خصوصی' },
+  { id: 'harassment', label: 'رفتار نامناسب، توهین یا مزاحمت' },
+  { id: 'spam', label: 'تبلیغات یا پیام‌های تکراری (اسپم)' },
+  { id: 'fraud', label: 'سوءاستفاده یا درخواست مشکوک / مالی' },
+  { id: 'other', label: 'سایر موارد' },
 ];

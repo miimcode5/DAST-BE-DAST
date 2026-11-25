@@ -10,10 +10,16 @@ import {
 } from 'lucide-react';
 import {
   CATEGORY_MAP,
+  CONVERSATION_STATUS_META,
   REQUEST_STATUS_META,
   RESPONSE_STATUS_META,
 } from '../constants/categories';
-import type { HelpCategory, RequestStatus, ResponseStatus } from '../types/database';
+import type {
+  ConversationStatus,
+  HelpCategory,
+  RequestStatus,
+  ResponseStatus,
+} from '../types/database';
 
 export function CategoryIcon({
   category,
@@ -71,6 +77,17 @@ export function ResponseStatusBadge({ status }: { status: ResponseStatus }) {
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${meta.badgeClass}`}
+    >
+      {meta.label}
+    </span>
+  );
+}
+
+export function ConversationStatusBadge({ status }: { status: ConversationStatus }) {
+  const meta = CONVERSATION_STATUS_META[status];
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${meta.badgeClass}`}
     >
       {meta.label}
     </span>
