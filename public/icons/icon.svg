@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="40" y1="20" x2="472" y2="492" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#174D35"/>
+      <stop offset="100%" stop-color="#26734B"/>
+    </linearGradient>
+    <linearGradient id="leftArc" x1="120" y1="190" x2="270" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#DCEBDD"/>
+    </linearGradient>
+    <linearGradient id="rightArc" x1="392" y1="190" x2="242" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#78B98A"/>
+      <stop offset="100%" stop-color="#DCEBDD"/>
+    </linearGradient>
+    <linearGradient id="goldSprout" x1="256" y1="126" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F7DA82"/>
+      <stop offset="100%" stop-color="#E9B949"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)"/>
+  <circle cx="256" cy="256" r="192" stroke="#78B98A" stroke-opacity="0.22" stroke-width="5"/>
+  <!-- Golden heart/sprout of mutual care -->
+  <path d="M256 262C256 262 200 226 200 184C200 163 217 146 238 146C247 146 253 150 256 156C259 150 265 146 274 146C295 146 312 163 312 184C312 226 256 262 256 262Z" fill="url(#goldSprout)"/>
+  <!-- Left cradling hand -->
+  <path d="M122 232C122 216 135 204 150 204C165 204 178 216 178 232V284C178 318 206 344 240 344H256V392H232C171 392 122 343 122 282V232Z" fill="url(#leftArc)"/>
+  <!-- Right cradling hand -->
+  <path d="M390 232C390 216 377 204 362 204C347 204 334 216 334 232V284C334 318 306 344 272 344H256V392H280C341 392 390 343 390 282V232Z" fill="url(#rightArc)"/>
+  <!-- Interlocking base join -->
+  <rect x="218" y="344" width="76" height="48" rx="24" fill="#FFFFFF" fill-opacity="0.96"/>
+  <circle cx="256" cy="368" r="10" fill="#174D35"/>
+</svg>
