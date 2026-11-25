@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Award,
+  Bell,
   CheckCircle2,
   ClipboardList,
   Edit3,
   LogOut,
   MapPin,
+  RefreshCw,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -29,27 +31,27 @@ export function ProfilePage() {
   const [myRequestsCount, setMyRequestsCount] = useState(0);
   const [myOffersCount, setMyOffersCount] = useState(0);
   const [summaryLoaded, setSummaryLoaded] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
-  useEffect(() => {
+  const loadSummary = useCallback(() => {
     if (!user) return;
-    let active = true;
-
+    setSummaryError(null);
     Promise.all([listMyRequests(user.id), getMyResponses(user.id)])
       .then(([reqs, resps]) => {
-        if (!active) return;
         setMyRequestsCount(reqs.length);
         setMyOffersCount(resps.filter((r) => r.status !== 'cancelled').length);
         setSummaryLoaded(true);
       })
-      .catch(() => {
-        if (active) setSummaryLoaded(true);
+      .catch((err) => {
+        setSummaryError(err instanceof Error ? err.message : 'دریافت خلاصه فعالیت‌ها ناموفق بود.');
+        setSummaryLoaded(true);
       });
-
-    return () => {
-      active = false;
-    };
   }, [user]);
+
+  useEffect(() => {
+    loadSummary();
+  }, [loadSummary]);
 
   if (loading) {
     return <LoadingState label="در حال بارگذاری پروفایل..." />;
@@ -140,8 +142,15 @@ export function ProfilePage() {
               ویرایش پروفایل
             </Link>
             <Link
+              to="/notifications"
+              className="inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-brand-surface bg-brand-bg px-4 py-2.5 text-xs font-bold text-brand-primary hover:border-brand-soft"
+            >
+              <Bell className="h-3.5 w-3.5" />
+              اعلان‌ها
+            </Link>
+            <Link
               to="/settings"
-              className="inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-brand-surface bg-brand-bg px-4 py-2.5 text-xs font-bold text-brand-text hover:border-brand-soft"
+              className="col-span-2 inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-brand-surface bg-brand-bg px-4 py-2.5 text-xs font-bold text-brand-text hover:border-brand-soft sm:col-span-1"
             >
               <Settings className="h-3.5 w-3.5" />
               تنظیمات
@@ -179,6 +188,20 @@ export function ProfilePage() {
           )}
         </div>
       </section>
+
+      {summaryError && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-brand-text/25 bg-white px-4 py-3 text-xs text-brand-text">
+          <span>{summaryError}</span>
+          <button
+            type="button"
+            onClick={loadSummary}
+            className="inline-flex items-center gap-1 rounded-xl bg-brand-primary px-3 py-1.5 font-bold text-white hover:bg-brand-green"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            تلاش مجدد
+          </button>
+        </div>
+      )}
 
       {/* Real Activity Stats */}
       <section className="grid grid-cols-3 gap-2 sm:gap-3">

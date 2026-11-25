@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
+import { NotificationsProvider } from './contexts/NotificationsContext';
 import { PwaProvider } from './contexts/PwaContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { AboutPage } from './pages/AboutPage';
@@ -14,7 +15,9 @@ import { HomePage } from './pages/HomePage';
 import { KindnessChainPage } from './pages/KindnessChainPage';
 import { LoginPage } from './pages/LoginPage';
 import { MessagesPage } from './pages/MessagesPage';
+import { ModerationPage } from './pages/ModerationPage';
 import { MyActivitiesPage } from './pages/MyActivitiesPage';
+import { NotificationsPage } from './pages/NotificationsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { RegisterPage } from './pages/RegisterPage';
 import { RequestDetailPage } from './pages/RequestDetailPage';
@@ -61,106 +64,126 @@ export function App() {
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ToastProvider>
         <AuthProvider>
-          <ChatProvider>
-            <PwaProvider>
-              <RecoveryWatcher />
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/welcome" element={<WelcomePage />} />
-                  <Route path="/auth/login" element={<LoginPage />} />
-                  <Route path="/auth/register" element={<RegisterPage />} />
-                  <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-                  <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+          <NotificationsProvider>
+            <ChatProvider>
+              <PwaProvider>
+                <RecoveryWatcher />
+                <Routes>
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/welcome" element={<WelcomePage />} />
+                    <Route path="/auth/login" element={<LoginPage />} />
+                    <Route path="/auth/register" element={<RegisterPage />} />
+                    <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
-                  <Route
-                    path="/profile/complete"
-                    element={
-                      <ProtectedRoute>
-                        <CompleteProfilePage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route
-                    path="/profile/edit"
-                    element={
-                      <ProtectedRoute>
-                        <EditProfilePage />
-                      </ProtectedRoute>
-                    }
-                  />
+                    <Route
+                      path="/profile/complete"
+                      element={
+                        <ProtectedRoute>
+                          <CompleteProfilePage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route
+                      path="/profile/edit"
+                      element={
+                        <ProtectedRoute>
+                          <EditProfilePage />
+                        </ProtectedRoute>
+                      }
+                    />
 
-                  <Route path="/requests" element={<RequestsListPage />} />
-                  <Route
-                    path="/requests/new"
-                    element={
-                      <ProtectedRoute>
-                        <RequestFormPage mode="create" />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route path="/requests/:id" element={<RequestDetailPage />} />
-                  <Route
-                    path="/requests/:id/edit"
-                    element={
-                      <ProtectedRoute>
-                        <RequestFormPage mode="edit" />
-                      </ProtectedRoute>
-                    }
-                  />
+                    <Route path="/requests" element={<RequestsListPage />} />
+                    <Route
+                      path="/requests/new"
+                      element={
+                        <ProtectedRoute>
+                          <RequestFormPage mode="create" />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="/requests/:id" element={<RequestDetailPage />} />
+                    <Route
+                      path="/requests/:id/edit"
+                      element={
+                        <ProtectedRoute>
+                          <RequestFormPage mode="edit" />
+                        </ProtectedRoute>
+                      }
+                    />
 
-                  <Route
-                    path="/messages"
-                    element={
-                      <ProtectedRoute>
-                        <MessagesPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/messages/:id"
-                    element={
-                      <ProtectedRoute>
-                        <ChatPage />
-                      </ProtectedRoute>
-                    }
-                  />
+                    <Route
+                      path="/messages"
+                      element={
+                        <ProtectedRoute>
+                          <MessagesPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/messages/:id"
+                      element={
+                        <ProtectedRoute>
+                          <ChatPage />
+                        </ProtectedRoute>
+                      }
+                    />
 
-                  <Route
-                    path="/my-activities"
-                    element={
-                      <ProtectedRoute>
-                        <MyActivitiesPage defaultTab="requests" />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/my-responses"
-                    element={
-                      <ProtectedRoute>
-                        <MyActivitiesPage defaultTab="offers" />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/saved"
-                    element={
-                      <ProtectedRoute>
-                        <MyActivitiesPage defaultTab="saved" />
-                      </ProtectedRoute>
-                    }
-                  />
+                    <Route
+                      path="/notifications"
+                      element={
+                        <ProtectedRoute>
+                          <NotificationsPage />
+                        </ProtectedRoute>
+                      }
+                    />
 
-                  <Route path="/kindness-chain" element={<KindnessChainPage />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
+                    <Route
+                      path="/moderation"
+                      element={
+                        <ProtectedRoute>
+                          <ModerationPage />
+                        </ProtectedRoute>
+                      }
+                    />
 
-                  <Route path="*" element={<NotFoundPage />} />
-                </Route>
-              </Routes>
-            </PwaProvider>
-          </ChatProvider>
+                    <Route
+                      path="/my-activities"
+                      element={
+                        <ProtectedRoute>
+                          <MyActivitiesPage defaultTab="requests" />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/my-responses"
+                      element={
+                        <ProtectedRoute>
+                          <MyActivitiesPage defaultTab="offers" />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/saved"
+                      element={
+                        <ProtectedRoute>
+                          <MyActivitiesPage defaultTab="saved" />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route path="/kindness-chain" element={<KindnessChainPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Route>
+                </Routes>
+              </PwaProvider>
+            </ChatProvider>
+          </NotificationsProvider>
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>

@@ -44,6 +44,12 @@ async function run() {
   const { data: anonVr } = await anon.from('volunteer_responses').select('*');
   assert.equal((anonVr ?? []).length, 0, 'Anon must not read volunteer_responses');
 
+  const { error: anonProfErr } = await anon.from('profiles').select('id').limit(1);
+  assert(anonProfErr, 'Anon must NOT directly read profiles table');
+
+  const { error: anonNotifErr } = await anon.from('notifications').select('id').limit(1);
+  assert(anonNotifErr, 'Anon must NOT read notifications table');
+
   console.log('2. Signing up User 1 (Requester)...');
   const u1 = makeClient();
   const { data: s1, error: e1 } = await u1.auth.signUp({
@@ -321,7 +327,39 @@ async function run() {
   const { data: reopenedReq } = await u1.rpc('reopen_help_request', { p_request_id: req2.id });
   assert.equal(reopenedReq.status, 'open');
 
-  console.log('\nALL LIVE TWO-USER E2E ASSERTIONS PASSED SUCCESSFULLY!');
+  console.log('14. Testing V1.0 notifications, blocking, content report & moderation guard...');
+  const { data: u1Notifs, error: u1NotifsErr } = await u1.from('notifications').select('*');
+  assert.ifError(u1NotifsErr);
+  assert(u1Notifs.some((n) => n.type === 'account_welcome'), 'Welcome notification must exist');
+  assert(u1Notifs.some((n) => n.type === 'new_offer'), 'New offer notification must exist');
+  assert(u1Notifs.some((n) => n.type === 'help_completed'), 'Completion notification must exist');
+
+  const { error: u1ModErr } = await u1.rpc('get_moderation_reports');
+  assert(u1ModErr, 'Regular member must NOT access moderation reports');
+
+  const { error: repErr } = await u2.rpc('submit_content_report', {
+    p_target_type: 'request',
+    p_target_id: req2.id,
+    p_reason: 'other',
+    p_details: 'تست گزارش E2E',
+  });
+  assert.ifError(repErr);
+
+  const { error: blkErr } = await u1.rpc('block_user', {
+    p_blocked_user_id: s3.user.id,
+    p_reason: 'تست مسدودسازی E2E',
+  });
+  assert.ifError(blkErr);
+
+  const { error: u3BlockedOfferErr } = await u3.rpc('submit_volunteer_response', {
+    p_request_id: req2.id,
+    p_message: 'نباید ثبت شود',
+  });
+  assert(u3BlockedOfferErr, 'Blocked user must NOT volunteer on blocker request');
+
+  await u1.rpc('unblock_user', { p_blocked_user_id: s3.user.id });
+
+  console.log('\nALL LIVE MULTI-USER E2E ASSERTIONS PASSED SUCCESSFULLY!');
   console.log(JSON.stringify({ user1Email, user2Email, req1Id: req1.id, req2Id: req2.id }));
 }
 

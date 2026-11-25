@@ -15,7 +15,7 @@ interface ProtectedImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 export function ProtectedImage({
   wrapperClassName = 'relative block overflow-hidden',
   className = '',
-  shield = true,
+  shield = false,
   alt = '',
   ...rest
 }: ProtectedImageProps) {
@@ -25,7 +25,7 @@ export function ProtectedImage({
         {...rest}
         alt={alt}
         draggable={false}
-        className={`select-none ${shield ? 'pointer-events-none' : ''} ${className}`.trim()}
+        className={`${shield ? 'pointer-events-none select-none' : ''} ${className}`.trim()}
       />
       {shield && (
         <span

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  Bell,
   BookOpen,
   ClipboardList,
   Download,
@@ -21,8 +22,8 @@ import {
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
+import { useNotifications } from '../contexts/NotificationsContext';
 import { usePwa } from '../contexts/PwaContext';
-import { useContentProtection } from '../hooks/useContentProtection';
 import { toPersianDigits } from '../lib/formatters';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { BrandLogo } from './BrandLogo';
@@ -31,6 +32,7 @@ import { ProtectedImage } from './ProtectedImage';
 export function Layout() {
   const { user, profile } = useAuth();
   const { unreadCount } = useChat();
+  const { unreadNotificationsCount } = useNotifications();
   const {
     isOnline,
     isInstalled,
@@ -42,9 +44,6 @@ export function Layout() {
   } = usePwa();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const protectedRootRef = useRef<HTMLDivElement | null>(null);
-
-  useContentProtection(protectedRootRef);
 
   // Close mobile drawer automatically on route changes
   useEffect(() => {
@@ -68,8 +67,7 @@ export function Layout() {
 
   return (
     <div
-      ref={protectedRootRef}
-      className={`content-protected flex flex-col bg-brand-bg text-brand-text ${
+      className={`flex flex-col bg-brand-bg text-brand-text ${
         isChatRoomRoute ? 'h-dvh overflow-hidden md:h-auto md:min-h-dvh md:overflow-visible' : 'min-h-dvh'
       }`}
     >
@@ -181,6 +179,25 @@ export function Layout() {
               ثبت درخواست کمک
             </Link>
 
+            {user && (
+              <Link
+                to="/notifications"
+                aria-label="اعلان‌ها"
+                className={`relative inline-flex h-10 w-10 items-center justify-center rounded-xl border transition ${
+                  location.pathname === '/notifications'
+                    ? 'border-brand-primary bg-brand-surface text-brand-primary'
+                    : 'border-brand-surface bg-brand-bg text-brand-primary hover:border-brand-soft'
+                }`}
+              >
+                <Bell className="h-4.5 w-4.5" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -left-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand-primary px-1 text-[9px] font-extrabold text-white ring-2 ring-white">
+                    {toPersianDigits(unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount)}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {user ? (
               <Link
                 to="/profile"
@@ -256,6 +273,11 @@ export function Layout() {
             <Link to="/messages" className="hover:text-brand-primary">
               پیام‌ها
             </Link>
+            {user && (
+              <Link to="/notifications" className="hover:text-brand-primary">
+                اعلان‌ها
+              </Link>
+            )}
             <Link to="/kindness-chain" className="hover:text-brand-primary">
               زنجیره مهربانی
             </Link>
@@ -411,6 +433,21 @@ export function Layout() {
             )}
 
             <div className="grid grid-cols-2 gap-2.5">
+              <Link
+                to="/notifications"
+                className="flex items-center justify-between gap-2 rounded-2xl border border-brand-surface bg-brand-bg/75 p-3.5 text-xs font-bold text-brand-primary active:scale-[0.98]"
+              >
+                <span className="flex items-center gap-2.5">
+                  <Bell className="h-4 w-4 shrink-0 text-brand-green" />
+                  <span>اعلان‌ها</span>
+                </span>
+                {unreadNotificationsCount > 0 && (
+                  <span className="rounded-full bg-brand-primary px-2 py-0.5 text-[10px] font-extrabold text-white">
+                    {toPersianDigits(unreadNotificationsCount)}
+                  </span>
+                )}
+              </Link>
+
               <Link
                 to="/my-activities"
                 className="flex items-center gap-2.5 rounded-2xl border border-brand-surface bg-brand-bg/75 p-3.5 text-xs font-bold text-brand-primary active:scale-[0.98]"

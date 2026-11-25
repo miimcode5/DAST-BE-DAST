@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
+  Ban,
+  Bell,
   CheckCircle2,
   Database,
   Download,
   KeyRound,
   RefreshCw,
+  ShieldCheck,
   Smartphone,
   Trash2,
   Wifi,
@@ -12,14 +15,17 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { useAuth } from '../contexts/AuthContext';
 import { usePwa } from '../contexts/PwaContext';
 import { useToast } from '../contexts/ToastContext';
-import { formatRelativeTimeFa, toPersianDigits } from '../lib/formatters';
+import { formatRelativeTimeFa, getInitials, toPersianDigits } from '../lib/formatters';
 import { clearOfflineCache, getOfflineCacheStats } from '../lib/offlineDb';
+import { getMyBlockedUsers, unblockUser } from '../services/safetyService';
+import type { BlockedUserItem } from '../types/database';
 
 export function SettingsPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const {
     isOnline,
     isInstalled,
@@ -37,15 +43,51 @@ export function SettingsPage() {
     pendingSyncCount: 0,
   });
   const [confirmClear, setConfirmClear] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUserItem[]>([]);
+  const [loadingBlocks, setLoadingBlocks] = useState(false);
+  const [unblockingId, setUnblockingId] = useState<string | null>(null);
 
   const loadCacheStats = async () => {
     const stats = await getOfflineCacheStats();
     setCacheStats(stats);
   };
 
+  const loadBlockedUsers = useCallback(async () => {
+    if (!user || !navigator.onLine) {
+      setBlockedUsers([]);
+      return;
+    }
+    setLoadingBlocks(true);
+    try {
+      const list = await getMyBlockedUsers();
+      setBlockedUsers(list);
+    } catch {
+      // ignore on transient failure
+    } finally {
+      setLoadingBlocks(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     void loadCacheStats();
   }, [pendingSyncCount]);
+
+  useEffect(() => {
+    void loadBlockedUsers();
+  }, [loadBlockedUsers]);
+
+  const handleUnblock = async (target: BlockedUserItem) => {
+    setUnblockingId(target.blocked_id);
+    try {
+      await unblockUser(target.blocked_id);
+      setBlockedUsers((prev) => prev.filter((item) => item.blocked_id !== target.blocked_id));
+      showToast(`مسدودیت «${target.display_name}» برداشته شد.`, 'success');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'رفع مسدودیت انجام نشد.', 'error');
+    } finally {
+      setUnblockingId(null);
+    }
+  };
 
   const handleInstall = async () => {
     const outcome = await promptInstall();
@@ -186,11 +228,27 @@ export function SettingsPage() {
               ویرایش اطلاعات پروفایل
             </Link>
             <Link
+              to="/notifications"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-surface bg-brand-bg px-4 py-2.5 text-xs font-bold text-brand-primary hover:border-brand-soft"
+            >
+              <Bell className="h-3.5 w-3.5" />
+              مرکز اعلان‌ها
+            </Link>
+            <Link
               to="/auth/reset-password"
               className="rounded-xl border border-brand-surface bg-brand-bg px-4 py-2.5 text-xs font-bold text-brand-primary hover:border-brand-soft"
             >
               تغییر رمز عبور
             </Link>
+            {(profile?.role === 'admin' || profile?.role === 'moderator') && (
+              <Link
+                to="/moderation"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-brand-primary px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-green"
+              >
+                <ShieldCheck className="h-3.5 w-3.5" />
+                پنل نظارت و گزارش‌ها
+              </Link>
+            )}
           </div>
         ) : (
           <p className="text-xs text-brand-text/70">
@@ -202,6 +260,71 @@ export function SettingsPage() {
           </p>
         )}
       </section>
+
+      {/* Blocked Users Management */}
+      {user && (
+        <section className="space-y-3 rounded-2xl border border-brand-surface bg-white p-4 sm:p-6">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-base font-bold text-brand-text">
+              <Ban className="h-5 w-5 text-brand-primary" />
+              <h2>کاربران مسدودشده</h2>
+            </div>
+            <span className="rounded-full bg-brand-bg px-3 py-1 text-[11px] font-bold text-brand-text/75">
+              {toPersianDigits(blockedUsers.length)} نفر
+            </span>
+          </div>
+
+          {loadingBlocks ? (
+            <p className="text-xs text-brand-text/70">در حال بارگذاری فهرست...</p>
+          ) : blockedUsers.length === 0 ? (
+            <p className="text-xs leading-6 text-brand-text/70">
+              در حال حاضر هیچ کاربری را مسدود نکرده‌اید. در صورت مشاهده رفتار نامناسب می‌توانید از صفحه گفت‌وگو کاربر مقابل را مسدود کنید.
+            </p>
+          ) : (
+            <div className="space-y-2.5">
+              {blockedUsers.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-brand-surface bg-brand-bg/60 p-3"
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    {item.avatar_url ? (
+                      <ProtectedImage
+                        src={item.avatar_url}
+                        alt={item.display_name}
+                        wrapperClassName="relative block h-9 w-9 shrink-0 overflow-hidden rounded-full border border-brand-surface"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-surface text-xs font-bold text-brand-primary">
+                        {getInitials(item.display_name)}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="truncate text-xs font-bold text-brand-text">
+                        {item.display_name}
+                      </div>
+                      <div className="text-[11px] text-brand-text/65">
+                        {item.city ? `${item.city} · ` : ''}
+                        مسدودشده {formatRelativeTimeFa(item.created_at)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={unblockingId === item.blocked_id}
+                    onClick={() => void handleUnblock(item)}
+                    className="shrink-0 rounded-xl border border-brand-primary bg-white px-3 py-1.5 text-[11px] font-bold text-brand-primary hover:bg-brand-surface/40 disabled:opacity-60"
+                  >
+                    {unblockingId === item.blocked_id ? 'در حال انجام...' : 'رفع مسدودیت'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <ConfirmDialog
         open={confirmClear}

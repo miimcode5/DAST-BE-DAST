@@ -1,5 +1,16 @@
-import { useEffect, useState } from 'react';
-import { ArrowDown, ArrowLeft, CheckCircle2, HeartHandshake, Link2, MapPin, Plus, Sparkles, Users } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ArrowDown,
+  ArrowLeft,
+  CheckCircle2,
+  HeartHandshake,
+  Link2,
+  MapPin,
+  Plus,
+  RefreshCw,
+  Sparkles,
+  Users,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
@@ -14,23 +25,24 @@ export function KindnessChainPage() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    let active = true;
+  const loadChain = useCallback(() => {
+    setLoading(true);
+    setErrorMsg(null);
     getKindnessChain()
       .then((res) => {
-        if (active) setData(res);
+        setData(res);
       })
       .catch((err) => {
-        if (active) setErrorMsg(err instanceof Error ? err.message : 'خطا در بارگذاری زنجیره مهربانی');
+        setErrorMsg(err instanceof Error ? err.message : 'خطا در بارگذاری زنجیره مهربانی');
       })
       .finally(() => {
-        if (active) setLoading(false);
+        setLoading(false);
       });
-
-    return () => {
-      active = false;
-    };
   }, []);
+
+  useEffect(() => {
+    loadChain();
+  }, [loadChain]);
 
   if (loading) {
     return <LoadingState label="در حال دریافت حلقه‌های واقعی زنجیره مهربانی..." />;
@@ -53,8 +65,16 @@ export function KindnessChainPage() {
       </section>
 
       {errorMsg && (
-        <div className="rounded-2xl border border-brand-text/25 bg-white px-4 py-3 text-sm text-brand-text">
-          {errorMsg}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-text/25 bg-white px-4 py-3 text-sm text-brand-text">
+          <span>{errorMsg}</span>
+          <button
+            type="button"
+            onClick={loadChain}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-brand-primary px-4 py-2 text-xs font-bold text-white hover:bg-brand-green"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            تلاش مجدد
+          </button>
         </div>
       )}
 
