@@ -2,12 +2,15 @@ import { useState, type FormEvent } from 'react';
 import { KeyRound, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationsContext';
 import { useToast } from '../contexts/ToastContext';
 import { mapSupabaseErrorToPersian, supabase } from '../lib/supabase';
 import { validatePassword } from '../lib/validation';
+import { recordPasswordChangedNotification } from '../services/notificationsService';
 
 export function ResetPasswordPage() {
   const { user, clearPasswordRecovery } = useAuth();
+  const { refreshNotifications } = useNotifications();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -40,6 +43,8 @@ export function ResetPasswordPage() {
       }
 
       clearPasswordRecovery();
+      await recordPasswordChangedNotification();
+      await refreshNotifications();
       showToast('رمز عبور شما با موفقیت تغییر یافت.', 'success');
       navigate('/profile', { replace: true });
     } catch (ex) {

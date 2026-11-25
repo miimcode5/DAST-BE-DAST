@@ -1,5 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type {
+  AppNotification,
   ConversationItem,
   HelpCategory,
   HelpRequestFeedItem,
@@ -59,6 +60,14 @@ interface DastBeDastDB extends DBSchema {
       updatedAt: string;
     };
   };
+  notifications_cache: {
+    key: string;
+    value: {
+      userId: string;
+      items: AppNotification[];
+      updatedAt: string;
+    };
+  };
   pending_requests: {
     key: string;
     value: PendingCreateRequest;
@@ -70,7 +79,7 @@ let dbPromise: Promise<IDBPDatabase<DastBeDastDB>> | null = null;
 
 function getDb() {
   if (!dbPromise) {
-    dbPromise = openDB<DastBeDastDB>('dast-be-dast-offline-v1', 2, {
+    dbPromise = openDB<DastBeDastDB>('dast-be-dast-offline-v1', 3, {
       upgrade(db) {
         if (!db.objectStoreNames.contains('requests_cache')) {
           db.createObjectStore('requests_cache', { keyPath: 'key' });
@@ -83,6 +92,9 @@ function getDb() {
         }
         if (!db.objectStoreNames.contains('conversations_cache')) {
           db.createObjectStore('conversations_cache', { keyPath: 'userId' });
+        }
+        if (!db.objectStoreNames.contains('notifications_cache')) {
+          db.createObjectStore('notifications_cache', { keyPath: 'userId' });
         }
         if (!db.objectStoreNames.contains('pending_requests')) {
           const store = db.createObjectStore('pending_requests', { keyPath: 'clientMutationId' });
@@ -250,6 +262,33 @@ export async function clearOfflineCache(): Promise<void> {
   await db.clear('stats_cache');
   await db.clear('profiles_cache');
   await db.clear('conversations_cache');
+  await db.clear('notifications_cache');
+}
+
+export async function cacheUserNotifications(
+  userId: string,
+  items: AppNotification[]
+): Promise<void> {
+  try {
+    const db = await getDb();
+    await db.put('notifications_cache', {
+      userId,
+      items: items.slice(0, 80),
+      updatedAt: new Date().toISOString(),
+    });
+  } catch {
+    // ignore
+  }
+}
+
+export async function getCachedUserNotifications(userId: string): Promise<AppNotification[]> {
+  try {
+    const db = await getDb();
+    const record = await db.get('notifications_cache', userId);
+    return record?.items ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function cacheUserConversations(userId: string, items: ConversationItem[]): Promise<void> {

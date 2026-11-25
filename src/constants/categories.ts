@@ -1,8 +1,10 @@
 import type {
+  ContentReportReason,
   ConversationReportReason,
   ConversationStatus,
   HelpCategory,
   HelpType,
+  NotificationType,
   RequestStatus,
   ResponseStatus,
 } from '../types/database';
@@ -242,3 +244,63 @@ export const CONVERSATION_REPORT_REASONS: { id: ConversationReportReason; label:
   { id: 'fraud', label: 'سوءاستفاده یا درخواست مشکوک / مالی' },
   { id: 'other', label: 'سایر موارد' },
 ];
+
+export const CONTENT_REPORT_REASONS: { id: ContentReportReason; label: string }[] = [
+  { id: 'privacy_violation', label: 'انتشار شماره تماس، پلاک یا اطلاعات محرمانه' },
+  { id: 'suspicious_or_fraud', label: 'درخواست مشکوک، مالی یا فریب‌کارانه' },
+  { id: 'spam_or_commercial', label: 'آگهی تجاری یا تبلیغات نامرتبط (اسپم)' },
+  { id: 'inappropriate_content', label: 'محتوای نامناسب یا مغایر با ادب و احترام' },
+  { id: 'wrong_category', label: 'دسته‌بندی یا اطلاعات نادرست' },
+  { id: 'other', label: 'سایر موارد' },
+];
+
+export const NOTIFICATION_TYPE_META: Record<
+  NotificationType,
+  { badgeLabel: string; badgeClass: string }
+> = {
+  new_message: {
+    badgeLabel: 'پیام جدید',
+    badgeClass: 'bg-brand-surface text-brand-primary border-brand-soft/60',
+  },
+  new_offer: {
+    badgeLabel: 'پیشنهاد کمک',
+    badgeClass: 'bg-brand-surface text-brand-primary border-brand-soft/60',
+  },
+  offer_accepted: {
+    badgeLabel: 'پذیرش همکاری',
+    badgeClass: 'bg-brand-primary text-white border-brand-primary',
+  },
+  offer_rejected: {
+    badgeLabel: 'تغییر وضعیت',
+    badgeClass: 'bg-brand-bg text-brand-text/75 border-brand-surface',
+  },
+  help_started: {
+    badgeLabel: 'شروع همیاری',
+    badgeClass: 'bg-brand-gold/15 text-brand-text border-brand-gold/60',
+  },
+  volunteer_done: {
+    badgeLabel: 'نیازمند تأیید',
+    badgeClass: 'bg-brand-gold/20 text-brand-text border-brand-gold/70',
+  },
+  help_completed: {
+    badgeLabel: 'کمک تأییدشده',
+    badgeClass: 'bg-brand-primary text-white border-brand-primary',
+  },
+  request_cancelled: {
+    badgeLabel: 'لغو درخواست',
+    badgeClass: 'bg-brand-bg text-brand-text/75 border-brand-surface',
+  },
+  offer_withdrawn: {
+    badgeLabel: 'انصراف داوطلب',
+    badgeClass: 'bg-brand-bg text-brand-text/75 border-brand-surface',
+  },
+  account_welcome: {
+    badgeLabel: 'خوش‌آمدگویی',
+    badgeClass: 'bg-brand-surface text-brand-primary border-brand-soft/60',
+  },
+  account_security: {
+    badgeLabel: 'امنیت حساب',
+    badgeClass: 'bg-brand-gold/15 text-brand-text border-brand-gold/60',
+  },
+};
+

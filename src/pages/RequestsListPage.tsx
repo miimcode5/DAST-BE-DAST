@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp, Filter, Plus, RotateCcw, Search, SlidersHorizontal, Sparkles, X } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Filter,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../components/EmptyState';
 import { CardSkeleton } from '../components/LoadingState';
@@ -46,6 +57,7 @@ export function RequestsListPage() {
   const [cachedAt, setCachedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -98,7 +110,7 @@ export function RequestsListPage() {
     return () => {
       active = false;
     };
-  }, [debouncedSearch, category, helpType, city, status, sort, user]);
+  }, [debouncedSearch, category, helpType, city, status, sort, user, retryTick]);
 
   const availableCities = useMemo(() => {
     const set = new Set<string>(SOUTH_KHORASAN_CITIES);
@@ -383,7 +395,15 @@ export function RequestsListPage() {
         <CardSkeleton count={6} />
       ) : errorMsg ? (
         <div className="rounded-2xl border border-brand-text/25 bg-white p-6 text-center text-sm text-brand-text">
-          {errorMsg}
+          <p className="mb-3 font-semibold">{errorMsg}</p>
+          <button
+            type="button"
+            onClick={() => setRetryTick((t) => t + 1)}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-brand-primary px-4 py-2 text-xs font-bold text-white hover:bg-brand-green"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            تلاش مجدد
+          </button>
         </div>
       ) : displayedItems.length === 0 ? (
         <EmptyState

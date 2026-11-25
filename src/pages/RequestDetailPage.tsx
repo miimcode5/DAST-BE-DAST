@@ -7,13 +7,16 @@ import {
   CheckCircle2,
   Clock,
   Edit3,
+  Flag,
   HandHelping,
   MapPin,
   MessageCircle,
   Play,
+  RefreshCw,
   RotateCcw,
   ShieldCheck,
   Users,
+  X,
   XCircle,
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -21,7 +24,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LoadingState } from '../components/LoadingState';
 import { ProtectedImage } from '../components/ProtectedImage';
 import { CategoryBadge, RequestStatusBadge, ResponseStatusBadge } from '../components/StatusBadge';
-import { HELP_TYPE_MAP, RESPONSE_STATUS_META } from '../constants/categories';
+import { CONTENT_REPORT_REASONS, HELP_TYPE_MAP, RESPONSE_STATUS_META } from '../constants/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
 import { useToast } from '../contexts/ToastContext';
@@ -43,8 +46,10 @@ import {
   submitVolunteerResponse,
   withdrawVolunteerResponse,
 } from '../services/responsesService';
+import { submitContentReport } from '../services/safetyService';
 import { getSavedRequestIds, toggleSavedRequest } from '../services/savedService';
 import type {
+  ContentReportReason,
   ConversationItem,
   HelpRequestFeedItem,
   VolunteerResponse,
@@ -78,6 +83,10 @@ export function RequestDetailPage() {
   const [actionBusy, setActionBusy] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [dialog, setDialog] = useState<DialogAction>(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState<ContentReportReason>('privacy_violation');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reportBusy, setReportBusy] = useState(false);
 
   const loadAll = useCallback(async () => {
     if (!id) return;
@@ -283,6 +292,22 @@ export function RequestDetailPage() {
     }
   };
 
+  const handleSubmitRequestReport = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!request) return;
+    setReportBusy(true);
+    try {
+      await submitContentReport('request', request.id, reportReason, reportDetails);
+      showToast('گزارش شما درباره این درخواست ثبت و برای بررسی تیم نظارت نگهداری شد.', 'success');
+      setReportOpen(false);
+      setReportDetails('');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'ثبت گزارش انجام نشد.', 'error');
+    } finally {
+      setReportBusy(false);
+    }
+  };
+
   if (loading) {
     return <LoadingState label="در حال دریافت جزئیات درخواست..." />;
   }
@@ -294,13 +319,23 @@ export function RequestDetailPage() {
         <p className="mb-5 text-sm text-brand-text/75">
           {errorMsg ?? 'ممکن است این درخواست حذف شده یا نشانی آن نادرست باشد.'}
         </p>
-        <Link
-          to="/requests"
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white"
-        >
-          <ArrowRight className="h-4 w-4" />
-          بازگشت به فهرست درخواست‌ها
-        </Link>
+        <div className="flex flex-wrap justify-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => void loadAll()}
+            className="inline-flex items-center gap-2 rounded-xl border border-brand-primary bg-white px-5 py-2.5 text-sm font-bold text-brand-primary hover:bg-brand-surface/35"
+          >
+            <RefreshCw className="h-4 w-4" />
+            تلاش مجدد
+          </button>
+          <Link
+            to="/requests"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white"
+          >
+            <ArrowRight className="h-4 w-4" />
+            بازگشت به فهرست درخواست‌ها
+          </Link>
+        </div>
       </div>
     );
   }
@@ -317,18 +352,30 @@ export function RequestDetailPage() {
         </Link>
 
         {user && (
-          <button
-            type="button"
-            onClick={handleToggleSave}
-            className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
-              isSaved
-                ? 'border-brand-primary bg-brand-surface text-brand-primary'
-                : 'border-brand-surface bg-white text-brand-text hover:border-brand-soft'
-            }`}
-          >
-            <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
-            {isSaved ? 'ذخیره‌شده' : 'ذخیره درخواست'}
-          </button>
+          <div className="flex items-center gap-2">
+            {!isOwner && !fromOfflineCache && (
+              <button
+                type="button"
+                onClick={() => setReportOpen(true)}
+                className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-brand-surface bg-white px-3 py-2 text-xs font-bold text-brand-text/75 hover:border-brand-text/30 hover:text-brand-text"
+              >
+                <Flag className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">گزارش درخواست</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleToggleSave}
+              className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
+                isSaved
+                  ? 'border-brand-primary bg-brand-surface text-brand-primary'
+                  : 'border-brand-surface bg-white text-brand-text hover:border-brand-soft'
+              }`}
+            >
+              <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+              {isSaved ? 'ذخیره‌شده' : 'ذخیره درخواست'}
+            </button>
+          </div>
         )}
       </div>
 
@@ -835,6 +882,79 @@ export function RequestDetailPage() {
         onConfirm={executeDialogAction}
         onCancel={() => setDialog(null)}
       />
+
+      {reportOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-brand-text/50 p-0 backdrop-blur-xs sm:items-center sm:p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="w-full max-w-md rounded-t-2xl border border-brand-surface bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-sm animate-fade-up sm:rounded-2xl sm:p-6">
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-brand-surface sm:hidden" />
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-base font-extrabold text-brand-primary">گزارش درخواست</h2>
+              <button
+                type="button"
+                onClick={() => setReportOpen(false)}
+                className="rounded-xl p-1 text-brand-text/70 hover:bg-brand-bg"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitRequestReport} className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-bold text-brand-text">
+                  علت گزارش
+                </label>
+                <select
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value as ContentReportReason)}
+                  className="min-h-[44px] w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-brand-green sm:text-sm"
+                >
+                  {CONTENT_REPORT_REASONS.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold text-brand-text">
+                  توضیحات تکمیلی (اختیاری)
+                </label>
+                <textarea
+                  rows={3}
+                  value={reportDetails}
+                  maxLength={1000}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  placeholder="توضیح مختصری درباره مورد مشکوک یا نقض حریم خصوصی بنویسید..."
+                  className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 p-3 text-[15px] outline-none focus:border-brand-green sm:text-sm"
+                />
+              </div>
+
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setReportOpen(false)}
+                  disabled={reportBusy}
+                  className="min-h-[42px] rounded-xl border border-brand-surface px-4 py-2 text-xs font-bold text-brand-text/80"
+                >
+                  انصراف
+                </button>
+                <button
+                  type="submit"
+                  disabled={reportBusy}
+                  className="min-h-[42px] rounded-xl bg-brand-text px-4 py-2 text-xs font-bold text-white hover:bg-brand-text/90 disabled:opacity-60"
+                >
+                  {reportBusy ? 'در حال ثبت...' : 'ثبت گزارش'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

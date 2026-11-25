@@ -195,3 +195,83 @@ export interface ConversationReport {
   status: 'open' | 'reviewed' | 'resolved';
   created_at: string;
 }
+
+export type NotificationType =
+  | 'new_message'
+  | 'new_offer'
+  | 'offer_accepted'
+  | 'offer_rejected'
+  | 'help_started'
+  | 'volunteer_done'
+  | 'help_completed'
+  | 'request_cancelled'
+  | 'offer_withdrawn'
+  | 'account_welcome'
+  | 'account_security';
+
+export interface AppNotification {
+  id: string;
+  user_id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  link_path: string | null;
+  request_id: string | null;
+  conversation_id: string | null;
+  response_id: string | null;
+  actor_id: string | null;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface BlockedUserItem {
+  id: string;
+  blocked_id: string;
+  display_name: string;
+  avatar_url: string | null;
+  city: string | null;
+  reason: string | null;
+  created_at: string;
+}
+
+export interface BlockStatus {
+  blocked_by_me: boolean;
+  blocked_by_other: boolean;
+  any_block: boolean;
+}
+
+export type ContentReportTargetType = 'request' | 'profile' | 'response';
+
+export type ContentReportReason =
+  | 'privacy_violation'
+  | 'spam_or_commercial'
+  | 'inappropriate_content'
+  | 'suspicious_or_fraud'
+  | 'wrong_category'
+  | 'other';
+
+export interface ContentReport {
+  id: string;
+  reporter_id: string;
+  target_type: ContentReportTargetType;
+  target_id: string;
+  reported_user_id: string | null;
+  reason: ContentReportReason;
+  details: string | null;
+  status: 'open' | 'reviewed' | 'resolved' | 'dismissed';
+  created_at: string;
+}
+
+export interface ModerationReportItem {
+  report_kind: 'conversation' | 'content';
+  report_id: string;
+  reason: string;
+  details: string | null;
+  status: 'open' | 'reviewed' | 'resolved' | 'dismissed';
+  created_at: string;
+  reporter_name: string;
+  reported_user_name: string;
+  target_type: string;
+  target_id: string;
+}
+

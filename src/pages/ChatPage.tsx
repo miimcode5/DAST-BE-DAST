@@ -11,6 +11,7 @@ import {
   AlertCircle,
   ArrowDown,
   ArrowRight,
+  Ban,
   Check,
   CheckCheck,
   Clock,
@@ -25,6 +26,7 @@ import {
   X,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LoadingState } from '../components/LoadingState';
 import { ProtectedImage } from '../components/ProtectedImage';
 import { ConversationStatusBadge, RequestStatusBadge } from '../components/StatusBadge';
@@ -34,6 +36,7 @@ import {
 } from '../constants/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
+import { useNotifications } from '../contexts/NotificationsContext';
 import { usePwa } from '../contexts/PwaContext';
 import { useToast } from '../contexts/ToastContext';
 import {
@@ -57,7 +60,9 @@ import {
   sendChatMessage,
   submitConversationReport,
 } from '../services/chatService';
+import { blockUser, getBlockStatusWith, unblockUser } from '../services/safetyService';
 import type {
+  BlockStatus,
   ChatMessage,
   ConversationItem,
   ConversationReportReason,
@@ -72,6 +77,7 @@ export function ChatPage() {
   const { id: conversationId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { notifyMessagesChanged, refreshUnreadCount } = useChat();
+  const { refreshNotifications } = useNotifications();
   const { isOnline } = usePwa();
   const { showToast } = useToast();
 
@@ -94,6 +100,15 @@ export function ChatPage() {
   const [reportReason, setReportReason] = useState<ConversationReportReason>('privacy_violation');
   const [reportDetails, setReportDetails] = useState('');
   const [reportBusy, setReportBusy] = useState(false);
+
+  // Block / Unblock safety state
+  const [blockStatus, setBlockStatus] = useState<BlockStatus>({
+    blocked_by_me: false,
+    blocked_by_other: false,
+    any_block: false,
+  });
+  const [blockDialogOpen, setBlockDialogOpen] = useState(false);
+  const [blockBusy, setBlockBusy] = useState(false);
 
   const scrollBoxRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -123,10 +138,10 @@ export function ChatPage() {
     if (!conversationId) return;
     const count = await markConversationMessagesRead(conversationId);
     if (count > 0) {
-      await refreshUnreadCount();
+      await Promise.all([refreshUnreadCount(), refreshNotifications()]);
       notifyMessagesChanged();
     }
-  }, [conversationId, notifyMessagesChanged, refreshUnreadCount]);
+  }, [conversationId, notifyMessagesChanged, refreshNotifications, refreshUnreadCount]);
 
   // Initial load of conversation header + newest page of messages
   const loadInitialChat = useCallback(async () => {
@@ -151,6 +166,9 @@ export function ChatPage() {
       setConversation(details);
       setMessages(page.messages);
       setHasMoreOlder(page.hasMore);
+
+      const blk = await getBlockStatusWith(details.other_user_id);
+      setBlockStatus(blk);
 
       const firstUnread = page.messages.find(
         (m) => m.sender_id !== user.id && m.read_at === null
@@ -469,6 +487,29 @@ export function ChatPage() {
     }
   };
 
+  const handleToggleBlock = async () => {
+    if (!conversation) return;
+    setBlockBusy(true);
+    try {
+      if (blockStatus.blocked_by_me) {
+        await unblockUser(conversation.other_user_id);
+        showToast(`مسدودیت «${conversation.other_user_name}» برداشته شد.`, 'success');
+      } else {
+        await blockUser(conversation.other_user_id);
+        showToast(`«${conversation.other_user_name}» مسدود شد و امکان ارسال پیام جدید وجود ندارد.`, 'info');
+      }
+      const nextStatus = await getBlockStatusWith(conversation.other_user_id);
+      setBlockStatus(nextStatus);
+      setBlockDialogOpen(false);
+      await reconcileMissedMessages();
+      notifyMessagesChanged();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'تغییر وضعیت مسدودسازی انجام نشد.', 'error');
+    } finally {
+      setBlockBusy(false);
+    }
+  };
+
   const privacyHint = useMemo(() => detectSensitivePrivacyText(draft), [draft]);
 
   const handleScrollBox = () => {
@@ -489,13 +530,23 @@ export function ChatPage() {
         <p className="mb-5 text-sm leading-7 text-brand-text/75">
           {errorMsg ?? 'این گفت‌وگو وجود ندارد یا شما مجاز به مشاهده آن نیستید.'}
         </p>
-        <Link
-          to="/messages"
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-green"
-        >
-          <ArrowRight className="h-4 w-4" />
-          بازگشت به پیام‌ها
-        </Link>
+        <div className="flex flex-wrap justify-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => void loadInitialChat()}
+            className="inline-flex items-center gap-2 rounded-xl border border-brand-primary bg-white px-5 py-2.5 text-sm font-bold text-brand-primary hover:bg-brand-surface/35"
+          >
+            <RefreshCw className="h-4 w-4" />
+            تلاش مجدد
+          </button>
+          <Link
+            to="/messages"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-green"
+          >
+            <ArrowRight className="h-4 w-4" />
+            بازگشت به پیام‌ها
+          </Link>
+        </div>
       </div>
     );
   }
@@ -503,6 +554,7 @@ export function ChatPage() {
   const isRequester = conversation.requester_id === user?.id;
   const partnerRoleLabel = isRequester ? 'داوطلب کمک' : 'ثبت‌کننده درخواست';
   const canSendMessage =
+    !blockStatus.any_block &&
     conversation.status === 'active' &&
     (conversation.request_status === 'open' || conversation.request_status === 'in_progress');
   const statusMeta = CONVERSATION_STATUS_META[conversation.status];
@@ -571,15 +623,33 @@ export function ChatPage() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setReportOpen(true)}
-            title="گزارش گفت‌وگو یا رفتار نامناسب"
-            className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-brand-surface bg-brand-bg px-2.5 py-2 text-[11px] font-bold text-brand-text/75 hover:border-brand-text/30 hover:text-brand-text"
-          >
-            <Flag className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">گزارش</span>
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setBlockDialogOpen(true)}
+              title={blockStatus.blocked_by_me ? 'رفع مسدودیت کاربر' : 'مسدود کردن کاربر'}
+              className={`inline-flex shrink-0 items-center gap-1 rounded-xl border px-2.5 py-2 text-[11px] font-bold transition ${
+                blockStatus.blocked_by_me
+                  ? 'border-brand-primary bg-brand-surface/70 text-brand-primary'
+                  : 'border-brand-surface bg-brand-bg text-brand-text/75 hover:border-brand-text/30 hover:text-brand-text'
+              }`}
+            >
+              <Ban className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">
+                {blockStatus.blocked_by_me ? 'رفع مسدودیت' : 'مسدودسازی'}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setReportOpen(true)}
+              title="گزارش گفت‌وگو یا رفتار نامناسب"
+              className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-brand-surface bg-brand-bg px-2.5 py-2 text-[11px] font-bold text-brand-text/75 hover:border-brand-text/30 hover:text-brand-text"
+            >
+              <Flag className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">گزارش</span>
+            </button>
+          </div>
         </div>
 
         {/* Linked Request Bar */}
@@ -778,17 +848,37 @@ export function ChatPage() {
       {/* Composer or Lifecycle Status Lock */}
       <footer className="shrink-0 border-t border-brand-surface bg-white px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))] sm:p-4">
         {!canSendMessage ? (
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-brand-surface bg-brand-bg px-3.5 py-2.5 text-xs text-brand-text/80 sm:px-4 sm:py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-surface bg-brand-bg px-3.5 py-2.5 text-xs text-brand-text/80 sm:px-4 sm:py-3">
             <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4 shrink-0 text-brand-primary" />
-              <span>{statusMeta.helperNote}</span>
+              {blockStatus.any_block ? (
+                <Ban className="h-4 w-4 shrink-0 text-brand-text" />
+              ) : (
+                <Lock className="h-4 w-4 shrink-0 text-brand-primary" />
+              )}
+              <span>
+                {blockStatus.blocked_by_me
+                  ? 'شما این کاربر را مسدود کرده‌اید؛ امکان ارسال پیام در این گفت‌وگو بسته است.'
+                  : blockStatus.blocked_by_other
+                    ? 'امکان ارسال پیام جدید به دلیل محدودیت ارتباطی از سوی کاربر مقابل وجود ندارد.'
+                    : statusMeta.helperNote}
+              </span>
             </div>
-            <Link
-              to={`/requests/${conversation.request_id}`}
-              className="shrink-0 font-bold text-brand-primary hover:underline"
-            >
-              صفحه درخواست
-            </Link>
+            {blockStatus.blocked_by_me ? (
+              <button
+                type="button"
+                onClick={() => setBlockDialogOpen(true)}
+                className="shrink-0 rounded-xl bg-brand-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-green"
+              >
+                رفع مسدودیت
+              </button>
+            ) : (
+              <Link
+                to={`/requests/${conversation.request_id}`}
+                className="shrink-0 font-bold text-brand-primary hover:underline"
+              >
+                صفحه درخواست
+              </Link>
+            )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-1.5 sm:space-y-2">
@@ -917,6 +1007,25 @@ export function ChatPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={blockDialogOpen}
+        busy={blockBusy}
+        title={
+          blockStatus.blocked_by_me
+            ? `رفع مسدودیت ${conversation.other_user_name}`
+            : `مسدود کردن ${conversation.other_user_name}`
+        }
+        description={
+          blockStatus.blocked_by_me
+            ? 'با رفع مسدودیت، امکان ارسال پیام یا همکاری مجدد با این کاربر دوباره برقرار می‌شود.'
+            : 'با مسدود کردن این کاربر، هر دو طرف امکان ارسال پیام جدید یا ثبت اعلام آمادگی روی درخواست‌های یکدیگر را نخواهید داشت.'
+        }
+        confirmLabel={blockStatus.blocked_by_me ? 'بله، رفع مسدودیت' : 'بله، مسدود شود'}
+        tone={blockStatus.blocked_by_me ? 'primary' : 'danger'}
+        onConfirm={() => void handleToggleBlock()}
+        onCancel={() => setBlockDialogOpen(false)}
+      />
     </div>
   );
 }
