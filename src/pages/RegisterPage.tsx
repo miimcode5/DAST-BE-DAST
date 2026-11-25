@@ -127,8 +127,8 @@ export function RegisterPage() {
       <div className="rounded-3xl border border-[#DCEBDD] bg-white p-5 shadow-sm sm:p-8">
         <div className="mb-6 flex flex-col items-center text-center">
           <BrandLogo />
-          <h1 className="mt-4 text-xl font-extrabold text-[#174D35]">عضویت در دست‌به‌دست</h1>
-          <p className="mt-1.5 text-sm text-[#505E50]">
+          <h1 className="mt-4 text-xl font-bold text-[#174D35]">عضویت در دست‌به‌دست</h1>
+          <p className="mt-1.5 text-sm font-normal text-[#505E50]">
             هرکس می‌تواند گرهی باز کند.
           </p>
         </div>

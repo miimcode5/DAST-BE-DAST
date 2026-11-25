@@ -228,16 +228,16 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
 
   return (
     <div className="space-y-5 animate-fade-up">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-[0_2px_10px_rgba(23,77,53,0.03)] sm:p-6">
         <div>
-          <h1 className="text-xl font-extrabold text-[#174D35]">فعالیت‌های من</h1>
-          <p className="mt-1 text-sm text-[#505E50]">
+          <h1 className="text-lg font-bold text-[#174D35] sm:text-2xl">فعالیت‌های من</h1>
+          <p className="mt-1 text-xs font-normal text-[#505E50] sm:text-sm">
             پیگیری درخواست‌ها، اعلام آمادگی‌های داوطلبانه، کمک‌های در جریان و موارد ذخیره‌شده
           </p>
         </div>
         <Link
           to="/requests/new"
-          className="inline-flex items-center gap-1.5 rounded-2xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B]"
+          className="inline-flex min-h-[42px] items-center gap-1.5 rounded-2xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B]"
         >
           <Plus className="h-4 w-4" />
           ثبت درخواست جدید

@@ -64,8 +64,8 @@ export function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 animate-fade-up">
       <div>
-        <h1 className="text-xl font-extrabold text-[#174D35]">تنظیمات و وضعیت برنامه</h1>
-        <p className="mt-1 text-sm text-[#505E50]">
+        <h1 className="text-xl font-bold text-[#174D35] sm:text-2xl">تنظیمات و وضعیت برنامه</h1>
+        <p className="mt-1 text-xs font-normal text-[#505E50] sm:text-sm">
           مدیریت نصب اپلیکیشن (PWA)، حافظه آفلاین و امنیت حساب کاربری
         </p>
       </div>
@@ -75,10 +75,10 @@ export function SettingsPage() {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
             <Smartphone className="h-5 w-5 text-[#174D35]" />
-            <h2 className="text-base font-bold text-[#202820]">نصب روی دستگاه (PWA)</h2>
+            <h2 className="text-base font-semibold text-[#202820]">نصب روی دستگاه (PWA)</h2>
           </div>
           {isInstalled ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#DCEBDD] px-3 py-1 text-xs font-semibold text-[#174D35]">
               <CheckCircle2 className="h-3.5 w-3.5" />
               در حالت اپلیکیشن نصب‌شده
             </span>

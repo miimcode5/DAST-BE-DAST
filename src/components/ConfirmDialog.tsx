@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
 interface ConfirmDialogProps {
@@ -23,6 +24,15 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  useEffect(() => {
+    if (!open || busy) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [open, busy, onCancel]);
+
   if (!open) return null;
 
   return (
@@ -31,8 +41,11 @@ export function ConfirmDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
+      onClick={(e) => {
+        if (!busy && e.target === e.currentTarget) onCancel();
+      }}
     >
-      <div className="w-full max-w-md rounded-t-3xl border border-[#DCEBDD] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl animate-fade-up sm:rounded-3xl sm:p-6">
+      <div className="w-full max-w-md rounded-t-3xl border border-[#DCEBDD] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl animate-sheet-up sm:rounded-3xl sm:p-6">
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#DCEBDD] sm:hidden" />
 
         <div className="mb-3 flex items-start justify-between gap-3">

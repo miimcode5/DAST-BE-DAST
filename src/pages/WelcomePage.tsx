@@ -8,17 +8,16 @@ export function WelcomePage() {
 
   return (
     <div className="space-y-8 animate-fade-up">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-bl from-[#174D35] via-[#1E5D40] to-[#26734B] p-6 text-white shadow-xl sm:p-10">
-        <div className="absolute -left-16 -top-16 h-56 w-56 rounded-full bg-[#78B98A]/15 blur-2xl" />
-        <div className="relative z-10 max-w-2xl space-y-5">
+      <section className="overflow-hidden rounded-3xl border border-[#DCEBDD] bg-[#174D35] p-6 text-white sm:p-10">
+        <div className="max-w-2xl space-y-5">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-[#DCEBDD]">
             <MapPin className="h-3.5 w-3.5 text-[#E9B949]" />
             شروع فعالیت از استان خراسان جنوبی · قابل گسترش در سراسر ایران
           </div>
-          <h1 className="text-2xl font-extrabold leading-10 sm:text-4xl sm:leading-[3.1rem]">
+          <h1 className="text-2xl font-bold leading-10 sm:text-4xl sm:leading-[3.1rem]">
             دست‌به‌دست؛ شبکه همیاری، مهارت و کمک متقابل مردمی
           </h1>
-          <p className="text-sm leading-7 text-[#DCEBDD] sm:text-base">
+          <p className="text-sm font-normal leading-7 text-[#DCEBDD] sm:text-base">
             گاهی چیزی که برای تو ساده است، می‌تواند مشکل بزرگی را برای دیگری حل کند. دست‌به‌دست پلی است میان کسانی که نیازی دارند و هم‌شهریانی که مهارت، زمان یا امکان کمک کردن دارند.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
@@ -26,14 +25,14 @@ export function WelcomePage() {
               <>
                 <Link
                   to="/requests/new"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-[#E9B949] px-5 py-3 text-sm font-extrabold text-[#174D35] shadow-md transition hover:bg-[#F3C860]"
+                  className="inline-flex min-h-[46px] items-center gap-2 rounded-2xl bg-[#E9B949] px-5 py-3 text-sm font-bold text-[#174D35] shadow-xs transition hover:bg-[#F3C860]"
                 >
                   ثبت درخواست کمک
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/requests"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+                  className="inline-flex min-h-[46px] items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
                 >
                   مشاهده درخواست‌های فعال
                 </Link>
@@ -42,14 +41,14 @@ export function WelcomePage() {
               <>
                 <Link
                   to="/auth/register"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-[#E9B949] px-6 py-3 text-sm font-extrabold text-[#174D35] shadow-md transition hover:bg-[#F3C860]"
+                  className="inline-flex min-h-[46px] items-center gap-2 rounded-2xl bg-[#E9B949] px-6 py-3 text-sm font-bold text-[#174D35] shadow-xs transition hover:bg-[#F3C860]"
                 >
                   عضویت رایگان در دست‌به‌دست
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/requests"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+                  className="inline-flex min-h-[46px] items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
                 >
                   مرور درخواست‌های کمک
                 </Link>
