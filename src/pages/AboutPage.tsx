@@ -25,29 +25,25 @@ const RASSA_TEAM_MEMBERS: RassaMember[] = [
     id: 'mojtaba',
     name: 'مجتبی میدانی',
     role: 'سرپرست تیم و فرانت‌اندکار',
-    photoUrl:
-      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/mojtaba.jpg',
+    photoUrl: `${import.meta.env.BASE_URL}member-photos/mojtaba.jpg`,
   },
   {
     id: 'mohammad',
     name: 'محمد صحرانورد',
     role: 'توسعه‌دهنده موبایل و ادیتور',
-    photoUrl:
-      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/mohammad.jpg',
+    photoUrl: `${import.meta.env.BASE_URL}member-photos/mohammad.jpg`,
   },
   {
     id: 'abolfazl',
     name: 'سید ابوالفضل میرزازاده',
     role: 'بک‌اندکار و پشتیبان‌گیری',
-    photoUrl:
-      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/abolfazl.jpg',
+    photoUrl: `${import.meta.env.BASE_URL}member-photos/abolfazl.jpg`,
   },
   {
     id: 'alireza',
     name: 'علیرضا حاجی‌زاده',
     role: 'مسئول محتوا و ارائه',
-    photoUrl:
-      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/alireza.jpg',
+    photoUrl: `${import.meta.env.BASE_URL}member-photos/alireza.jpg`,
   },
 ];
 
@@ -59,14 +55,13 @@ function MemberPortraitCard({ member }: { member: RassaMember }) {
       dir="rtl"
       className="group/card relative w-[184px] shrink-0 overflow-hidden rounded-2xl border border-brand-surface bg-brand-bg transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-soft hover:shadow-xs sm:w-[214px]"
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-brand-surface/45">
+      <div className="relative aspect-square w-full overflow-hidden bg-brand-surface/45">
         {!imgFailed ? (
           <ProtectedImage
             src={member.photoUrl}
             alt={member.name}
             loading="eager"
             decoding="async"
-            referrerPolicy="no-referrer"
             onError={() => setImgFailed(true)}
             wrapperClassName="relative block h-full w-full overflow-hidden"
             className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover/card:scale-[1.03]"

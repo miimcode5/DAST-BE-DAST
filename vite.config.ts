@@ -25,6 +25,10 @@ export default defineConfig(({ mode }) => {
           'icons/icon-512.png',
           'icons/maskable-512.png',
           'icons/apple-touch-icon.png',
+          'member-photos/mojtaba.jpg',
+          'member-photos/mohammad.jpg',
+          'member-photos/abolfazl.jpg',
+          'member-photos/alireza.jpg',
         ],
         manifest: {
           id: base,
@@ -62,7 +66,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,webmanifest}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,woff,woff2,webmanifest}'],
           navigateFallback: `${base}index.html`,
           navigateFallbackDenylist: [/^\/api\//],
           runtimeCaching: [
