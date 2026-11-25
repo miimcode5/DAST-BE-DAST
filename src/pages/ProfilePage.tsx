@@ -91,31 +91,31 @@ export function ProfilePage() {
   return (
     <div className="space-y-6 animate-fade-up">
       {/* Main Profile Card */}
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xs sm:p-8">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
-          <div className="flex items-start gap-4">
+      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-7">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start sm:gap-5">
+          <div className="flex items-start gap-3.5 sm:gap-4">
             {profile?.avatar_url ? (
               <img
                 src={profile.avatar_url}
                 alt={profile.display_name}
-                className="h-20 w-20 rounded-3xl border-2 border-[#DCEBDD] object-cover"
+                className="h-16 w-16 rounded-3xl border-2 border-[#DCEBDD] object-cover sm:h-20 sm:w-20"
               />
             ) : (
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-[#DCEBDD] text-2xl font-extrabold text-[#174D35]">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-[#DCEBDD] text-xl font-extrabold text-[#174D35] sm:h-20 sm:w-20 sm:text-2xl">
                 {getInitials(profile?.display_name ?? user.email)}
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <h1 className="text-xl font-extrabold text-[#202820]">
+            <div className="min-w-0 space-y-1.5">
+              <h1 className="truncate text-lg font-extrabold text-[#202820] sm:text-xl">
                 {profile?.display_name ?? 'کاربر دست‌به‌دست'}
               </h1>
-              <p className="text-xs text-[#667466]" dir="ltr">
+              <p className="truncate text-xs text-[#667466]" dir="ltr">
                 {user.email}
               </p>
               <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-medium text-[#26734B]">
                 <span className="inline-flex items-center gap-1 rounded-full bg-[#DCEBDD]/65 px-3 py-1 text-[#174D35]">
-                  <MapPin className="h-3.5 w-3.5" />
+                  <MapPin className="h-3.5 w-3.5 shrink-0" />
                   {profile?.province || 'خراسان جنوبی'}
                   {profile?.city ? ` · ${profile.city}` : ''}
                   {profile?.neighborhood ? ` (${profile.neighborhood})` : ''}
@@ -129,17 +129,17 @@ export function ProfilePage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Link
               to="/profile/edit"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B]"
+              className="inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B]"
             >
               <Edit3 className="h-3.5 w-3.5" />
               ویرایش پروفایل
             </Link>
             <Link
               to="/settings"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2.5 text-xs font-bold text-[#202820] hover:border-[#78B98A]"
+              className="inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2.5 text-xs font-bold text-[#202820] hover:border-[#78B98A]"
             >
               <Settings className="h-3.5 w-3.5" />
               تنظیمات
@@ -179,34 +179,34 @@ export function ProfilePage() {
       </section>
 
       {/* Real Activity Stats */}
-      <section className="grid grid-cols-3 gap-3">
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-4 text-center">
-          <CheckCircle2 className="mx-auto mb-1.5 h-6 w-6 text-[#26734B]" />
-          <div className="text-2xl font-extrabold text-[#174D35]">
+      <section className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="rounded-2xl border border-[#DCEBDD] bg-white p-3 text-center sm:rounded-3xl sm:p-4">
+          <CheckCircle2 className="mx-auto mb-1 h-5 w-5 text-[#26734B] sm:mb-1.5 sm:h-6 sm:w-6" />
+          <div className="text-xl font-extrabold text-[#174D35] sm:text-2xl">
             {toPersianDigits(profile?.completed_helps_count ?? 0)}
           </div>
-          <div className="mt-0.5 text-xs font-medium text-[#556455]">کمک‌های تأییدشده</div>
+          <div className="mt-0.5 text-[11px] font-medium text-[#556455] sm:text-xs">کمک تأییدشده</div>
         </div>
 
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-4 text-center">
-          <ClipboardList className="mx-auto mb-1.5 h-6 w-6 text-[#26734B]" />
-          <div className="text-2xl font-extrabold text-[#174D35]">
+        <div className="rounded-2xl border border-[#DCEBDD] bg-white p-3 text-center sm:rounded-3xl sm:p-4">
+          <ClipboardList className="mx-auto mb-1 h-5 w-5 text-[#26734B] sm:mb-1.5 sm:h-6 sm:w-6" />
+          <div className="text-xl font-extrabold text-[#174D35] sm:text-2xl">
             {summaryLoaded ? toPersianDigits(myRequestsCount) : '—'}
           </div>
-          <div className="mt-0.5 text-xs font-medium text-[#556455]">درخواست‌های من</div>
+          <div className="mt-0.5 text-[11px] font-medium text-[#556455] sm:text-xs">درخواست‌ها</div>
         </div>
 
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-4 text-center">
-          <Sparkles className="mx-auto mb-1.5 h-6 w-6 text-[#E9B949]" />
-          <div className="text-2xl font-extrabold text-[#174D35]">
+        <div className="rounded-2xl border border-[#DCEBDD] bg-white p-3 text-center sm:rounded-3xl sm:p-4">
+          <Sparkles className="mx-auto mb-1 h-5 w-5 text-[#E9B949] sm:mb-1.5 sm:h-6 sm:w-6" />
+          <div className="text-xl font-extrabold text-[#174D35] sm:text-2xl">
             {summaryLoaded ? toPersianDigits(myOffersCount) : '—'}
           </div>
-          <div className="mt-0.5 text-xs font-medium text-[#556455]">اعلام آمادگی‌ها</div>
+          <div className="mt-0.5 text-[11px] font-medium text-[#556455] sm:text-xs">اعلام آمادگی</div>
         </div>
       </section>
 
       {/* Future Badges / Recognition Roadmap (explicitly marked as upcoming v2, never fake!) */}
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6">
+      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:p-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Award className="h-5 w-5 text-[#E9B949]" />

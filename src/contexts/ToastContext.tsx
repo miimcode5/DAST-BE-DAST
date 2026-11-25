@@ -35,7 +35,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 top-4 z-50 flex flex-col items-center gap-2 px-4 sm:items-end sm:px-6"
+        className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+4.25rem)] z-50 flex flex-col items-center gap-2 px-3 sm:top-5 sm:items-end sm:px-6"
       >
         {toasts.map((toast) => {
           const styles: Record<ToastTone, string> = {
@@ -63,7 +63,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => removeToast(toast.id)}
-                className="rounded-lg p-0.5 opacity-80 hover:opacity-100"
+                className="rounded-lg p-1 opacity-80 hover:opacity-100"
                 aria-label="بستن اعلان"
               >
                 <X className="h-4 w-4" />

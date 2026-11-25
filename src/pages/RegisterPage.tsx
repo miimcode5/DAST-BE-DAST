@@ -123,8 +123,8 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg py-4 animate-fade-up">
-      <div className="rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-sm sm:p-8">
+    <div className="mx-auto max-w-lg py-2 sm:py-4 animate-fade-up">
+      <div className="rounded-3xl border border-[#DCEBDD] bg-white p-5 shadow-sm sm:p-8">
         <div className="mb-6 flex flex-col items-center text-center">
           <BrandLogo />
           <h1 className="mt-4 text-xl font-extrabold text-[#174D35]">عضویت در دست‌به‌دست</h1>
@@ -152,8 +152,8 @@ export function RegisterPage() {
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="مثلاً: علی محمدی"
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-sm text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white"
+            placeholder="مثلاً: علی محمدی"
+            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white sm:text-sm"
               required
             />
           </div>

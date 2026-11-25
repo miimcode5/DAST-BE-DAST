@@ -23,6 +23,7 @@
     background-color: #F6F7F2;
     color: #202820;
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -31,6 +32,7 @@
     background-color: #F6F7F2;
     color: #202820;
     overflow-x: hidden;
+    overscroll-behavior-y: contain;
   }
 
   button,
@@ -39,6 +41,11 @@
   select,
   textarea {
     font-family: inherit;
+  }
+
+  button,
+  a {
+    touch-action: manipulation;
   }
 }
 

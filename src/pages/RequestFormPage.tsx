@@ -220,7 +220,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="space-y-5 rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xs sm:p-8"
+        className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:space-y-5 sm:p-7"
       >
         {formError && (
           <div
@@ -241,7 +241,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="مثلاً: نیاز به همراهی برای خرید روزانه سالمند یا تدریس ریاضی پایه هشتم"
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             required
           />
           {fieldErrors.title && (
@@ -259,7 +259,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="شرح دهید چه کمکی نیاز است، در چه شرایطی انجام می‌شود و چه مهارت یا وسیله‌ای لازم دارد..."
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-sm leading-7 outline-none focus:border-[#26734B] focus:bg-white"
+            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] leading-7 outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             required
           />
           {fieldErrors.description && (
@@ -280,7 +280,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
           onApplyTitle={(nextTitle) => setTitle(nextTitle)}
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
           <div>
             <label htmlFor="req-cat" className="mb-1.5 block text-sm font-semibold text-[#202820]">
               دسته‌بندی *
@@ -289,7 +289,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
               id="req-cat"
               value={category}
               onChange={(e) => setCategory(e.target.value as HelpCategory)}
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             >
               {HELP_CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>
@@ -307,7 +307,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
               id="req-type"
               value={helpType}
               onChange={(e) => setHelpType(e.target.value as HelpType)}
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             >
               {HELP_TYPES.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -318,7 +318,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
           <div>
             <label htmlFor="req-prov" className="mb-1.5 block text-sm font-semibold text-[#202820]">
               استان *
@@ -331,7 +331,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
                 setProvince(nextProv);
                 setCity((IRAN_PROVINCES_CITIES[nextProv] ?? ['سایر شهرها'])[0]);
               }}
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             >
               {PROVINCES_LIST.map((p) => (
                 <option key={p} value={p}>
@@ -349,7 +349,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
               id="req-city"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             >
               {citiesForProvince.map((c) => (
                 <option key={c} value={c}>
@@ -370,14 +370,14 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
             value={area}
             onChange={(e) => setArea(e.target.value)}
             placeholder="مثلاً: محدوده خیابان طالقانی یا محله توحید"
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             required
           />
           {fieldErrors.area && (
             <p className="mt-1 text-xs font-medium text-rose-600">{fieldErrors.area}</p>
           )}
           <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#556455]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#26734B]" />
+            <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#26734B]" />
             <span>برای حفظ امنیت خود، پلاک، نشانی دقیق منزل و شماره تلفن را در فرم عمومی ننویسید.</span>
           </div>
         </div>
@@ -392,7 +392,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
                 key={preset}
                 type="button"
                 onClick={() => setNeededAt(preset)}
-                className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
+                className={`min-h-[36px] rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
                   neededAt === preset
                     ? 'border-[#174D35] bg-[#174D35] text-white'
                     : 'border-[#DCEBDD] bg-[#F6F7F2] text-[#202820] hover:border-[#78B98A]'
@@ -408,7 +408,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
             value={neededAt}
             onChange={(e) => setNeededAt(e.target.value)}
             placeholder="یا زمان دقیق‌تر بنویسید..."
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-2.5 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-2.5 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             required
           />
           {fieldErrors.needed_at && (

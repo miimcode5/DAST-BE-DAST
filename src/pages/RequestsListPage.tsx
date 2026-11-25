@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Filter, Plus, RotateCcw, Search, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, Plus, RotateCcw, Search, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../components/EmptyState';
 import { CardSkeleton } from '../components/LoadingState';
@@ -35,6 +35,10 @@ export function RequestsListPage() {
     (searchParams.get('sort') as 'newest' | 'oldest' | 'in_progress_first' | null) ?? 'newest'
   );
   const [onlyMatched, setOnlyMatched] = useState(false);
+
+  const hasInitialAdvancedFilters =
+    city !== 'all' || helpType !== 'all' || status !== 'active' || sort !== 'newest';
+  const [filtersExpanded, setFiltersExpanded] = useState(hasInitialAdvancedFilters);
 
   const [items, setItems] = useState<HelpRequestFeedItem[]>([]);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
@@ -115,6 +119,16 @@ export function RequestsListPage() {
       .sort((a, b) => b.match.score - a.match.score);
   }, [items, profile, onlyMatched]);
 
+  const activeAdvancedCount =
+    (city !== 'all' ? 1 : 0) +
+    (helpType !== 'all' ? 1 : 0) +
+    (status !== 'active' ? 1 : 0) +
+    (sort !== 'newest' ? 1 : 0) +
+    (onlyMatched ? 1 : 0);
+
+  const hasAnyFilter =
+    Boolean(search.trim()) || category !== 'all' || activeAdvancedCount > 0;
+
   const resetFilters = () => {
     setSearch('');
     setDebouncedSearch('');
@@ -147,17 +161,17 @@ export function RequestsListPage() {
   };
 
   return (
-    <div className="space-y-5 animate-fade-up">
+    <div className="space-y-4 sm:space-y-5 animate-fade-up">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-extrabold text-[#174D35]">درخواست‌های کمک مردمی</h1>
-          <p className="mt-1 text-sm text-[#505E50]">
+          <h1 className="text-lg font-extrabold text-[#174D35] sm:text-xl">درخواست‌های کمک مردمی</h1>
+          <p className="mt-0.5 text-xs text-[#505E50] sm:mt-1 sm:text-sm">
             جست‌وجو و فیلتر بر اساس دسته‌بندی، شهر، وضعیت و نوع همیاری
           </p>
         </div>
         <Link
           to="/requests/new"
-          className="inline-flex items-center gap-1.5 rounded-2xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B] sm:text-sm"
+          className="hidden items-center gap-1.5 rounded-2xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B] sm:inline-flex sm:text-sm"
         >
           <Plus className="h-4 w-4" />
           ثبت درخواست جدید
@@ -165,24 +179,37 @@ export function RequestsListPage() {
       </div>
 
       {/* Search & Filter Panel */}
-      <section className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-5">
+      <section className="space-y-3 rounded-3xl border border-[#DCEBDD] bg-white p-3.5 shadow-xs sm:space-y-4 sm:p-5">
         <div className="relative">
-          <Search className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-[#5A695A]" />
+          <Search className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5A695A]" />
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="جست‌وجو در عنوان، توضیحات یا نام محله (مثلاً: تدریس ریاضی، کولر، بیرجند)..."
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/70 py-3 pr-10 pl-4 text-sm outline-none transition focus:border-[#26734B] focus:bg-white"
+            placeholder="جست‌وجو در عنوان، توضیحات یا محله..."
+            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/70 py-2.5 pr-10 pl-10 text-[15px] outline-none transition focus:border-[#26734B] focus:bg-white sm:text-sm"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                setDebouncedSearch('');
+              }}
+              aria-label="پاک کردن متن جست‌وجو"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1 text-[#5A695A] hover:bg-[#DCEBDD]/50 hover:text-[#174D35]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Category horizontal pills */}
-        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-0.5">
           <button
             type="button"
             onClick={() => setCategory('all')}
-            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+            className={`min-h-[36px] shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
               category === 'all'
                 ? 'border-[#174D35] bg-[#174D35] text-white'
                 : 'border-[#DCEBDD] bg-[#F6F7F2] text-[#202820] hover:border-[#78B98A]'
@@ -195,7 +222,7 @@ export function RequestsListPage() {
               key={cat.id}
               type="button"
               onClick={() => setCategory(cat.id)}
-              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+              className={`min-h-[36px] shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
                 category === cat.id
                   ? 'border-[#174D35] bg-[#174D35] text-white'
                   : 'border-[#DCEBDD] bg-[#F6F7F2] text-[#202820] hover:border-[#78B98A]'
@@ -206,8 +233,8 @@ export function RequestsListPage() {
           ))}
         </div>
 
-        {/* Select Filters */}
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        {/* Collapsible Select Filters on Mobile, always visible on sm+ */}
+        <div className={`${filtersExpanded ? 'grid' : 'hidden sm:grid'} grid-cols-2 gap-2.5 sm:grid-cols-4`}>
           <div>
             <label htmlFor="filter-city" className="mb-1 block text-[11px] font-semibold text-[#556455]">
               شهر
@@ -216,7 +243,7 @@ export function RequestsListPage() {
               id="filter-city"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-xs font-medium outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[42px] w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-[13px] font-medium outline-none focus:border-[#26734B] focus:bg-white sm:text-xs"
             >
               <option value="all">همه شهرها</option>
               {availableCities.map((c) => (
@@ -235,7 +262,7 @@ export function RequestsListPage() {
               id="filter-type"
               value={helpType}
               onChange={(e) => setHelpType(e.target.value as HelpType | 'all')}
-              className="w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-xs font-medium outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[42px] w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-[13px] font-medium outline-none focus:border-[#26734B] focus:bg-white sm:text-xs"
             >
               <option value="all">همه انواع</option>
               {HELP_TYPES.map((t) => (
@@ -254,7 +281,7 @@ export function RequestsListPage() {
               id="filter-status"
               value={status}
               onChange={(e) => setStatus(e.target.value as RequestStatus | 'active' | 'all')}
-              className="w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-xs font-medium outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[42px] w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-[13px] font-medium outline-none focus:border-[#26734B] focus:bg-white sm:text-xs"
             >
               <option value="active">فعال (باز و در حال انجام)</option>
               <option value="open">فقط باز</option>
@@ -274,7 +301,7 @@ export function RequestsListPage() {
               onChange={(e) =>
                 setSort(e.target.value as 'newest' | 'oldest' | 'in_progress_first')
               }
-              className="w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-xs font-medium outline-none focus:border-[#26734B] focus:bg-white"
+              className="min-h-[42px] w-full rounded-xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3 py-2 text-[13px] font-medium outline-none focus:border-[#26734B] focus:bg-white sm:text-xs"
             >
               <option value="newest">جدیدترین</option>
               <option value="oldest">قدیمی‌ترین</option>
@@ -283,37 +310,65 @@ export function RequestsListPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#F6F7F2] pt-3 text-xs">
-          <div className="flex flex-wrap items-center gap-3">
+        {/* Filter summary & mobile filter drawer toggle */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#F6F7F2] pt-2.5 text-xs">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="inline-flex items-center gap-1 font-semibold text-[#465346]">
               <Filter className="h-3.5 w-3.5 text-[#26734B]" />
-              {toPersianDigits(displayedItems.length)} درخواست یافت شد
+              {toPersianDigits(displayedItems.length)} درخواست
             </span>
+
+            <button
+              type="button"
+              onClick={() => setFiltersExpanded((prev) => !prev)}
+              className={`inline-flex min-h-[34px] items-center gap-1.5 rounded-xl border px-3 py-1 font-bold transition sm:hidden ${
+                filtersExpanded || activeAdvancedCount > 0
+                  ? 'border-[#174D35] bg-[#DCEBDD]/70 text-[#174D35]'
+                  : 'border-[#DCEBDD] bg-[#F6F7F2] text-[#202820]'
+              }`}
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>فیلتر پیشرفته</span>
+              {activeAdvancedCount > 0 && (
+                <span className="rounded-full bg-[#174D35] px-1.5 py-0.5 text-[10px] text-white">
+                  {toPersianDigits(activeAdvancedCount)}
+                </span>
+              )}
+              {filtersExpanded ? (
+                <ChevronUp className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5" />
+              )}
+            </button>
 
             {profile && (
               <button
                 type="button"
                 onClick={() => setOnlyMatched((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 font-semibold transition ${
+                className={`${
+                  filtersExpanded ? 'inline-flex' : 'hidden sm:inline-flex'
+                } min-h-[34px] items-center gap-1.5 rounded-xl border px-3 py-1.5 font-semibold transition ${
                   onlyMatched
                     ? 'border-[#E9B949] bg-[#E9B949]/20 text-[#7A5807]'
                     : 'border-[#DCEBDD] bg-[#F6F7F2] text-[#202820] hover:border-[#78B98A]'
                 }`}
               >
                 <Sparkles className="h-3.5 w-3.5 text-[#E9B949]" />
-                پیشنهادهای متناسب با شهر و مهارت من
+                متناسب با شهر و مهارت من
               </button>
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="inline-flex items-center gap-1 font-semibold text-[#26734B] hover:text-[#174D35]"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            پاک‌کردن فیلترها
-          </button>
+          {hasAnyFilter && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="inline-flex min-h-[34px] items-center gap-1 font-semibold text-[#26734B] hover:text-[#174D35]"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              پاک‌کردن فیلترها
+            </button>
+          )}
         </div>
       </section>
 
@@ -345,7 +400,7 @@ export function RequestsListPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {displayedItems.map(({ req, match }) => (
             <RequestCard
               key={req.id}

@@ -146,19 +146,19 @@ export function MessagesPage() {
       )}
 
       {conversations.length > 0 && (
-        <div className="space-y-3 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs">
+        <div className="space-y-3 rounded-3xl border border-[#DCEBDD] bg-white p-3.5 shadow-xs sm:p-4">
           <div className="relative">
             <Search className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#667466]" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="جست‌وجو بر اساس نام کاربر، عنوان درخواست یا متن پیام..."
-              className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/70 py-2.5 pr-10 pl-4 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+              placeholder="جست‌وجو بر اساس نام، درخواست یا متن پیام..."
+              className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/70 py-2.5 pr-10 pl-4 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
             />
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="no-scrollbar flex flex-nowrap gap-2 overflow-x-auto pb-0.5 sm:flex-wrap">
             {(
               [
                 { id: 'all', label: 'همه گفت‌وگوها', count: conversations.length },
@@ -178,7 +178,7 @@ export function MessagesPage() {
                 key={t.id}
                 type="button"
                 onClick={() => setFilterTab(t.id)}
-                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition ${
+                className={`inline-flex min-h-[36px] shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition ${
                   filterTab === t.id
                     ? 'border-[#174D35] bg-[#174D35] text-white'
                     : 'border-[#DCEBDD] bg-[#F6F7F2] text-[#202820] hover:border-[#78B98A]'
@@ -268,12 +268,12 @@ export function MessagesPage() {
 
                   {/* Body */}
                   <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
                         <span className="truncate text-sm font-extrabold text-[#202820]">
                           {conv.other_user_name}
                         </span>
-                        <span className="rounded-lg bg-[#F6F7F2] px-2 py-0.5 text-[10px] font-semibold text-[#26734B]">
+                        <span className="shrink-0 rounded-lg bg-[#F6F7F2] px-2 py-0.5 text-[10px] font-semibold text-[#26734B]">
                           {roleLabel}
                         </span>
                       </div>
@@ -282,12 +282,14 @@ export function MessagesPage() {
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="truncate text-xs font-bold text-[#174D35]">
+                    <div className="space-y-1">
+                      <p className="truncate text-xs font-bold text-[#174D35]">
                         {conv.request_title}
-                      </span>
-                      <CategoryBadge category={conv.request_category} />
-                      <ConversationStatusBadge status={conv.status} />
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <CategoryBadge category={conv.request_category} />
+                        <ConversationStatusBadge status={conv.status} />
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between gap-2 pt-0.5">

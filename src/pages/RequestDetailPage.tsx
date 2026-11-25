@@ -305,11 +305,11 @@ export function RequestDetailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 animate-fade-up">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-3xl space-y-5 sm:space-y-6 animate-fade-up">
+      <div className="flex items-center justify-between gap-2">
         <Link
           to="/requests"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/30"
+          className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/30"
         >
           <ArrowRight className="h-4 w-4" />
           بازگشت به درخواست‌ها
@@ -319,7 +319,7 @@ export function RequestDetailPage() {
           <button
             type="button"
             onClick={handleToggleSave}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
+            className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
               isSaved
                 ? 'border-[#174D35] bg-[#DCEBDD] text-[#174D35]'
                 : 'border-[#DCEBDD] bg-white text-[#202820] hover:border-[#78B98A]'
@@ -338,8 +338,8 @@ export function RequestDetailPage() {
       )}
 
       {/* Main Request Card */}
-      <article className="rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xs sm:p-8">
-        <div className="mb-4 flex flex-wrap items-center gap-2">
+      <article className="rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-7">
+        <div className="mb-3.5 flex flex-wrap items-center gap-2">
           <CategoryBadge category={request.category} />
           <RequestStatusBadge status={request.status} />
           <span className="rounded-full bg-[#F6F7F2] px-3 py-1 text-xs font-semibold text-[#26734B]">
@@ -347,25 +347,25 @@ export function RequestDetailPage() {
           </span>
         </div>
 
-        <h1 className="mb-4 text-xl font-extrabold leading-9 text-[#202820] sm:text-2xl">
+        <h1 className="mb-3.5 text-lg font-extrabold leading-8 text-[#202820] sm:mb-4 sm:text-2xl sm:leading-9">
           {request.title}
         </h1>
 
         {request.image_url && (
-          <div className="mb-5 overflow-hidden rounded-2xl border border-[#DCEBDD]">
+          <div className="mb-4 overflow-hidden rounded-2xl border border-[#DCEBDD] sm:mb-5">
             <img
               src={request.image_url}
               alt={request.title}
-              className="max-h-96 w-full object-cover"
+              className="max-h-80 w-full object-cover sm:max-h-96"
             />
           </div>
         )}
 
-        <p className="mb-6 whitespace-pre-line text-sm leading-8 text-[#344234] sm:text-base">
+        <p className="mb-5 whitespace-pre-line text-sm leading-7 text-[#344234] sm:mb-6 sm:text-base sm:leading-8">
           {request.description}
         </p>
 
-        <div className="grid gap-3 rounded-2xl bg-[#F6F7F2] p-4 text-xs sm:grid-cols-2">
+        <div className="grid gap-2.5 rounded-2xl bg-[#F6F7F2] p-3.5 text-xs sm:grid-cols-2 sm:gap-3 sm:p-4">
           <div className="flex items-center gap-2 text-[#202820]">
             <MapPin className="h-4 w-4 shrink-0 text-[#26734B]" />
             <span>
@@ -463,18 +463,18 @@ export function RequestDetailPage() {
 
       {/* VOLUNTEER INTERACTION PANEL (Non-Owner) */}
       {!isOwner && !fromOfflineCache && (
-        <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xs">
+        <section className="rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-6">
           {!user ? (
             <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-right">
               <div>
                 <h2 className="text-base font-extrabold text-[#174D35]">می‌خواهید در این مورد کمک کنید؟</h2>
-                <p className="mt-1 text-sm text-[#505E50]">
+                <p className="mt-1 text-xs leading-6 text-[#505E50] sm:text-sm">
                   برای ثبت اعلام آمادگی و هماهنگی با درخواست‌کننده، ابتدا وارد حساب خود شوید.
                 </p>
               </div>
               <Link
                 to={`/auth/login?next=${encodeURIComponent(`/requests/${request.id}`)}`}
-                className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-[#174D35] px-5 py-3 text-sm font-bold text-white hover:bg-[#26734B]"
+                className="inline-flex min-h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-5 py-3 text-sm font-bold text-white hover:bg-[#26734B] sm:w-auto"
               >
                 ورود و اعلام آمادگی
               </Link>
@@ -486,7 +486,7 @@ export function RequestDetailPage() {
                 <ResponseStatusBadge status={myResponse.status} />
               </div>
 
-              <p className="text-sm leading-7 text-[#465346]">
+              <p className="text-xs leading-6 text-[#465346] sm:text-sm sm:leading-7">
                 {RESPONSE_STATUS_META[myResponse.status].description}
               </p>
 
@@ -503,12 +503,12 @@ export function RequestDetailPage() {
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-2.5 pt-1">
+              <div className="flex flex-col gap-2.5 pt-1 sm:flex-row sm:flex-wrap">
                 <button
                   type="button"
                   disabled={actionBusy}
                   onClick={() => void handleOpenChat(myResponse.id, convByVolunteer[user.id]?.id)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:w-auto"
                 >
                   <MessageCircle className="h-4 w-4 text-[#E9B949]" />
                   <span>گفت‌وگوی خصوصی با درخواست‌کننده</span>
@@ -525,7 +525,7 @@ export function RequestDetailPage() {
                       type="button"
                       disabled={actionBusy}
                       onClick={() => handleMarkVolunteerDone(myResponse.id)}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#26734B] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60"
+                      className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#26734B] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60 sm:w-auto"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       اعلام انجام کمک از طرف من
@@ -539,7 +539,7 @@ export function RequestDetailPage() {
                     onClick={() =>
                       setDialog({ type: 'withdraw_response', responseId: myResponse.id })
                     }
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                    className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100 disabled:opacity-60 sm:w-auto"
                   >
                     <XCircle className="h-4 w-4" />
                     لغو اعلام آمادگی
@@ -555,14 +555,14 @@ export function RequestDetailPage() {
                     <h2 className="text-base font-extrabold text-[#174D35]">
                       آماده یاری هستید؟
                     </h2>
-                    <p className="mt-1 text-sm text-[#505E50]">
+                    <p className="mt-1 text-xs leading-6 text-[#505E50] sm:text-sm">
                       با ثبت اعلام آمادگی، درخواست‌کننده درخواست شما را مشاهده و بررسی می‌کند.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setShowOfferForm(true)}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-[#174D35] px-6 py-3.5 text-sm font-extrabold text-white shadow-sm transition hover:bg-[#26734B]"
+                    className="inline-flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-6 py-3.5 text-sm font-extrabold text-white shadow-sm transition hover:bg-[#26734B] sm:w-auto"
                   >
                     <HandHelping className="h-5 w-5 text-[#E9B949]" />
                     من می‌توانم کمک کنم
@@ -581,13 +581,13 @@ export function RequestDetailPage() {
                     value={offerMessage}
                     onChange={(e) => setOfferMessage(e.target.value)}
                     placeholder="مثلاً: سلام، من در محدوده خیابان معلم هستم و فردا عصر می‌توانم برای انجام این کار کمک کنم."
-                    className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 p-3.5 text-sm leading-6 outline-none focus:border-[#26734B] focus:bg-white"
+                    className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 p-3.5 text-[15px] leading-6 outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
                   />
-                  <div className="flex flex-wrap gap-2.5">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-2.5">
                     <button
                       type="submit"
                       disabled={actionBusy}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                      className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:w-auto"
                     >
                       <Check className="h-4 w-4" />
                       {actionBusy ? 'در حال ثبت...' : 'تأیید و ارسال اعلام آمادگی'}
@@ -596,7 +596,7 @@ export function RequestDetailPage() {
                       type="button"
                       onClick={() => setShowOfferForm(false)}
                       disabled={actionBusy}
-                      className="rounded-xl border border-[#DCEBDD] px-4 py-2.5 text-xs font-bold text-[#465346] hover:bg-[#F6F7F2]"
+                      className="min-h-[42px] w-full rounded-xl border border-[#DCEBDD] px-4 py-2.5 text-xs font-bold text-[#465346] hover:bg-[#F6F7F2] sm:w-auto"
                     >
                       انصراف
                     </button>
@@ -614,7 +614,7 @@ export function RequestDetailPage() {
 
       {/* REQUEST OWNER VOLUNTEER MANAGEMENT PANEL */}
       {isOwner && !fromOfflineCache && (
-        <section className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xs">
+        <section className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-base font-extrabold text-[#174D35]">
               داوطلبان اعلام آمادگی‌کرده ({toPersianDigits(responses.length)})
@@ -702,7 +702,7 @@ export function RequestDetailPage() {
                             convByVolunteer[resp.volunteer_id]?.id
                           )
                         }
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-[#174D35] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/50 disabled:opacity-60"
+                        className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-xl border border-[#174D35] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/50 disabled:opacity-60 sm:w-auto"
                       >
                         <MessageCircle className="h-3.5 w-3.5" />
                         <span>گفت‌وگوی خصوصی</span>
@@ -719,7 +719,7 @@ export function RequestDetailPage() {
                             type="button"
                             disabled={actionBusy}
                             onClick={() => handleAccept(resp.id)}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:flex-initial"
                           >
                             <Check className="h-3.5 w-3.5" />
                             پذیرفتن داوطلب
@@ -730,7 +730,7 @@ export function RequestDetailPage() {
                             onClick={() =>
                               setDialog({ type: 'reject_response', responseId: resp.id })
                             }
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 disabled:opacity-60 sm:flex-initial"
                           >
                             <XCircle className="h-3.5 w-3.5" />
                             رد کردن
@@ -744,7 +744,7 @@ export function RequestDetailPage() {
                             type="button"
                             disabled={actionBusy}
                             onClick={() => handleStart(resp.id)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-[#26734B] bg-white px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/40 disabled:opacity-60"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#26734B] bg-white px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/40 disabled:opacity-60 sm:flex-initial"
                           >
                             <Play className="h-3.5 w-3.5" />
                             شروع همکاری
@@ -759,7 +759,7 @@ export function RequestDetailPage() {
                                 volunteerName: volName,
                               })
                             }
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#26734B] px-4 py-2 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#26734B] px-4 py-2 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60 sm:flex-initial"
                           >
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             تأیید تکمیل کمک
@@ -770,7 +770,7 @@ export function RequestDetailPage() {
                             onClick={() =>
                               setDialog({ type: 'reject_response', responseId: resp.id })
                             }
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100"
+                            className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 sm:w-auto"
                           >
                             لغو انتخاب
                           </button>
@@ -788,7 +788,7 @@ export function RequestDetailPage() {
                               volunteerName: volName,
                             })
                           }
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                          className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:w-auto"
                         >
                           <CheckCircle2 className="h-3.5 w-3.5 text-[#E9B949]" />
                           تأیید نهایی تکمیل کمک

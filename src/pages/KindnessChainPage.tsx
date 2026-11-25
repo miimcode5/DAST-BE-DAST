@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CheckCircle2, HeartHandshake, Link2, MapPin, Plus, Sparkles, Users } from 'lucide-react';
+import { ArrowDown, ArrowLeft, CheckCircle2, HeartHandshake, Link2, MapPin, Plus, Sparkles, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
@@ -132,8 +132,8 @@ export function KindnessChainPage() {
                 className="relative overflow-hidden rounded-3xl border border-[#DCEBDD] bg-gradient-to-l from-white via-white to-[#DCEBDD]/35 p-5 shadow-xs transition hover:border-[#78B98A]"
               >
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                  {/* Helper -> Recipient visual link */}
-                  <div className="flex flex-wrap items-center gap-3">
+                  {/* Helper -> Recipient visual link (vertical connector on mobile, horizontal RTL arrow on sm+) */}
+                  <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                     <div className="flex items-center gap-2 rounded-2xl bg-[#DCEBDD]/70 px-3 py-2">
                       {link.helper_avatar ? (
                         <img
@@ -152,10 +152,11 @@ export function KindnessChainPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-[#26734B]">
-                      <span className="h-2 w-2 rounded-full bg-[#78B98A] animate-pulse-ring" />
-                      <span className="h-0.5 w-8 bg-gradient-to-l from-[#174D35] to-[#78B98A]" />
-                      <ArrowLeft className="h-4 w-4 text-[#174D35]" />
+                    <div className="flex items-center justify-center gap-1.5 py-0.5 text-[#26734B] sm:py-0">
+                      <ArrowDown className="h-4 w-4 text-[#174D35] sm:hidden" />
+                      <span className="hidden h-2 w-2 rounded-full bg-[#78B98A] animate-pulse-ring sm:block" />
+                      <span className="hidden h-0.5 w-8 bg-gradient-to-l from-[#174D35] to-[#78B98A] sm:block" />
+                      <ArrowLeft className="hidden h-4 w-4 text-[#174D35] sm:block" />
                     </div>
 
                     <div className="flex items-center gap-2 rounded-2xl border border-[#DCEBDD] bg-white px-3 py-2">
@@ -177,7 +178,7 @@ export function KindnessChainPage() {
                     </div>
 
                     {link.chain_continued && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[#E9B949]/25 px-2.5 py-1 text-[11px] font-extrabold text-[#7A5807]">
+                      <span className="inline-flex items-center justify-center gap-1 rounded-full bg-[#E9B949]/25 px-2.5 py-1 text-[11px] font-extrabold text-[#7A5807]">
                         <Sparkles className="h-3.5 w-3.5 text-[#E9B949]" />
                         ادامه‌دهنده زنجیره
                       </span>

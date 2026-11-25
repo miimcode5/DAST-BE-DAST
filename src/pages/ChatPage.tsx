@@ -507,15 +507,15 @@ export function ChatPage() {
   const statusMeta = CONVERSATION_STATUS_META[conversation.status];
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-10.5rem)] max-w-3xl flex-col overflow-hidden rounded-3xl border border-[#DCEBDD] bg-white shadow-sm md:h-[calc(100dvh-9.5rem)] animate-fade-up">
+    <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden bg-white md:h-[calc(100dvh-9.5rem)] md:flex-none md:rounded-3xl md:border md:border-[#DCEBDD] md:shadow-sm animate-fade-up">
       {/* Chat Header */}
-      <header className="shrink-0 border-b border-[#DCEBDD] bg-white px-4 py-3 sm:px-5">
+      <header className="shrink-0 border-b border-[#DCEBDD] bg-white px-3 py-2.5 sm:px-5 sm:py-3">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
             <Link
               to="/messages"
               aria-label="بازگشت به فهرست پیام‌ها"
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] text-[#174D35] hover:bg-[#DCEBDD]/60"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] text-[#174D35] hover:bg-[#DCEBDD]/60 sm:h-9 sm:w-9"
             >
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -776,9 +776,9 @@ export function ChatPage() {
       )}
 
       {/* Composer or Lifecycle Status Lock */}
-      <footer className="shrink-0 border-t border-[#DCEBDD] bg-white p-3 sm:p-4">
+      <footer className="shrink-0 border-t border-[#DCEBDD] bg-white px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))] sm:p-4">
         {!canSendMessage ? (
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-3 text-xs text-[#465346]">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2] px-3.5 py-2.5 text-xs text-[#465346] sm:px-4 sm:py-3">
             <div className="flex items-center gap-2">
               <Lock className="h-4 w-4 shrink-0 text-[#174D35]" />
               <span>{statusMeta.helperNote}</span>
@@ -791,7 +791,7 @@ export function ChatPage() {
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-1.5 sm:space-y-2">
             {(privacyHint.hasPhoneNumber || privacyHint.hasExactAddressHint) && (
               <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-medium text-amber-900">
                 توجه: متن شما شامل شماره تماس یا جزئیات دقیق نشانی است؛ تنها در صورت اطمینان برای هماهنگی ارسال کنید.
@@ -808,24 +808,24 @@ export function ChatPage() {
                 onKeyDown={handleTextareaKeyDown}
                 placeholder={
                   isOnline
-                    ? 'پیام خود را بنویسید... (Enter برای ارسال)'
+                    ? 'پیام خود را بنویسید...'
                     : 'اتصال اینترنت قطع است...'
                 }
-                className="max-h-36 min-h-[44px] flex-1 resize-none rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/70 px-4 py-2.5 text-sm leading-6 outline-none focus:border-[#26734B] focus:bg-white"
+                className="max-h-36 min-h-[44px] flex-1 resize-none rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/70 px-3.5 py-2.5 text-[15px] leading-6 outline-none focus:border-[#26734B] focus:bg-white sm:px-4 sm:text-sm"
               />
 
               <button
                 type="submit"
                 disabled={!draft.trim()}
                 aria-label="ارسال پیام"
-                className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-[#174D35] px-4 text-sm font-bold text-white shadow-xs transition hover:bg-[#26734B] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-[#174D35] px-3.5 text-sm font-bold text-white shadow-xs transition hover:bg-[#26734B] disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
               >
                 <Send className="h-4 w-4" />
                 <span className="hidden sm:inline">ارسال</span>
               </button>
             </div>
 
-            <div className="flex items-center justify-between px-1 text-[10px] text-[#667466]">
+            <div className="hidden items-center justify-between px-1 text-[10px] text-[#667466] sm:flex">
               <span>ارسال با Enter · خط جدید با Shift + Enter</span>
               {draft.length > 1400 && (
                 <span>
@@ -833,18 +833,24 @@ export function ChatPage() {
                 </span>
               )}
             </div>
+            {draft.length > 1400 && (
+              <div className="px-1 text-left text-[10px] text-[#667466] sm:hidden">
+                {toPersianDigits(draft.length)} / {toPersianDigits(MAX_CHAT_MESSAGE_LENGTH)}
+              </div>
+            )}
           </form>
         )}
       </footer>
 
-      {/* Report Modal */}
+      {/* Report Modal — Native bottom sheet on mobile */}
       {reportOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#202820]/50 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-[#202820]/50 p-0 backdrop-blur-xs sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-md rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xl">
+          <div className="w-full max-w-md rounded-t-3xl border border-[#DCEBDD] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-xl animate-fade-up sm:rounded-3xl sm:p-6">
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#DCEBDD] sm:hidden" />
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-extrabold text-[#174D35]">
                 گزارش گفت‌وگو یا رفتار نامناسب
@@ -866,7 +872,7 @@ export function ChatPage() {
                 <select
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value as ConversationReportReason)}
-                  className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2.5 text-sm outline-none focus:border-[#26734B]"
+                  className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-[#26734B] sm:text-sm"
                 >
                   {CONVERSATION_REPORT_REASONS.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -886,23 +892,23 @@ export function ChatPage() {
                   maxLength={1000}
                   onChange={(e) => setReportDetails(e.target.value)}
                   placeholder="توضیح مختصری درباره مورد پیش‌آمده بنویسید..."
-                  className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 p-3 text-sm outline-none focus:border-[#26734B]"
+                  className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 p-3 text-[15px] outline-none focus:border-[#26734B] sm:text-sm"
                 />
               </div>
 
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setReportOpen(false)}
                   disabled={reportBusy}
-                  className="rounded-xl border border-[#DCEBDD] px-4 py-2 text-xs font-bold text-[#465346]"
+                  className="min-h-[42px] rounded-xl border border-[#DCEBDD] px-4 py-2 text-xs font-bold text-[#465346]"
                 >
                   انصراف
                 </button>
                 <button
                   type="submit"
                   disabled={reportBusy}
-                  className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 disabled:opacity-60"
+                  className="min-h-[42px] rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 disabled:opacity-60"
                 >
                   {reportBusy ? 'در حال ثبت...' : 'ثبت گزارش'}
                 </button>
