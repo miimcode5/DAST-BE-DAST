@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#174D35" />
+    <title>حالت آفلاین | دست‌به‌دست</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Vazirmatn, Tahoma, sans-serif;
+        background: #F6F7F2;
+        color: #202820;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        max-width: 440px;
+        width: 100%;
+        background: #FFFFFF;
+        border: 1px solid #DCEBDD;
+        border-radius: 24px;
+        padding: 32px 24px;
+        text-align: center;
+        box-shadow: 0 12px 32px rgba(23, 77, 53, 0.08);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #DCEBDD;
+        color: #174D35;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 22px;
+        color: #174D35;
+      }
+      p {
+        margin: 0 0 24px;
+        line-height: 1.8;
+        font-size: 15px;
+        color: #465346;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        background: #174D35;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 14px;
+        padding: 13px 20px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .btn:hover {
+        background: #26734B;
+      }
+      .sub {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #5E6C5E;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="badge">اتصال اینترنت برقرار نیست</div>
+      <h1>شما در حالت آفلاین هستید</h1>
+      <p>
+        در حال حاضر دسترسی به اینترنت وجود ندارد. برای مشاهده آخرین درخواست‌های همیاری و ثبت اطلاعات جدید در سرور، اتصال اینترنت خود را بررسی کنید.
+      </p>
+      <button class="btn" onclick="window.location.reload()">تلاش مجدد برای اتصال</button>
+      <div class="sub">دست‌به‌دست؛ توان ما، کنار هم معنا پیدا می‌کند.</div>
+    </main>
+  </body>
+</html>
