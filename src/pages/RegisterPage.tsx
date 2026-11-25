@@ -76,7 +76,7 @@ export function RegisterPage() {
             city,
             neighborhood: neighborhood.trim() || null,
           },
-          emailRedirectTo: `${window.location.origin}/auth/login`,
+          emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}auth/login`,
         },
       });
 

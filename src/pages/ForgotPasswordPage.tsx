@@ -23,7 +23,7 @@ export function ForgotPasswordPage() {
     setSubmitting(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}auth/reset-password`,
       });
       if (error) {
         setErrorMsg(mapSupabaseErrorToPersian(error, 'ارسال لینک بازیابی ناموفق بود.'));
