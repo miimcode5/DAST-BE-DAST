@@ -31,6 +31,7 @@ function makeClient() {
 const ts = Date.now();
 const user1Email = `e2e.requester.${ts}@example.com`;
 const user2Email = `e2e.volunteer.${ts}@example.com`;
+const user3Email = `e2e.outsider.${ts}@example.com`;
 const password = `DastTest#${ts}`;
 
 async function run() {
@@ -154,13 +155,70 @@ async function run() {
     .select();
   assert(!hijackErr && (!hijackRows || hijackRows.length === 0), 'Non-owner must not update request');
 
-  console.log('9. User 2 clicks "I can help" & duplicate offer is blocked...');
+  console.log('9. User 2 clicks "I can help" -> auto-creates private chat & blocks duplicate...');
   const { data: offer1, error: offer1Err } = await u2.rpc('submit_volunteer_response', {
     p_request_id: req1.id,
     p_message: 'سلام، عصر در محدوده مدرس هستم و می‌توانم همراهی کنم.',
   });
   assert.ifError(offer1Err);
   assert.equal(offer1.status, 'pending');
+
+  const { data: u2Convs, error: u2ConvsErr } = await u2.rpc('get_my_conversations');
+  assert.ifError(u2ConvsErr);
+  const convAB = u2Convs.find((c) => c.request_id === req1.id && c.volunteer_id === u2Id);
+  assert(convAB, 'Private conversation between A and B must be auto-created');
+
+  console.log('9b. Testing Real-time Private Chat messaging, read receipts, and User C isolation...');
+  const { data: msgB, error: msgBErr } = await u2.rpc('send_chat_message', {
+    p_conversation_id: convAB.id,
+    p_content: 'سلام کاربر اول، ساعت ۱۷ مناسب است؟',
+  });
+  assert.ifError(msgBErr);
+  assert.equal(msgB.sender_id, u2Id);
+
+  const { data: u1Unread } = await u1.rpc('get_total_unread_messages_count');
+  assert(u1Unread >= 2, 'User A must see unread messages from User B');
+
+  const { data: readCount } = await u1.rpc('mark_conversation_messages_read', {
+    p_conversation_id: convAB.id,
+  });
+  assert(readCount >= 2, 'User A marking messages read must update read_at');
+
+  const { data: msgA, error: msgAErr } = await u1.rpc('send_chat_message', {
+    p_conversation_id: convAB.id,
+    p_content: 'بله ساعت ۱۷ عالی است، سپاسگزارم.',
+  });
+  assert.ifError(msgAErr);
+  assert.equal(msgA.sender_id, u1Id);
+
+  // User C (unrelated third party) must see ZERO conversations/messages and be blocked from sending
+  const u3 = makeClient();
+  const { data: s3, error: e3 } = await u3.auth.signUp({
+    email: user3Email,
+    password,
+    options: { data: { display_name: 'کاربر سوم غیرمرتبط' } },
+  });
+  assert.ifError(e3);
+  assert(s3.user && s3.session);
+
+  const { data: u3Msgs } = await u3.from('messages').select('*').eq('conversation_id', convAB.id);
+  assert.equal((u3Msgs ?? []).length, 0, 'User C must NOT read private messages');
+  const { error: u3SendErr } = await u3.rpc('send_chat_message', {
+    p_conversation_id: convAB.id,
+    p_content: 'پیام غیرمجاز',
+  });
+  assert(u3SendErr, 'User C must NOT send messages in A-B conversation');
+
+  // Second volunteer (User C volunteering on req1) must get a completely separate conversation!
+  const { data: offerC, error: offerCErr } = await u3.rpc('submit_volunteer_response', {
+    p_request_id: req1.id,
+    p_message: 'من هم می‌توانم کمک کنم',
+  });
+  assert.ifError(offerCErr);
+  const { data: convACId } = await u3.rpc('ensure_conversation_for_response', {
+    p_response_id: offerC.id,
+  });
+  assert.notEqual(convACId.id ?? convACId, convAB.id, 'Multiple volunteers must have separate private chats');
 
   const { error: dupOfferErr } = await u2.rpc('submit_volunteer_response', {
     p_request_id: req1.id,
@@ -175,14 +233,14 @@ async function run() {
     .eq('id', offer1.id);
   assert(directUpdateVrErr, 'Direct table update on volunteer_responses must be blocked');
 
-  console.log('11. Back to User 1: seeing offer, accepting, User 2 marks done, User 1 confirms completion...');
+  console.log('11. Back to User 1: seeing both volunteers, accepting User B, completing help...');
   const { data: ownerOffers, error: ownerOffersErr } = await u1
     .from('volunteer_responses')
     .select('*, profiles(display_name)')
     .eq('request_id', req1.id);
   assert.ifError(ownerOffersErr);
-  assert.equal(ownerOffers.length, 1);
-  assert.equal(ownerOffers[0].volunteer_id, u2Id);
+  assert.equal(ownerOffers.length, 2);
+  assert(ownerOffers.some((o) => o.volunteer_id === u2Id));
 
   const { data: acceptedOffer, error: acceptErr } = await u1.rpc('accept_volunteer_response', {
     p_response_id: offer1.id,
@@ -203,6 +261,12 @@ async function run() {
   assert.ifError(confirmErr);
   assert.equal(completedOffer.status, 'completed');
   assert.equal(completedOffer.requester_confirmed, true);
+
+  const { error: sendAfterCompleteErr } = await u2.rpc('send_chat_message', {
+    p_conversation_id: convAB.id,
+    p_content: 'پیام بعد از تکمیل',
+  });
+  assert(sendAfterCompleteErr, 'New messages must be blocked after completion while history remains');
 
   console.log('12. Checking User 2 completed_helps_count, platform stats, and kindness chain...');
   const { data: p2After } = await u2.from('profiles').select('*').eq('id', u2Id).single();
