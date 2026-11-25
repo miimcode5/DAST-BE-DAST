@@ -15,6 +15,7 @@ import { getInitials } from '../lib/formatters';
 interface RassaMember {
   id: string;
   name: string;
+  role: string;
   photoUrl: string;
 }
 
@@ -22,24 +23,28 @@ const RASSA_TEAM_MEMBERS: RassaMember[] = [
   {
     id: 'mojtaba',
     name: 'مجتبی میدانی',
+    role: 'سرپرست تیم و فرانت‌اندکار',
     photoUrl:
       'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/mojtaba.jpg',
   },
   {
     id: 'mohammad',
     name: 'محمد صحرانورد',
+    role: 'توسعه‌دهنده موبایل و ادیتور',
     photoUrl:
       'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/mohammad.jpg',
   },
   {
     id: 'abolfazl',
     name: 'سید ابوالفضل میرزازاده',
+    role: 'بک‌اندکار و پشتیبان‌گیری',
     photoUrl:
       'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/abolfazl.jpg',
   },
   {
     id: 'alireza',
     name: 'علیرضا حاجی‌زاده',
+    role: 'مسئول محتوا و ارائه',
     photoUrl:
       'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/alireza.jpg',
   },
@@ -77,10 +82,13 @@ function MemberPortraitCard({ member }: { member: RassaMember }) {
         />
       </div>
 
-      <div className="flex items-center justify-center border-t border-[#DCEBDD] bg-white px-3 py-3 text-center">
-        <h3 className="truncate text-sm font-extrabold text-[#174D35] sm:text-[15px]">
+      <div className="flex flex-col items-center justify-center gap-1 border-t border-[#DCEBDD] bg-white px-2.5 py-3 text-center sm:px-3">
+        <h3 className="text-sm font-extrabold leading-5 text-[#174D35] sm:text-[15px]">
           {member.name}
         </h3>
+        <p className="text-[11px] font-semibold leading-4 text-[#26734B] sm:text-xs">
+          {member.role}
+        </p>
       </div>
     </article>
   );
