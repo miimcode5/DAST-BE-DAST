@@ -101,3 +101,41 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Seamless infinite loop carousel for AboutPage team showcase */
+@keyframes rassaMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.rassa-marquee-viewport {
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+.rassa-marquee-track {
+  animation: rassaMarquee 22s linear infinite;
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rassa-marquee-viewport:hover .rassa-marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rassa-marquee-viewport {
+    overflow-x: auto;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .rassa-marquee-track {
+    animation: none;
+  }
+}
+
