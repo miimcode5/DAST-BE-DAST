@@ -13,6 +13,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LoadingState } from '../components/LoadingState';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatDateFa, getInitials, toPersianDigits } from '../lib/formatters';
@@ -95,10 +96,11 @@ export function ProfilePage() {
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start sm:gap-5">
           <div className="flex items-start gap-3.5 sm:gap-4">
             {profile?.avatar_url ? (
-              <img
+              <ProtectedImage
                 src={profile.avatar_url}
                 alt={profile.display_name}
-                className="h-16 w-16 rounded-3xl border-2 border-[#DCEBDD] object-cover sm:h-20 sm:w-20"
+                wrapperClassName="relative block h-16 w-16 shrink-0 overflow-hidden rounded-3xl border-2 border-[#DCEBDD] sm:h-20 sm:w-20"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-[#DCEBDD] text-xl font-extrabold text-[#174D35] sm:h-20 sm:w-20 sm:text-2xl">

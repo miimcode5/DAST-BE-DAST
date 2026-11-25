@@ -3,6 +3,7 @@ import { ArrowDown, ArrowLeft, CheckCircle2, HeartHandshake, Link2, MapPin, Plus
 import { Link } from 'react-router-dom';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { CategoryBadge } from '../components/StatusBadge';
 import { formatDateFa, getInitials, toPersianDigits } from '../lib/formatters';
 import { getKindnessChain } from '../services/statsService';
@@ -136,10 +137,11 @@ export function KindnessChainPage() {
                   <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                     <div className="flex items-center gap-2 rounded-2xl bg-[#DCEBDD]/70 px-3 py-2">
                       {link.helper_avatar ? (
-                        <img
+                        <ProtectedImage
                           src={link.helper_avatar}
                           alt={link.helper_name}
-                          className="h-8 w-8 rounded-full object-cover"
+                          wrapperClassName="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full"
+                          className="h-full w-full object-cover"
                         />
                       ) : (
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#174D35] text-xs font-bold text-white">
@@ -161,10 +163,11 @@ export function KindnessChainPage() {
 
                     <div className="flex items-center gap-2 rounded-2xl border border-[#DCEBDD] bg-white px-3 py-2">
                       {link.recipient_avatar ? (
-                        <img
+                        <ProtectedImage
                           src={link.recipient_avatar}
                           alt={link.recipient_name}
-                          className="h-8 w-8 rounded-full object-cover"
+                          wrapperClassName="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full"
+                          className="h-full w-full object-cover"
                         />
                       ) : (
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#DCEBDD] text-xs font-bold text-[#174D35]">

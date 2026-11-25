@@ -4,7 +4,7 @@ export function BrandMark({ className = 'h-10 w-10' }: { className?: string }) {
   const gradId = useId();
 
   return (
-    <svg viewBox="0 0 512 512" fill="none" className={className} aria-hidden="true">
+    <svg viewBox="0 0 512 512" fill="none" className={`pointer-events-none select-none ${className}`} aria-hidden="true">
       <defs>
         <linearGradient id={gradId} x1="24" y1="24" x2="488" y2="488" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#174D35" />

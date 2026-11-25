@@ -1,6 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { ArrowRight, Camera, Check, Plus, Save, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { SUGGESTED_SKILLS } from '../constants/categories';
 import { DEFAULT_PROVINCE, IRAN_PROVINCES_CITIES, PROVINCES_LIST } from '../constants/locations';
 import { useAuth } from '../contexts/AuthContext';
@@ -161,10 +162,11 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative">
             {previewSrc ? (
-              <img
+              <ProtectedImage
                 src={previewSrc}
                 alt="تصویر پروفایل"
-                className="h-20 w-20 rounded-3xl border-2 border-[#DCEBDD] object-cover"
+                wrapperClassName="relative block h-20 w-20 overflow-hidden rounded-3xl border-2 border-[#DCEBDD]"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-[#DCEBDD] text-xl font-extrabold text-[#174D35]">
@@ -173,7 +175,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
             )}
             <label
               htmlFor="avatar-upload"
-              className="absolute -bottom-1 -left-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-[#174D35] text-white shadow hover:bg-[#26734B]"
+              className="absolute -bottom-1 -left-1 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-[#174D35] text-white shadow hover:bg-[#26734B]"
               title="تغییر تصویر پروفایل"
             >
               <Camera className="h-4 w-4" />

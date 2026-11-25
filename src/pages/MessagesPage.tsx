@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LoadingState } from '../components/LoadingState';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { CategoryBadge, ConversationStatusBadge } from '../components/StatusBadge';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
@@ -249,10 +250,11 @@ export function MessagesPage() {
                   {/* Avatar */}
                   <div className="relative shrink-0">
                     {conv.other_user_avatar ? (
-                      <img
+                      <ProtectedImage
                         src={conv.other_user_avatar}
                         alt={conv.other_user_name}
-                        className="h-12 w-12 rounded-2xl border border-[#DCEBDD] object-cover"
+                        wrapperClassName="relative block h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
+                        className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#DCEBDD] text-sm font-extrabold text-[#174D35]">

@@ -19,6 +19,7 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LoadingState } from '../components/LoadingState';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { CategoryBadge, RequestStatusBadge, ResponseStatusBadge } from '../components/StatusBadge';
 import { HELP_TYPE_MAP, RESPONSE_STATUS_META } from '../constants/categories';
 import { useAuth } from '../contexts/AuthContext';
@@ -353,9 +354,10 @@ export function RequestDetailPage() {
 
         {request.image_url && (
           <div className="mb-4 overflow-hidden rounded-2xl border border-[#DCEBDD] sm:mb-5">
-            <img
+            <ProtectedImage
               src={request.image_url}
               alt={request.title}
+              wrapperClassName="relative block w-full overflow-hidden"
               className="max-h-80 w-full object-cover sm:max-h-96"
             />
           </div>
@@ -396,10 +398,11 @@ export function RequestDetailPage() {
         <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-[#F6F7F2] pt-5">
           <div className="flex items-center gap-3">
             {request.requester_avatar ? (
-              <img
+              <ProtectedImage
                 src={request.requester_avatar}
                 alt={request.requester_name}
-                className="h-11 w-11 rounded-2xl border border-[#DCEBDD] object-cover"
+                wrapperClassName="relative block h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#DCEBDD] text-sm font-extrabold text-[#174D35]">
@@ -640,10 +643,11 @@ export function RequestDetailPage() {
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
                         {resp.volunteer?.avatar_url ? (
-                          <img
+                          <ProtectedImage
                             src={resp.volunteer.avatar_url}
                             alt={volName}
-                            className="h-10 w-10 rounded-2xl border border-[#DCEBDD] object-cover"
+                            wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
+                            className="h-full w-full object-cover"
                           />
                         ) : (
                           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#DCEBDD] text-xs font-extrabold text-[#174D35]">

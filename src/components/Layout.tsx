@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   BookOpen,
   ClipboardList,
@@ -22,9 +22,11 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
 import { usePwa } from '../contexts/PwaContext';
+import { useContentProtection } from '../hooks/useContentProtection';
 import { toPersianDigits } from '../lib/formatters';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { BrandLogo } from './BrandLogo';
+import { ProtectedImage } from './ProtectedImage';
 
 export function Layout() {
   const { user, profile } = useAuth();
@@ -40,6 +42,9 @@ export function Layout() {
   } = usePwa();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const protectedRootRef = useRef<HTMLDivElement | null>(null);
+
+  useContentProtection(protectedRootRef);
 
   // Close mobile drawer automatically on route changes
   useEffect(() => {
@@ -63,7 +68,8 @@ export function Layout() {
 
   return (
     <div
-      className={`flex flex-col bg-[#F6F7F2] text-[#202820] ${
+      ref={protectedRootRef}
+      className={`content-protected flex flex-col bg-[#F6F7F2] text-[#202820] ${
         isChatRoomRoute ? 'h-dvh overflow-hidden md:h-auto md:min-h-dvh md:overflow-visible' : 'min-h-dvh'
       }`}
     >
@@ -181,10 +187,11 @@ export function Layout() {
                 className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-2.5 py-1.5 text-xs font-semibold text-[#174D35] transition hover:border-[#78B98A] sm:gap-2 sm:px-3 sm:text-sm"
               >
                 {profile?.avatar_url ? (
-                  <img
+                  <ProtectedImage
                     src={profile.avatar_url}
                     alt={profile.display_name}
-                    className="h-6 w-6 rounded-full object-cover"
+                    wrapperClassName="relative block h-6 w-6 shrink-0 overflow-hidden rounded-full"
+                    className="h-full w-full object-cover"
                   />
                 ) : (
                   <User className="h-4 w-4 shrink-0" />

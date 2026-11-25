@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { LoadingState } from '../components/LoadingState';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { ConversationStatusBadge, RequestStatusBadge } from '../components/StatusBadge';
 import {
   CONVERSATION_REPORT_REASONS,
@@ -521,10 +522,11 @@ export function ChatPage() {
             </Link>
 
             {conversation.other_user_avatar ? (
-              <img
+              <ProtectedImage
                 src={conversation.other_user_avatar}
                 alt={conversation.other_user_name}
-                className="h-10 w-10 shrink-0 rounded-2xl border border-[#DCEBDD] object-cover"
+                wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#DCEBDD] text-xs font-extrabold text-[#174D35]">

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { HELP_TYPE_MAP } from '../constants/categories';
 import { formatRelativeTimeFa, getInitials, toPersianDigits } from '../lib/formatters';
 import type { HelpRequestFeedItem } from '../types/database';
+import { ProtectedImage } from './ProtectedImage';
 import { CategoryBadge, RequestStatusBadge } from './StatusBadge';
 
 interface RequestCardProps {
@@ -70,11 +71,12 @@ export function RequestCard({
 
         {request.image_url && (
           <Link to={`/requests/${request.id}`} className="mb-3.5 block overflow-hidden rounded-2xl border border-[#DCEBDD]/70">
-            <img
+            <ProtectedImage
               src={request.image_url}
               alt={request.title}
               loading="lazy"
-              className="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+              wrapperClassName="relative block h-36 w-full overflow-hidden"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </Link>
         )}
@@ -100,10 +102,11 @@ export function RequestCard({
         <div className="flex items-center justify-between gap-2 pt-0.5">
           <div className="flex min-w-0 items-center gap-2">
             {request.requester_avatar ? (
-              <img
+              <ProtectedImage
                 src={request.requester_avatar}
                 alt={request.requester_name}
-                className="h-7 w-7 shrink-0 rounded-full border border-[#DCEBDD] object-cover"
+                wrapperClassName="relative block h-7 w-7 shrink-0 overflow-hidden rounded-full border border-[#DCEBDD]"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#DCEBDD] text-[11px] font-bold text-[#174D35]">
