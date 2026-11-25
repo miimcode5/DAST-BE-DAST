@@ -334,6 +334,17 @@ async function run() {
   assert(u1Notifs.some((n) => n.type === 'new_offer'), 'New offer notification must exist');
   assert(u1Notifs.some((n) => n.type === 'help_completed'), 'Completion notification must exist');
 
+  const { data: u2Ach, error: u2AchErr } = await u2.rpc('get_my_achievements_summary');
+  assert.ifError(u2AchErr);
+  assert(u2Ach.participation_points >= 50, 'Volunteer must earn base + first_helping_hand points');
+  assert(u2Ach.earned_count >= 1, 'Volunteer must earn at least first_helping_hand badge');
+
+  const { error: tamperPointsErr } = await u2
+    .from('profiles')
+    .update({ participation_points: 9999 })
+    .eq('id', u2Id);
+  assert(tamperPointsErr, 'User must NOT be able to forge participation_points directly');
+
   const { error: u1ModErr } = await u1.rpc('get_moderation_reports');
   assert(u1ModErr, 'Regular member must NOT access moderation reports');
 

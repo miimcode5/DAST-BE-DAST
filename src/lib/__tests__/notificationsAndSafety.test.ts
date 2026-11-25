@@ -18,6 +18,7 @@ const ALL_NOTIFICATION_TYPES: NotificationType[] = [
   'offer_withdrawn',
   'account_welcome',
   'account_security',
+  'badge_earned',
 ];
 
 describe('V1.0 notification and report metadata', () => {

@@ -53,4 +53,27 @@ describe('V1.0 safety, privacy & architectural invariants', () => {
     expect(notifSql).toContain('revoke select on public.profiles from anon');
     expect(notifSql).toContain('is_moderator_or_admin()');
   });
+
+  it('wires live achievements & participation points in ProfilePage and DB migrations', () => {
+    const profileSource = fs.readFileSync(
+      path.join(ROOT, 'src/pages/ProfilePage.tsx'),
+      'utf8'
+    );
+    expect(profileSource).not.toContain('فعال‌سازی در نسخه تکمیلی');
+    expect(profileSource).toContain('getMyAchievementsSummary');
+
+    const achSql = fs.readFileSync(
+      path.join(
+        ROOT,
+        'supabase/migrations/20261125210000_dast_be_dast_achievements_and_points.sql'
+      ),
+      'utf8'
+    );
+    expect(achSql).toContain('create table if not exists public.badge_definitions');
+    expect(achSql).toContain('create table if not exists public.user_achievements');
+    expect(achSql).toContain('participation_points');
+    expect(achSql).toContain('get_my_achievements_summary');
+    expect(achSql).toContain("'voluntary'");
+    expect(achSql).toContain("'specialized'");
+  });
 });

@@ -302,5 +302,9 @@ export const NOTIFICATION_TYPE_META: Record<
     badgeLabel: 'امنیت حساب',
     badgeClass: 'bg-brand-gold/15 text-brand-text border-brand-gold/60',
   },
+  badge_earned: {
+    badgeLabel: 'نشان افتخار',
+    badgeClass: 'bg-brand-gold/25 text-brand-primary border-brand-gold/70',
+  },
 };
 

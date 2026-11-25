@@ -2,13 +2,13 @@
 
 ## ۱. طراحی پایگاه‌داده و جداول
 
-در نسخه `1.0.0` پایگاه‌داده شامل ۱۰ جدول با `Row Level Security` فعال و یک نمای عمومی امن است:
+در نسخه `1.0.0` پایگاه‌داده شامل ۱۲ جدول با `Row Level Security` فعال و یک نمای عمومی امن است:
 
 1. **`public.profiles`**
    - متصل به `auth.users(id)` با تریگر خودکار `handle_new_user()` هنگام ثبت‌نام (همراه با ثبت اعلان خوش‌آمدگویی).
-   - شامل: `display_name`, `avatar_url`, `bio`, `province`, `city`, `neighborhood`, `skills`, `role`, `completed_helps_count`.
+   - شامل: `display_name`, `avatar_url`, `bio`, `province`, `city`, `neighborhood`, `skills`, `role`, `completed_helps_count`, `participation_points`.
    - دسترسی مستقیم `SELECT` برای نقش `anon` بسته شده است (`revoke select on public.profiles from anon`) و فقط کاربران احرازشده دسترسی مجاز دارند؛ مهمانان صرفاً از طریق نمای `public_help_requests_feed` نام و تصویر نمایشی صاحب درخواست را می‌بینند.
-   - تریگر `guard_profile_protected_fields` مانع از تغییر مستقیم `role` و `completed_helps_count` از سمت کلاینت می‌شود.
+   - تریگر `guard_profile_protected_fields` مانع از تغییر مستقیم `role`، `completed_helps_count` و `participation_points` از سمت کلاینت می‌شود.
 
 2. **`public.help_requests`**
    - درخواست‌های کمک ثبت‌شده توسط کاربران با اعتبارسنجی طول رشته‌ها، دسته‌بندی‌های هشت‌گانه، نوع کمک، شهر و محدوده تقریبی.
@@ -56,6 +56,11 @@
    - **`content_reports`:** ثبت گزارش تخلف برای درخواست، پروفایل یا پاسخ داوطلب با یکتایی گزارش باز در هر هدف.
    - **نظارت سمت سرور (`is_moderator_or_admin()`):** دسترسی مشاهده و تغییر وضعیت گزارش‌ها در `get_moderation_reports()` و `update_moderation_report_status()` صرفاً برای کاربرانی که در `public.profiles` دارای نقش تأییدشده `admin` یا `moderator` هستند باز است.
 
+9. **نشان‌های افتخار و امتیازات مشارکت غیرمالی (`public.badge_definitions`, `public.user_achievements`)**
+   - کاتالوگ ۸ نشان افتخار معتبر (مانند «اولین دست یاری»، «قلب محله»، «همراه دانایی»، «گره‌گشای مهربان»، «همدل سالمندان»، «دست توانا»، «زنجیره‌ساز»، «یاور همیشگی») همراه با امتیازات غیرمالی بدون ارزش مادی.
+   - تابع سمت سرور `evaluate_and_award_achievements()` هنگام تکمیل نهایی کمک (`confirm_help_completion`) به‌صورت خودکار معیارها را بررسی، نشان‌های جدید را بدون تکرار (`UNIQUE (user_id, badge_code)`) اعطا، اعلان `badge_earned` صادر و جمع امتیازات (+۲۰ امتیاز پایه هر همیاری تأییدشده + امتیاز نشان‌ها) را در `profiles.participation_points` به‌روز می‌کند.
+   - نوشتن مستقیم از سمت کلاینت روی `user_achievements` و `badge_definitions` مسدود است و گزارش کامل سطح و نشان‌ها با RPC امن `get_my_achievements_summary()` ارائه می‌شود.
+
 ---
 
 ## ۲. امنیت و حریم خصوصی
@@ -78,4 +83,4 @@
 
 ## ۴. مسیر توسعه آینده (نسخه دوم به بعد)
 
-قراردادهای تایپ‌شده برای سیستم نشان‌های افتخار و امتیازات مشارکت بدون ارزش مالی (`achievements` & `PLANNED_BADGES_ROADMAP`) و اعلان‌های Push مرورگر در `src/types/future.ts` نگهداری می‌شوند تا در نسخه ۲ اضافه شوند.
+قراردادهای پایه برای اعلان‌های Push مرورگر و قابلیت‌های تکمیلی آینده در `src/types/future.ts` مستند شده‌اند تا در نسخه‌های بعدی بدون تغییر ساختار هسته اضافه شوند.
