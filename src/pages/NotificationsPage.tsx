@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Award,
   Bell,
   Check,
   CheckCheck,
@@ -42,6 +43,8 @@ function renderNotificationIcon(type: NotificationType) {
       return <Sparkles className="h-5 w-5 text-brand-gold" />;
     case 'account_security':
       return <KeyRound className="h-5 w-5 text-brand-primary" />;
+    case 'badge_earned':
+      return <Award className="h-5 w-5 text-brand-gold" />;
     default:
       return <Bell className="h-5 w-5 text-brand-green" />;
   }

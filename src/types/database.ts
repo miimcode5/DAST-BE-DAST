@@ -38,6 +38,7 @@ export interface Profile {
   skills: string[];
   role: UserRole;
   completed_helps_count: number;
+  participation_points?: number;
   created_at: string;
   updated_at: string;
 }
@@ -207,7 +208,32 @@ export type NotificationType =
   | 'request_cancelled'
   | 'offer_withdrawn'
   | 'account_welcome'
-  | 'account_security';
+  | 'account_security'
+  | 'badge_earned';
+
+export interface AchievementBadgeItem {
+  code: string;
+  title_fa: string;
+  description_fa: string;
+  criteria_fa: string;
+  category_filter: HelpCategory | null;
+  points: number;
+  earned: boolean;
+  points_awarded: number;
+  awarded_at: string | null;
+}
+
+export interface AchievementsSummary {
+  participation_points: number;
+  completed_helps_count: number;
+  level_number: number;
+  level_title: string;
+  next_level_points: number | null;
+  next_level_title: string | null;
+  earned_count: number;
+  total_badges: number;
+  badges: AchievementBadgeItem[];
+}
 
 export interface AppNotification {
   id: string;

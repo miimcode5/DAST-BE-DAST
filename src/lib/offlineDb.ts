@@ -1,5 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type {
+  AchievementsSummary,
   AppNotification,
   ConversationItem,
   HelpCategory,
@@ -288,6 +289,34 @@ export async function getCachedUserNotifications(userId: string): Promise<AppNot
     return record?.items ?? [];
   } catch {
     return [];
+  }
+}
+
+export async function cacheUserAchievements(
+  userId: string,
+  summary: AchievementsSummary
+): Promise<void> {
+  try {
+    const db = await getDb();
+    await db.put('stats_cache', {
+      key: `achievements:${userId}`,
+      stats: summary as unknown as PlatformStats,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch {
+    // ignore
+  }
+}
+
+export async function getCachedUserAchievements(
+  userId: string
+): Promise<AchievementsSummary | null> {
+  try {
+    const db = await getDb();
+    const record = await db.get('stats_cache', `achievements:${userId}`);
+    return (record?.stats as unknown as AchievementsSummary) ?? null;
+  } catch {
+    return null;
   }
 }
 

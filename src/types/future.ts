@@ -1,11 +1,11 @@
 /**
  * Architecture extension types reserved for future versions (v2+):
- * - Achievements & Non-monetary Points (Section 8 & 21)
- * - Web Push Subscriptions (Service Worker Push API)
+ * - Web Push Notifications (Service Worker Push API)
  *
  * Note: Real-time Private Chat (`conversations`, `messages`), Notifications (`notifications`),
- * User Blocking (`user_blocks`), and Content/Conversation Reporting (`content_reports`,
- * `conversation_reports`) are implemented and active in V1.0.
+ * User Blocking (`user_blocks`), Content Reporting (`content_reports`), and Non-Monetary
+ * Achievements & Participation Points (`badge_definitions`, `user_achievements`)
+ * are implemented and active in V1.0.
  */
 
 export type ReportTargetType = 'request' | 'profile' | 'response';
@@ -40,6 +40,12 @@ export const PLANNED_BADGES_ROADMAP: PlannedBadgeDefinition[] = [
     suggestedPoints: 30,
   },
   {
+    code: 'neighborhood_heart',
+    titleFa: 'قلب محله',
+    descriptionFa: 'مشارکت فعال در فعالیت‌های گروهی و محله‌محور',
+    suggestedPoints: 50,
+  },
+  {
     code: 'skill_mentor',
     titleFa: 'همراه دانایی',
     descriptionFa: 'آموزش داوطلبانه یک درس یا مهارت',
@@ -52,15 +58,28 @@ export const PLANNED_BADGES_ROADMAP: PlannedBadgeDefinition[] = [
     suggestedPoints: 20,
   },
   {
-    code: 'neighborhood_heart',
-    titleFa: 'قلب محله',
-    descriptionFa: 'مشارکت فعال در فعالیت‌های گروهی و محله‌محور',
-    suggestedPoints: 50,
+    code: 'elderly_friend',
+    titleFa: 'همدل سالمندان',
+    descriptionFa: 'همراهی و یاری‌رسانی به سالمندان و کم‌توانان',
+    suggestedPoints: 35,
+  },
+  {
+    code: 'technical_helper',
+    titleFa: 'دست توانا',
+    descriptionFa: 'انجام داوطلبانه تعمیرات و خدمات فنی یا تخصصی',
+    suggestedPoints: 35,
   },
   {
     code: 'chain_builder',
     titleFa: 'زنجیره‌ساز',
-    descriptionFa: 'ایجاد پیوند مؤثر در زنجیره مهربانی',
+    descriptionFa: 'ایجاد پیوند مؤثر و واقعی در زنجیره مهربانی',
     suggestedPoints: 40,
   },
+  {
+    code: 'steady_supporter',
+    titleFa: 'یاور همیشگی',
+    descriptionFa: 'استمرار مهربانی با تکمیل ۳ همیاری معتبر',
+    suggestedPoints: 60,
+  },
 ];
+
