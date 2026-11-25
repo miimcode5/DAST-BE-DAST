@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { ArrowRight, ImagePlus, Save, Send, ShieldCheck, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { LoadingState } from '../components/LoadingState';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { SmartAssistantPanel } from '../components/SmartAssistantPanel';
 import { HELP_CATEGORIES, HELP_TYPES } from '../constants/categories';
 import {
@@ -423,9 +424,10 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
           </span>
           {displayedPreview ? (
             <div className="relative overflow-hidden rounded-2xl border border-[#DCEBDD]">
-              <img
+              <ProtectedImage
                 src={displayedPreview}
                 alt="پیش‌نمایش تصویر درخواست"
+                wrapperClassName="relative block w-full overflow-hidden"
                 className="max-h-60 w-full object-cover"
               />
               <button
@@ -435,7 +437,7 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
                   setImagePreview(null);
                   setRemoveImage(true);
                 }}
-                className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-xl bg-black/65 px-3 py-1.5 text-xs font-bold text-white hover:bg-black/80"
+                className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-xl bg-black/65 px-3 py-1.5 text-xs font-bold text-white hover:bg-black/80"
               >
                 <X className="h-3.5 w-3.5" />
                 حذف تصویر

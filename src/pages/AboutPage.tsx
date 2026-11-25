@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BrandLogo } from '../components/BrandLogo';
+import { ProtectedImage } from '../components/ProtectedImage';
 import { getInitials } from '../lib/formatters';
 
 interface RassaMember {
@@ -60,13 +61,14 @@ function MemberPortraitCard({ member }: { member: RassaMember }) {
     >
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-b from-[#DCEBDD]/50 to-[#174D35]/15">
         {!imgFailed ? (
-          <img
+          <ProtectedImage
             src={member.photoUrl}
             alt={member.name}
             loading="eager"
             decoding="async"
             referrerPolicy="no-referrer"
             onError={() => setImgFailed(true)}
+            wrapperClassName="relative block h-full w-full overflow-hidden"
             className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover/card:scale-[1.04]"
           />
         ) : (
