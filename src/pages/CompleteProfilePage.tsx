@@ -149,7 +149,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xs sm:p-8"
+        className="space-y-5 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:space-y-6 sm:p-7"
       >
         {errorMsg && (
           <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
@@ -273,7 +273,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
             value={neighborhood}
             onChange={(e) => setNeighborhood(e.target.value)}
             placeholder="مثلاً: محدوده بلوار معلم یا مهرشهر"
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-sm outline-none focus:border-[#26734B] focus:bg-white"
+            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
           />
           <p className="mt-1 text-[11px] text-[#667466]">
             برای حفظ حریم خصوصی از نوشتن آدرس دقیق یا پلاک خودداری کنید.
@@ -290,7 +290,7 @@ export function ProfileEditor({ mode }: { mode: 'complete' | 'edit' }) {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="کوتاه درباره خودتان و زمینه‌هایی که می‌توانید کمک کنید بنویسید..."
-            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-sm leading-6 outline-none focus:border-[#26734B] focus:bg-white"
+            className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] leading-6 outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
           />
         </div>
 

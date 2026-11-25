@@ -387,9 +387,9 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                 .map((resp) => (
                   <div
                     key={resp.id}
-                    className="flex flex-col justify-between gap-4 rounded-3xl border border-[#DCEBDD] bg-white p-5 sm:flex-row sm:items-center"
+                    className="flex flex-col justify-between gap-3.5 rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:flex-row sm:items-center sm:gap-4 sm:p-5"
                   >
-                    <div className="space-y-1.5">
+                    <div className="min-w-0 space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <ResponseStatusBadge status={resp.status} />
                         {resp.request && <CategoryBadge category={resp.request.category} />}
@@ -399,7 +399,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                       </div>
                       <Link
                         to={`/requests/${resp.request_id}`}
-                        className="block text-base font-bold text-[#174D35] hover:underline"
+                        className="block text-[15px] font-bold text-[#174D35] hover:underline sm:text-base"
                       >
                         {resp.request?.title ?? 'مشاهده درخواست'}
                       </Link>
@@ -419,7 +419,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                       <button
                         type="button"
                         onClick={() => void openChatForResponse(resp.id)}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B]"
+                        className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] sm:flex-initial"
                       >
                         <MessageCircle className="h-3.5 w-3.5 text-[#E9B949]" />
                         <span>ادامه گفت‌وگو</span>
@@ -431,7 +431,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                       </button>
                       <Link
                         to={`/requests/${resp.request_id}`}
-                        className="rounded-xl bg-[#DCEBDD]/80 px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#174D35] hover:text-white"
+                        className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-xl bg-[#DCEBDD]/80 px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#174D35] hover:text-white sm:flex-initial"
                       >
                         صفحه درخواست
                       </Link>
@@ -439,7 +439,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                         <button
                           type="button"
                           onClick={() => setWithdrawTargetId(resp.id)}
-                          className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100"
+                          className="min-h-[40px] w-full rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 sm:w-auto"
                         >
                           لغو اعلام آمادگی
                         </button>
@@ -505,7 +505,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                     {inProgressItems.asVolunteer.map((resp) => (
                       <div
                         key={resp.id}
-                        className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#DCEBDD] bg-white p-5"
+                        className="flex flex-col justify-between gap-3 rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:flex-row sm:items-center sm:p-5"
                       >
                         <div>
                           <div className="mb-1 flex items-center gap-2">
@@ -516,7 +516,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                           </div>
                           <Link
                             to={`/requests/${resp.request_id}`}
-                            className="text-base font-bold text-[#174D35] hover:underline"
+                            className="text-[15px] font-bold text-[#174D35] hover:underline sm:text-base"
                           >
                             {resp.request?.title ?? 'جزئیات همکاری'}
                           </Link>
@@ -525,7 +525,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                           <button
                             type="button"
                             onClick={() => void openChatForResponse(resp.id)}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B]"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] sm:flex-initial"
                           >
                             <MessageCircle className="h-3.5 w-3.5 text-[#E9B949]" />
                             <span>ادامه گفت‌وگو</span>
@@ -537,7 +537,7 @@ export function MyActivitiesPage({ defaultTab = 'requests' }: { defaultTab?: Act
                           </button>
                           <Link
                             to={`/requests/${resp.request_id}`}
-                            className="rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2 text-xs font-bold text-[#174D35] hover:border-[#78B98A]"
+                            className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2 text-xs font-bold text-[#174D35] hover:border-[#78B98A] sm:flex-initial"
                           >
                             مدیریت همکاری
                           </Link>

@@ -27,12 +27,14 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
     >
-      <div className="w-full max-w-md rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-2xl animate-fade-up">
+      <div className="w-full max-w-md rounded-t-3xl border border-[#DCEBDD] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl animate-fade-up sm:rounded-3xl sm:p-6">
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#DCEBDD] sm:hidden" />
+
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div
@@ -66,7 +68,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={busy}
-            className="rounded-xl border border-[#DCEBDD] bg-white px-4 py-2.5 text-sm font-semibold text-[#202820] hover:bg-[#F6F7F2] disabled:opacity-60"
+            className="min-h-[44px] rounded-xl border border-[#DCEBDD] bg-white px-4 py-2.5 text-sm font-semibold text-[#202820] hover:bg-[#F6F7F2] disabled:opacity-60"
           >
             {cancelLabel}
           </button>
@@ -74,7 +76,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={busy}
-            className={`rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-60 ${
+            className={`min-h-[44px] rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-60 ${
               tone === 'danger'
                 ? 'bg-rose-600 hover:bg-rose-700'
                 : 'bg-[#174D35] hover:bg-[#26734B]'

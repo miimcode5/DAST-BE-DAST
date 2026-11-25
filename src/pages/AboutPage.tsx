@@ -5,7 +5,7 @@ import { BrandLogo } from '../components/BrandLogo';
 export function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 animate-fade-up">
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6 shadow-xs sm:p-8">
+      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-5 shadow-xs sm:p-8">
         <BrandLogo />
         <h1 className="mt-4 text-xl font-extrabold text-[#174D35] sm:text-2xl">
           درباره دست‌به‌دست و راهنمای استفاده

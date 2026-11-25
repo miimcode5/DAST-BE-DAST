@@ -71,7 +71,7 @@ export function SettingsPage() {
       </div>
 
       {/* PWA Install Card */}
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6 space-y-4">
+      <section className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:p-6">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
             <Smartphone className="h-5 w-5 text-[#174D35]" />
@@ -106,7 +106,7 @@ export function SettingsPage() {
       </section>
 
       {/* Network & Offline Storage Card */}
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6 space-y-4">
+      <section className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:p-6">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
             <Database className="h-5 w-5 text-[#174D35]" />
@@ -171,7 +171,7 @@ export function SettingsPage() {
       </section>
 
       {/* Account Security Links */}
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6 space-y-3">
+      <section className="space-y-3 rounded-3xl border border-[#DCEBDD] bg-white p-4 sm:p-6">
         <div className="flex items-center gap-2 text-base font-bold text-[#202820]">
           <KeyRound className="h-5 w-5 text-[#174D35]" />
           <h2>حساب کاربری و امنیت</h2>

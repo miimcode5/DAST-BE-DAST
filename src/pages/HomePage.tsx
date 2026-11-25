@@ -90,56 +90,56 @@ export function HomePage() {
   };
 
   return (
-    <div className="space-y-8 animate-fade-up">
+    <div className="space-y-6 sm:space-y-8 animate-fade-up">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl border border-[#78B98A]/35 bg-gradient-to-bl from-[#174D35] via-[#1C5B3F] to-[#26734B] p-6 text-white shadow-lg sm:p-9">
+      <section className="relative overflow-hidden rounded-3xl border border-[#78B98A]/35 bg-gradient-to-bl from-[#174D35] via-[#1C5B3F] to-[#26734B] p-4 text-white shadow-lg sm:p-8">
         <div className="pointer-events-none absolute -left-16 -top-16 h-60 w-60 rounded-full bg-[#78B98A]/15 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-20 right-10 h-48 w-48 rounded-full bg-[#E9B949]/10 blur-2xl" />
 
-        <div className="relative z-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-          <div className="max-w-2xl space-y-4">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-[#DCEBDD]">
+        <div className="relative z-10 flex flex-col justify-between gap-4 sm:gap-6 lg:flex-row lg:items-center">
+          <div className="max-w-2xl space-y-3 sm:space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-[#DCEBDD] sm:text-xs">
                 <MapPin className="h-3.5 w-3.5 text-[#E9B949]" />
-                استان خراسان جنوبی · همیاری مردمی
+                خراسان جنوبی · همیاری مردمی
               </div>
               {profile && (
-                <span className="rounded-full bg-[#78B98A]/20 px-3 py-1 text-xs font-semibold text-white">
+                <span className="rounded-full bg-[#78B98A]/20 px-3 py-1 text-[11px] font-semibold text-white sm:text-xs">
                   سلام، {profile.display_name} عزیز
                 </span>
               )}
             </div>
 
             <div className="flex items-center gap-3">
-              <BrandMark className="h-12 w-12 shrink-0 rounded-2xl ring-2 ring-white/20" />
-              <h1 className="text-2xl font-extrabold leading-9 sm:text-3xl sm:leading-10">
+              <BrandMark className="h-10 w-10 shrink-0 rounded-2xl ring-2 ring-white/20 sm:h-12 sm:w-12" />
+              <h1 className="text-lg font-extrabold leading-7 sm:text-3xl sm:leading-10">
                 توان ما، کنار هم معنا پیدا می‌کند.
               </h1>
             </div>
 
-            <p className="text-sm leading-7 text-[#DCEBDD] sm:text-base">
-              گاهی چیزی که برای تو ساده است، می‌تواند مشکل بزرگی را برای دیگری حل کند. در دست‌به‌دست نیازهای واقعی محله را ببینید یا برای حل یک گره درخواست کمک ثبت کنید.
+            <p className="text-xs leading-6 text-[#DCEBDD] sm:text-base sm:leading-7">
+              گاهی چیزی که برای تو ساده است، می‌تواند مشکل بزرگی را برای دیگری حل کند. در دست‌به‌دست نیازهای واقعی محله را ببینید یا درخواست کمک ثبت کنید.
             </p>
 
-            <div className="flex flex-wrap gap-3 pt-1">
+            <div className="grid grid-cols-2 gap-2.5 pt-1 sm:flex sm:flex-wrap sm:gap-3">
               <Link
                 to="/requests/new"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#E9B949] px-5 py-3 text-sm font-extrabold text-[#174D35] shadow-md transition hover:bg-[#F4C95D]"
+                className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-2xl bg-[#E9B949] px-3.5 py-2.5 text-xs font-extrabold text-[#174D35] shadow-md transition hover:bg-[#F4C95D] sm:px-5 sm:py-3 sm:text-sm"
               >
-                <Plus className="h-4 w-4" />
-                ثبت درخواست کمک
+                <Plus className="h-4 w-4 shrink-0" />
+                <span>ثبت درخواست کمک</span>
               </Link>
               <Link
                 to="/requests"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/12 px-5 py-3 text-sm font-bold text-white backdrop-blur-xs transition hover:bg-white/22"
+                className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-2xl border border-white/30 bg-white/12 px-3.5 py-2.5 text-xs font-bold text-white backdrop-blur-xs transition hover:bg-white/22 sm:px-5 sm:py-3 sm:text-sm"
               >
-                <HandHelping className="h-4 w-4" />
-                می‌خواهم کمک کنم
+                <HandHelping className="h-4 w-4 shrink-0" />
+                <span>می‌خواهم کمک کنم</span>
               </Link>
               {user && (
                 <Link
                   to="/messages"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-bold text-white backdrop-blur-xs transition hover:bg-white/20"
+                  className="col-span-2 inline-flex min-h-[42px] items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-4 py-2.5 text-xs font-bold text-white backdrop-blur-xs transition hover:bg-white/20 sm:col-span-1 sm:text-sm"
                 >
                   گفت‌وگوها و پیام‌ها
                 </Link>
@@ -148,43 +148,43 @@ export function HomePage() {
           </div>
 
           {/* Live Community Stats Mini-Grid */}
-          <div className="grid shrink-0 grid-cols-2 gap-2.5 sm:gap-3 lg:w-72">
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-xs">
+          <div className="grid shrink-0 grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3 lg:w-72 lg:grid-cols-2">
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-2.5 backdrop-blur-xs sm:p-3.5">
               <div className="flex items-center justify-between text-[#DCEBDD]">
-                <span className="text-xs font-medium">درخواست‌های فعال</span>
-                <HandHelping className="h-4 w-4 text-[#E9B949]" />
+                <span className="text-[11px] font-medium sm:text-xs">درخواست‌های فعال</span>
+                <HandHelping className="h-3.5 w-3.5 text-[#E9B949] sm:h-4 sm:w-4" />
               </div>
-              <div className="mt-1.5 text-2xl font-extrabold">
+              <div className="mt-1 text-lg font-extrabold sm:mt-1.5 sm:text-2xl">
                 {stats ? toPersianDigits(stats.active_requests) : '—'}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-xs">
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-2.5 backdrop-blur-xs sm:p-3.5">
               <div className="flex items-center justify-between text-[#DCEBDD]">
-                <span className="text-xs font-medium">کمک‌های تکمیل‌شده</span>
-                <CheckCircle2 className="h-4 w-4 text-[#78B98A]" />
+                <span className="text-[11px] font-medium sm:text-xs">کمک‌های تکمیل‌شده</span>
+                <CheckCircle2 className="h-3.5 w-3.5 text-[#78B98A] sm:h-4 sm:w-4" />
               </div>
-              <div className="mt-1.5 text-2xl font-extrabold">
+              <div className="mt-1 text-lg font-extrabold sm:mt-1.5 sm:text-2xl">
                 {stats ? toPersianDigits(stats.completed_helps) : '—'}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-xs">
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-2.5 backdrop-blur-xs sm:p-3.5">
               <div className="flex items-center justify-between text-[#DCEBDD]">
-                <span className="text-xs font-medium">داوطلبان فعال</span>
-                <Users className="h-4 w-4 text-[#78B98A]" />
+                <span className="text-[11px] font-medium sm:text-xs">داوطلبان فعال</span>
+                <Users className="h-3.5 w-3.5 text-[#78B98A] sm:h-4 sm:w-4" />
               </div>
-              <div className="mt-1.5 text-2xl font-extrabold">
+              <div className="mt-1 text-lg font-extrabold sm:mt-1.5 sm:text-2xl">
                 {stats ? toPersianDigits(stats.active_volunteers) : '—'}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-xs">
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-2.5 backdrop-blur-xs sm:p-3.5">
               <div className="flex items-center justify-between text-[#DCEBDD]">
-                <span className="text-xs font-medium">کل ثبت‌شده‌ها</span>
-                <HeartHandshake className="h-4 w-4 text-[#E9B949]" />
+                <span className="text-[11px] font-medium sm:text-xs">کل ثبت‌شده‌ها</span>
+                <HeartHandshake className="h-3.5 w-3.5 text-[#E9B949] sm:h-4 sm:w-4" />
               </div>
-              <div className="mt-1.5 text-2xl font-extrabold">
+              <div className="mt-1 text-lg font-extrabold sm:mt-1.5 sm:text-2xl">
                 {stats ? toPersianDigits(stats.total_requests) : '—'}
               </div>
             </div>
@@ -192,8 +192,8 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Categories Quick Explorer */}
-      <section className="space-y-3.5">
+      {/* Categories Quick Explorer — Horizontal rail on mobile, grid on tablet/desktop */}
+      <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-extrabold text-[#174D35] sm:text-lg">دسته‌بندی همیاری‌ها</h2>
           <Link
@@ -205,19 +205,19 @@ export function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-8">
+        <div className="no-scrollbar flex gap-2.5 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 lg:grid-cols-8">
           {HELP_CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
               to={`/requests?category=${cat.id}`}
-              className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-[#DCEBDD] bg-white px-2.5 py-3.5 text-center transition hover:-translate-y-0.5 hover:border-[#78B98A] hover:bg-[#DCEBDD]/30 hover:shadow-xs"
+              className="group flex w-[84px] shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border border-[#DCEBDD] bg-white px-2 py-3 text-center transition hover:-translate-y-0.5 hover:border-[#78B98A] hover:bg-[#DCEBDD]/30 hover:shadow-xs sm:w-auto sm:px-2.5 sm:py-3.5"
             >
               <span
                 className={`flex h-10 w-10 items-center justify-center rounded-xl border ${cat.accentBg} ${cat.accentText} ${cat.accentBorder}`}
               >
                 <CategoryIcon category={cat.id} className="h-5 w-5" />
               </span>
-              <span className="text-xs font-bold text-[#202820] group-hover:text-[#174D35]">
+              <span className="line-clamp-1 text-[11px] font-bold text-[#202820] group-hover:text-[#174D35] sm:text-xs">
                 {cat.shortLabel}
               </span>
             </Link>
@@ -294,17 +294,17 @@ export function HomePage() {
       </section>
 
       {/* Kindness Chain Spotlight */}
-      <section className="relative overflow-hidden rounded-3xl border border-[#78B98A]/50 bg-gradient-to-l from-[#DCEBDD]/70 via-white to-[#DCEBDD]/40 p-6 sm:p-8">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+      <section className="relative overflow-hidden rounded-3xl border border-[#78B98A]/50 bg-gradient-to-l from-[#DCEBDD]/70 via-white to-[#DCEBDD]/40 p-4 sm:p-8">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-5">
           <div className="max-w-xl space-y-2">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-[#174D35] px-3 py-1 text-xs font-bold text-white">
               <Sparkles className="h-3.5 w-3.5 text-[#E9B949]" />
               زنجیره مهربانی
             </div>
-            <h2 className="text-lg font-extrabold text-[#174D35]">
+            <h2 className="text-base font-extrabold text-[#174D35] sm:text-lg">
               هر کمک واقعی، جرقه‌ای برای کمک بعدی است
             </h2>
-            <p className="text-sm leading-7 text-[#344634]">
+            <p className="text-xs leading-6 text-[#344634] sm:text-sm sm:leading-7">
               در زنجیره مهربانی می‌توانید پیوند واقعی کمک‌های تکمیل‌شده و تأییدشده میان اعضای جامعه را ببینید.
               {stats && stats.verified_participations > 0
                 ? ` تاکنون ${toPersianDigits(stats.verified_participations)} مشارکت تأییدشده ثبت شده است.`
@@ -313,7 +313,7 @@ export function HomePage() {
           </div>
           <Link
             to="/kindness-chain"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#26734B]"
+            className="inline-flex min-h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#26734B] sm:w-auto"
           >
             مشاهده زنجیره مهربانی
             <ArrowLeft className="h-4 w-4" />
