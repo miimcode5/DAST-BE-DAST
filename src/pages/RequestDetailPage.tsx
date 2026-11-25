@@ -9,20 +9,23 @@ import {
   Edit3,
   HandHelping,
   MapPin,
+  MessageCircle,
   Play,
   RotateCcw,
   ShieldCheck,
   Users,
   XCircle,
 } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LoadingState } from '../components/LoadingState';
 import { CategoryBadge, RequestStatusBadge, ResponseStatusBadge } from '../components/StatusBadge';
 import { HELP_TYPE_MAP, RESPONSE_STATUS_META } from '../constants/categories';
 import { useAuth } from '../contexts/AuthContext';
+import { useChat } from '../contexts/ChatContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatDateFa, formatRelativeTimeFa, getInitials, toPersianDigits } from '../lib/formatters';
+import { ensureConversationForResponse, getMyConversations } from '../services/chatService';
 import {
   cancelHelpRequest,
   getRequestById,
@@ -41,6 +44,7 @@ import {
 } from '../services/responsesService';
 import { getSavedRequestIds, toggleSavedRequest } from '../services/savedService';
 import type {
+  ConversationItem,
   HelpRequestFeedItem,
   VolunteerResponse,
   VolunteerResponseWithProfile,
@@ -55,13 +59,16 @@ type DialogAction =
 
 export function RequestDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user, refreshProfile } = useAuth();
+  const { notifyMessagesChanged } = useChat();
   const { showToast } = useToast();
 
   const [request, setRequest] = useState<HelpRequestFeedItem | null>(null);
   const [fromOfflineCache, setFromOfflineCache] = useState(false);
   const [responses, setResponses] = useState<VolunteerResponseWithProfile[]>([]);
   const [myResponse, setMyResponse] = useState<VolunteerResponse | null>(null);
+  const [convByVolunteer, setConvByVolunteer] = useState<Record<string, ConversationItem>>({});
   const [isSaved, setIsSaved] = useState(false);
 
   const [offerMessage, setOfferMessage] = useState('');
@@ -87,26 +94,43 @@ export function RequestDetailPage() {
 
       if (user) {
         const savedPromise = getSavedRequestIds(user.id).catch((): string[] => []);
+        const convPromise = getMyConversations(user.id).catch(() => ({
+          items: [] as ConversationItem[],
+        }));
+
         if (item.user_id === user.id) {
-          const [respList, savedList] = await Promise.all([
+          const [respList, savedList, convs] = await Promise.all([
             getResponsesForRequest(item.id),
             savedPromise,
+            convPromise,
           ]);
           setResponses(respList);
           setMyResponse(null);
           setIsSaved(savedList.includes(item.id));
+          const map: Record<string, ConversationItem> = {};
+          for (const c of convs.items) {
+            if (c.request_id === item.id) map[c.volunteer_id] = c;
+          }
+          setConvByVolunteer(map);
         } else {
-          const [mine, savedList] = await Promise.all([
+          const [mine, savedList, convs] = await Promise.all([
             getMyResponseForRequest(item.id, user.id),
             savedPromise,
+            convPromise,
           ]);
           setMyResponse(mine);
           setResponses([]);
           setIsSaved(savedList.includes(item.id));
+          const map: Record<string, ConversationItem> = {};
+          for (const c of convs.items) {
+            if (c.request_id === item.id) map[c.volunteer_id] = c;
+          }
+          setConvByVolunteer(map);
         }
       } else {
         setResponses([]);
         setMyResponse(null);
+        setConvByVolunteer({});
         setIsSaved(false);
       }
     } catch (err) {
@@ -151,10 +175,27 @@ export function RequestDetailPage() {
       setMyResponse(created);
       setShowOfferForm(false);
       setOfferMessage('');
-      showToast('اعلام آمادگی شما با موفقیت در سیستم ثبت شد.', 'success');
+      notifyMessagesChanged();
+      showToast('اعلام آمادگی شما ثبت و گفت‌وگوی خصوصی با درخواست‌کننده ایجاد شد.', 'success');
       await loadAll();
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'ثبت اعلام آمادگی ناموفق بود', 'error');
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const handleOpenChat = async (responseId: string, existingConvId?: string) => {
+    if (existingConvId) {
+      navigate(`/messages/${existingConvId}`);
+      return;
+    }
+    setActionBusy(true);
+    try {
+      const convId = await ensureConversationForResponse(responseId);
+      navigate(`/messages/${convId}`);
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'باز کردن گفت‌وگو ناموفق بود', 'error');
     } finally {
       setActionBusy(false);
     }
@@ -232,6 +273,7 @@ export function RequestDetailPage() {
         showToast('تکمیل همیاری تأیید شد و در زنجیره مهربانی ثبت گردید.', 'success');
       }
       setDialog(null);
+      notifyMessagesChanged();
       await loadAll();
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'اجرای عملیات با خطا مواجه شد', 'error');
@@ -462,6 +504,21 @@ export function RequestDetailPage() {
               )}
 
               <div className="flex flex-wrap gap-2.5 pt-1">
+                <button
+                  type="button"
+                  disabled={actionBusy}
+                  onClick={() => void handleOpenChat(myResponse.id, convByVolunteer[user.id]?.id)}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                >
+                  <MessageCircle className="h-4 w-4 text-[#E9B949]" />
+                  <span>گفت‌وگوی خصوصی با درخواست‌کننده</span>
+                  {(convByVolunteer[user.id]?.unread_count ?? 0) > 0 && (
+                    <span className="rounded-full bg-[#E9B949] px-1.5 py-0.5 text-[10px] font-extrabold text-[#174D35]">
+                      {toPersianDigits(convByVolunteer[user.id].unread_count)}
+                    </span>
+                  )}
+                </button>
+
                 {(myResponse.status === 'accepted' || myResponse.status === 'in_progress') &&
                   !myResponse.volunteer_confirmed && (
                     <button
@@ -517,7 +574,7 @@ export function RequestDetailPage() {
                     ثبت اعلام آمادگی برای کمک
                   </h2>
                   <p className="text-xs leading-6 text-[#556455]">
-                    می‌توانید بنویسید چه زمانی و چگونه می‌توانید کمک کنید (اختیاری).
+                    پس از ثبت، یک گفت‌وگوی خصوصی با درخواست‌کننده ایجاد می‌شود. در صورت نوشتن پیام زیر، به‌عنوان اولین پیام گفت‌وگو ارسال خواهد شد (اختیاری).
                   </p>
                   <textarea
                     rows={3}
@@ -636,6 +693,26 @@ export function RequestDetailPage() {
 
                     {/* Owner Actions */}
                     <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        type="button"
+                        disabled={actionBusy}
+                        onClick={() =>
+                          void handleOpenChat(
+                            resp.id,
+                            convByVolunteer[resp.volunteer_id]?.id
+                          )
+                        }
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-[#174D35] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/50 disabled:opacity-60"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" />
+                        <span>گفت‌وگوی خصوصی</span>
+                        {(convByVolunteer[resp.volunteer_id]?.unread_count ?? 0) > 0 && (
+                          <span className="rounded-full bg-[#174D35] px-1.5 py-0.5 text-[10px] font-extrabold text-white">
+                            {toPersianDigits(convByVolunteer[resp.volunteer_id].unread_count)}
+                          </span>
+                        )}
+                      </button>
+
                       {resp.status === 'pending' && (
                         <>
                           <button
