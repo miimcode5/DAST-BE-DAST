@@ -25,6 +25,7 @@ import {
   X,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { ConversationListPane } from '../components/ConversationListPane';
 import { LoadingState } from '../components/LoadingState';
 import { ProtectedImage } from '../components/ProtectedImage';
 import { ConversationStatusBadge, RequestStatusBadge } from '../components/StatusBadge';
@@ -52,6 +53,7 @@ import {
   getConversationDetails,
   getMessagesPage,
   getMessagesSince,
+  getMyConversations,
   markConversationMessagesRead,
   mergeSortedMessages,
   sendChatMessage,
@@ -76,12 +78,28 @@ export function ChatPage() {
   const { showToast } = useToast();
 
   const [conversation, setConversation] = useState<ConversationItem | null>(null);
+  const [sidebarConversations, setSidebarConversations] = useState<ConversationItem[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pendingOutbox, setPendingOutbox] = useState<PendingOutgoingMessage[]>([]);
   const [hasMoreOlder, setHasMoreOlder] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    getMyConversations(user.id)
+      .then((res) => {
+        if (active) setSidebarConversations(res.items);
+      })
+      .catch(() => {
+        /* non-blocking desktop sidebar */
+      });
+    return () => {
+      active = false;
+    };
+  }, [user, conversationId, messages.length]);
 
   const [draft, setDraft] = useState('');
   const [firstUnreadMessageId, setFirstUnreadMessageId] = useState<string | null>(null);
@@ -508,41 +526,62 @@ export function ChatPage() {
   const statusMeta = CONVERSATION_STATUS_META[conversation.status];
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden bg-white md:h-[calc(100dvh-9.5rem)] md:flex-none md:rounded-3xl md:border md:border-[#DCEBDD] md:shadow-sm animate-fade-up">
-      {/* Chat Header */}
-      <header className="shrink-0 border-b border-[#DCEBDD] bg-white px-3 py-2.5 sm:px-5 sm:py-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-            <Link
-              to="/messages"
-              aria-label="بازگشت به فهرست پیام‌ها"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] text-[#174D35] hover:bg-[#DCEBDD]/60 sm:h-9 sm:w-9"
-            >
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+    <div className="mx-auto flex min-h-0 w-full flex-1 flex-col lg:grid lg:h-[calc(100dvh-8.5rem)] lg:grid-cols-[310px_1fr] lg:gap-4 animate-fade-up">
+      {/* Desktop Conversations Sidebar */}
+      <aside className="hidden min-h-0 flex-col overflow-hidden rounded-3xl border border-[#DCEBDD] bg-white lg:flex">
+        <div className="flex items-center justify-between border-b border-[#DCEBDD] px-4 py-3.5">
+          <h2 className="text-sm font-bold text-[#174D35]">همه گفت‌وگوها</h2>
+          <Link to="/messages" className="text-xs font-medium text-[#26734B] hover:underline">
+            مشاهده همه
+          </Link>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3">
+          <ConversationListPane
+            items={sidebarConversations}
+            loading={false}
+            currentUserId={user?.id}
+            activeId={conversationId}
+            compact
+          />
+        </div>
+      </aside>
 
-            {conversation.other_user_avatar ? (
-              <ProtectedImage
-                src={conversation.other_user_avatar}
-                alt={conversation.other_user_name}
-                wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#DCEBDD] text-xs font-extrabold text-[#174D35]">
-                {getInitials(conversation.other_user_name)}
-              </div>
-            )}
+      {/* Main Chat Pane */}
+      <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-white md:h-[calc(100dvh-9.5rem)] md:flex-none md:rounded-3xl md:border md:border-[#DCEBDD] md:shadow-xs lg:h-full">
+        {/* Chat Header */}
+        <header className="shrink-0 border-b border-[#DCEBDD] bg-white px-3 py-2.5 sm:px-5 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+              <Link
+                to="/messages"
+                aria-label="بازگشت به فهرست پیام‌ها"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] text-[#174D35] hover:bg-[#DCEBDD]/60 sm:h-9 sm:w-9 lg:hidden"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Link>
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h1 className="truncate text-sm font-extrabold text-[#202820] sm:text-base">
-                  {conversation.other_user_name}
-                </h1>
-                <span className="shrink-0 rounded-lg bg-[#DCEBDD]/70 px-2 py-0.5 text-[10px] font-bold text-[#174D35]">
-                  {partnerRoleLabel}
-                </span>
-              </div>
+              {conversation.other_user_avatar ? (
+                <ProtectedImage
+                  src={conversation.other_user_avatar}
+                  alt={conversation.other_user_name}
+                  wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#DCEBDD] text-xs font-bold text-[#174D35]">
+                  {getInitials(conversation.other_user_name)}
+                </div>
+              )}
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <h1 className="truncate text-sm font-bold text-[#202820] sm:text-base">
+                    {conversation.other_user_name}
+                  </h1>
+                  <span className="shrink-0 rounded-lg bg-[#DCEBDD]/70 px-2 py-0.5 text-[10px] font-semibold text-[#174D35]">
+                    {partnerRoleLabel}
+                  </span>
+                </div>
               <div className="flex items-center gap-2 text-[11px] text-[#556455]">
                 <span
                   className={`inline-flex items-center gap-1 font-medium ${
@@ -919,6 +958,7 @@ export function ChatPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

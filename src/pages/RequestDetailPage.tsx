@@ -291,12 +291,12 @@ export function RequestDetailPage() {
     return (
       <div className="mx-auto max-w-xl rounded-3xl border border-[#DCEBDD] bg-white p-8 text-center">
         <h1 className="mb-2 text-lg font-bold text-[#174D35]">درخواست یافت نشد</h1>
-        <p className="mb-5 text-sm text-[#505E50]">
+        <p className="mb-5 text-sm font-normal text-[#505E50]">
           {errorMsg ?? 'ممکن است این درخواست حذف شده یا نشانی آن نادرست باشد.'}
         </p>
         <Link
           to="/requests"
-          className="inline-flex items-center gap-2 rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B]"
         >
           <ArrowRight className="h-4 w-4" />
           بازگشت به فهرست درخواست‌ها
@@ -306,11 +306,12 @@ export function RequestDetailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 sm:space-y-6 animate-fade-up">
+    <div className="space-y-5 animate-fade-up">
+      {/* Top Action Bar */}
       <div className="flex items-center justify-between gap-2">
         <Link
           to="/requests"
-          className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/30"
+          className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-white px-3.5 py-2 text-xs font-semibold text-[#174D35] hover:bg-[#DCEBDD]/30"
         >
           <ArrowRight className="h-4 w-4" />
           بازگشت به درخواست‌ها
@@ -320,7 +321,7 @@ export function RequestDetailPage() {
           <button
             type="button"
             onClick={handleToggleSave}
-            className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
+            className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition ${
               isSaved
                 ? 'border-[#174D35] bg-[#DCEBDD] text-[#174D35]'
                 : 'border-[#DCEBDD] bg-white text-[#202820] hover:border-[#78B98A]'
@@ -338,474 +339,474 @@ export function RequestDetailPage() {
         </div>
       )}
 
-      {/* Main Request Card */}
-      <article className="rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-7">
-        <div className="mb-3.5 flex flex-wrap items-center gap-2">
-          <CategoryBadge category={request.category} />
-          <RequestStatusBadge status={request.status} />
-          <span className="rounded-full bg-[#F6F7F2] px-3 py-1 text-xs font-semibold text-[#26734B]">
-            {HELP_TYPE_MAP[request.help_type]?.label ?? request.help_type}
-          </span>
-        </div>
-
-        <h1 className="mb-3.5 text-lg font-extrabold leading-8 text-[#202820] sm:mb-4 sm:text-2xl sm:leading-9">
-          {request.title}
-        </h1>
-
-        {request.image_url && (
-          <div className="mb-4 overflow-hidden rounded-2xl border border-[#DCEBDD] sm:mb-5">
-            <ProtectedImage
-              src={request.image_url}
-              alt={request.title}
-              wrapperClassName="relative block w-full overflow-hidden"
-              className="max-h-80 w-full object-cover sm:max-h-96"
-            />
-          </div>
-        )}
-
-        <p className="mb-5 whitespace-pre-line text-sm leading-7 text-[#344234] sm:mb-6 sm:text-base sm:leading-8">
-          {request.description}
-        </p>
-
-        <div className="grid gap-2.5 rounded-2xl bg-[#F6F7F2] p-3.5 text-xs sm:grid-cols-2 sm:gap-3 sm:p-4">
-          <div className="flex items-center gap-2 text-[#202820]">
-            <MapPin className="h-4 w-4 shrink-0 text-[#26734B]" />
-            <span>
-              <strong className="font-bold">موقعیت تقریبی:</strong> {request.province}، {request.city} — {request.area}
+      {/* Desktop 2-column grid (Details + Action/Volunteer panel) */}
+      <div className="grid gap-5 lg:grid-cols-[1fr_360px] lg:items-start">
+        {/* Main Request Details Column */}
+        <article className="rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-[0_2px_10px_rgba(23,77,53,0.03)] sm:p-7">
+          <div className="mb-3.5 flex flex-wrap items-center gap-2">
+            <CategoryBadge category={request.category} />
+            <RequestStatusBadge status={request.status} />
+            <span className="rounded-full bg-[#F6F7F2] px-3 py-1 text-xs font-medium text-[#26734B]">
+              {HELP_TYPE_MAP[request.help_type]?.label ?? request.help_type}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-[#202820]">
-            <Clock className="h-4 w-4 shrink-0 text-[#26734B]" />
-            <span>
-              <strong className="font-bold">زمان موردنیاز:</strong> {request.needed_at}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-[#202820]">
-            <Calendar className="h-4 w-4 shrink-0 text-[#26734B]" />
-            <span>
-              <strong className="font-bold">تاریخ ثبت:</strong> {formatDateFa(request.created_at)} ({formatRelativeTimeFa(request.created_at)})
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-[#202820]">
-            <Users className="h-4 w-4 shrink-0 text-[#26734B]" />
-            <span>
-              <strong className="font-bold">اعلام آمادگی‌ها:</strong> {toPersianDigits(request.responses_count)} داوطلب
-            </span>
-          </div>
-        </div>
 
-        {/* Requester Info & Privacy Note */}
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-[#F6F7F2] pt-5">
-          <div className="flex items-center gap-3">
-            {request.requester_avatar ? (
+          <h1 className="mb-4 text-lg font-bold leading-8 text-[#202820] sm:text-2xl sm:leading-10">
+            {request.title}
+          </h1>
+
+          {request.image_url && (
+            <div className="mb-5 overflow-hidden rounded-2xl border border-[#DCEBDD]">
               <ProtectedImage
-                src={request.requester_avatar}
-                alt={request.requester_name}
-                wrapperClassName="relative block h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
-                className="h-full w-full object-cover"
+                src={request.image_url}
+                alt={request.title}
+                wrapperClassName="relative block w-full overflow-hidden"
+                className="max-h-80 w-full object-cover sm:max-h-96"
               />
-            ) : (
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#DCEBDD] text-sm font-extrabold text-[#174D35]">
-                {getInitials(request.requester_name)}
-              </div>
-            )}
-            <div>
-              <div className="text-sm font-bold text-[#202820]">
-                {isOwner ? 'درخواست ثبت‌شده توسط شما' : request.requester_name}
-              </div>
-              <div className="text-xs text-[#556455]">
-                کمک‌های تکمیل‌شده قبلی: {toPersianDigits(request.requester_completed_helps)} مورد
-              </div>
+            </div>
+          )}
+
+          <p className="mb-6 whitespace-pre-line text-sm font-normal leading-8 text-[#344234] sm:text-[15px]">
+            {request.description}
+          </p>
+
+          <div className="grid gap-2.5 rounded-2xl bg-[#F6F7F2] p-4 text-xs sm:grid-cols-2 sm:gap-3">
+            <div className="flex items-center gap-2 text-[#202820]">
+              <MapPin className="h-4 w-4 shrink-0 text-[#26734B]" />
+              <span>
+                <strong className="font-semibold">موقعیت تقریبی:</strong> {request.province}، {request.city} — {request.area}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-[#202820]">
+              <Clock className="h-4 w-4 shrink-0 text-[#26734B]" />
+              <span>
+                <strong className="font-semibold">زمان موردنیاز:</strong> {request.needed_at}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-[#202820]">
+              <Calendar className="h-4 w-4 shrink-0 text-[#26734B]" />
+              <span>
+                <strong className="font-semibold">تاریخ ثبت:</strong> {formatDateFa(request.created_at)}{' '}
+                <span className="font-light text-[#5E6C5E]">({formatRelativeTimeFa(request.created_at)})</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-[#202820]">
+              <Users className="h-4 w-4 shrink-0 text-[#26734B]" />
+              <span>
+                <strong className="font-semibold">اعلام آمادگی‌ها:</strong> {toPersianDigits(request.responses_count)} داوطلب
+              </span>
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#556455]">
-            <ShieldCheck className="h-4 w-4 text-[#26734B]" />
-            مکان دقیق و اطلاعات تماس محرمانه می‌ماند
-          </div>
-        </div>
-
-        {/* Owner Quick Controls */}
-        {isOwner && !fromOfflineCache && (
-          <div className="mt-5 flex flex-wrap gap-2.5 border-t border-[#F6F7F2] pt-5">
-            {(request.status === 'open' || request.status === 'in_progress') && (
-              <>
-                <Link
-                  to={`/requests/${request.id}/edit`}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2.5 text-xs font-bold text-[#174D35] hover:border-[#78B98A]"
-                >
-                  <Edit3 className="h-4 w-4" />
-                  ویرایش درخواست
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setDialog({ type: 'cancel_request' })}
-                  disabled={actionBusy}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100"
-                >
-                  <XCircle className="h-4 w-4" />
-                  لغو درخواست
-                </button>
-              </>
-            )}
-
-            {request.status === 'cancelled' && (
-              <button
-                type="button"
-                onClick={handleReopenRequest}
-                disabled={actionBusy}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B]"
-              >
-                <RotateCcw className="h-4 w-4" />
-                بازگشایی درخواست
-              </button>
-            )}
-          </div>
-        )}
-      </article>
-
-      {/* VOLUNTEER INTERACTION PANEL (Non-Owner) */}
-      {!isOwner && !fromOfflineCache && (
-        <section className="rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-6">
-          {!user ? (
-            <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-right">
+          {/* Requester Info & Privacy Note */}
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-[#F6F7F2] pt-5">
+            <div className="flex items-center gap-3">
+              {request.requester_avatar ? (
+                <ProtectedImage
+                  src={request.requester_avatar}
+                  alt={request.requester_name}
+                  wrapperClassName="relative block h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#DCEBDD] text-sm font-bold text-[#174D35]">
+                  {getInitials(request.requester_name)}
+                </div>
+              )}
               <div>
-                <h2 className="text-base font-extrabold text-[#174D35]">می‌خواهید در این مورد کمک کنید؟</h2>
-                <p className="mt-1 text-xs leading-6 text-[#505E50] sm:text-sm">
-                  برای ثبت اعلام آمادگی و هماهنگی با درخواست‌کننده، ابتدا وارد حساب خود شوید.
-                </p>
+                <div className="text-sm font-semibold text-[#202820]">
+                  {isOwner ? 'درخواست ثبت‌شده توسط شما' : request.requester_name}
+                </div>
+                <div className="text-xs font-normal text-[#556455]">
+                  کمک‌های تکمیل‌شده قبلی: {toPersianDigits(request.requester_completed_helps)} مورد
+                </div>
               </div>
-              <Link
-                to={`/auth/login?next=${encodeURIComponent(`/requests/${request.id}`)}`}
-                className="inline-flex min-h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-5 py-3 text-sm font-bold text-white hover:bg-[#26734B] sm:w-auto"
-              >
-                ورود و اعلام آمادگی
-              </Link>
             </div>
-          ) : myResponse && myResponse.status !== 'cancelled' ? (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-base font-extrabold text-[#174D35]">وضعیت اعلام آمادگی شما</h2>
-                <ResponseStatusBadge status={myResponse.status} />
-              </div>
 
-              <p className="text-xs leading-6 text-[#465346] sm:text-sm sm:leading-7">
-                {RESPONSE_STATUS_META[myResponse.status].description}
-              </p>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-normal text-[#556455]">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-[#26734B]" />
+              <span>مکان دقیق و اطلاعات تماس محرمانه می‌ماند</span>
+            </div>
+          </div>
 
-              {myResponse.message && (
-                <div className="rounded-2xl bg-[#F6F7F2] p-3.5 text-xs leading-6 text-[#202820]">
-                  <strong className="font-bold">پیام شما: </strong>
-                  {myResponse.message}
-                </div>
-              )}
-
-              {myResponse.volunteer_confirmed && myResponse.status !== 'completed' && (
-                <div className="rounded-2xl border border-[#78B98A]/50 bg-[#DCEBDD]/45 px-4 py-3 text-xs font-semibold text-[#174D35]">
-                  شما انجام کمک را اعلام کرده‌اید؛ در انتظار تأیید نهایی از طرف ثبت‌کننده درخواست هستید.
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2.5 pt-1 sm:flex-row sm:flex-wrap">
-                <button
-                  type="button"
-                  disabled={actionBusy}
-                  onClick={() => void handleOpenChat(myResponse.id, convByVolunteer[user.id]?.id)}
-                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:w-auto"
-                >
-                  <MessageCircle className="h-4 w-4 text-[#E9B949]" />
-                  <span>گفت‌وگوی خصوصی با درخواست‌کننده</span>
-                  {(convByVolunteer[user.id]?.unread_count ?? 0) > 0 && (
-                    <span className="rounded-full bg-[#E9B949] px-1.5 py-0.5 text-[10px] font-extrabold text-[#174D35]">
-                      {toPersianDigits(convByVolunteer[user.id].unread_count)}
-                    </span>
-                  )}
-                </button>
-
-                {(myResponse.status === 'accepted' || myResponse.status === 'in_progress') &&
-                  !myResponse.volunteer_confirmed && (
-                    <button
-                      type="button"
-                      disabled={actionBusy}
-                      onClick={() => handleMarkVolunteerDone(myResponse.id)}
-                      className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#26734B] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60 sm:w-auto"
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      اعلام انجام کمک از طرف من
-                    </button>
-                  )}
-
-                {(myResponse.status === 'pending' || myResponse.status === 'accepted') && (
+          {/* Owner Quick Controls */}
+          {isOwner && !fromOfflineCache && (
+            <div className="mt-5 flex flex-wrap gap-2.5 border-t border-[#F6F7F2] pt-5">
+              {(request.status === 'open' || request.status === 'in_progress') && (
+                <>
+                  <Link
+                    to={`/requests/${request.id}/edit`}
+                    className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-2 text-xs font-semibold text-[#174D35] hover:border-[#78B98A]"
+                  >
+                    <Edit3 className="h-4 w-4" />
+                    ویرایش درخواست
+                  </Link>
                   <button
                     type="button"
+                    onClick={() => setDialog({ type: 'cancel_request' })}
                     disabled={actionBusy}
-                    onClick={() =>
-                      setDialog({ type: 'withdraw_response', responseId: myResponse.id })
-                    }
-                    className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100 disabled:opacity-60 sm:w-auto"
+                    className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100"
                   >
                     <XCircle className="h-4 w-4" />
-                    لغو اعلام آمادگی
+                    لغو درخواست
                   </button>
-                )}
-              </div>
-            </div>
-          ) : canVolunteerOffer ? (
-            <div className="space-y-4">
-              {!showOfferForm ? (
-                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                  <div>
-                    <h2 className="text-base font-extrabold text-[#174D35]">
-                      آماده یاری هستید؟
-                    </h2>
-                    <p className="mt-1 text-xs leading-6 text-[#505E50] sm:text-sm">
-                      با ثبت اعلام آمادگی، درخواست‌کننده درخواست شما را مشاهده و بررسی می‌کند.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowOfferForm(true)}
-                    className="inline-flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-6 py-3.5 text-sm font-extrabold text-white shadow-sm transition hover:bg-[#26734B] sm:w-auto"
-                  >
-                    <HandHelping className="h-5 w-5 text-[#E9B949]" />
-                    من می‌توانم کمک کنم
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitOffer} className="space-y-3">
-                  <h2 className="text-base font-extrabold text-[#174D35]">
-                    ثبت اعلام آمادگی برای کمک
-                  </h2>
-                  <p className="text-xs leading-6 text-[#556455]">
-                    پس از ثبت، یک گفت‌وگوی خصوصی با درخواست‌کننده ایجاد می‌شود. در صورت نوشتن پیام زیر، به‌عنوان اولین پیام گفت‌وگو ارسال خواهد شد (اختیاری).
-                  </p>
-                  <textarea
-                    rows={3}
-                    value={offerMessage}
-                    onChange={(e) => setOfferMessage(e.target.value)}
-                    placeholder="مثلاً: سلام، من در محدوده خیابان معلم هستم و فردا عصر می‌توانم برای انجام این کار کمک کنم."
-                    className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 p-3.5 text-[15px] leading-6 outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
-                  />
-                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-2.5">
-                    <button
-                      type="submit"
-                      disabled={actionBusy}
-                      className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:w-auto"
-                    >
-                      <Check className="h-4 w-4" />
-                      {actionBusy ? 'در حال ثبت...' : 'تأیید و ارسال اعلام آمادگی'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowOfferForm(false)}
-                      disabled={actionBusy}
-                      className="min-h-[42px] w-full rounded-xl border border-[#DCEBDD] px-4 py-2.5 text-xs font-bold text-[#465346] hover:bg-[#F6F7F2] sm:w-auto"
-                    >
-                      انصراف
-                    </button>
-                  </div>
-                </form>
+                </>
+              )}
+
+              {request.status === 'cancelled' && (
+                <button
+                  type="button"
+                  onClick={handleReopenRequest}
+                  disabled={actionBusy}
+                  className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B]"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  بازگشایی درخواست
+                </button>
               )}
             </div>
-          ) : (
-            <p className="text-sm text-[#556455]">
-              این درخواست در حال حاضر برای اعلام آمادگی جدید باز نیست.
-            </p>
           )}
-        </section>
-      )}
+        </article>
 
-      {/* REQUEST OWNER VOLUNTEER MANAGEMENT PANEL */}
-      {isOwner && !fromOfflineCache && (
-        <section className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-xs sm:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-extrabold text-[#174D35]">
-              داوطلبان اعلام آمادگی‌کرده ({toPersianDigits(responses.length)})
-            </h2>
-            <span className="text-xs text-[#556455]">
-              تنها شما به‌عنوان ثبت‌کننده درخواست می‌توانید وضعیت داوطلبان را مدیریت کنید
-            </span>
-          </div>
-
-          {responses.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#DCEBDD] bg-[#F6F7F2]/60 p-6 text-center text-sm text-[#556455]">
-              هنوز داوطلبی برای این درخواست اعلام آمادگی نکرده است. به محض اعلام آمادگی کاربران، نام و توضیحات آن‌ها اینجا نمایش داده می‌شود.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {responses.map((resp) => {
-                const volName = resp.volunteer?.display_name ?? 'داوطلب دست‌به‌دست';
-                return (
-                  <div
-                    key={resp.id}
-                    className="rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/50 p-4 space-y-3"
+        {/* Sticky Sidebar / Mobile Bottom Action Column */}
+        <aside className="space-y-4 lg:sticky lg:top-20">
+          {!isOwner && !fromOfflineCache && (
+            <section className="rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-[0_2px_10px_rgba(23,77,53,0.04)] sm:p-6">
+              {!user ? (
+                <div className="space-y-4 text-center lg:text-right">
+                  <div>
+                    <h2 className="text-base font-bold text-[#174D35]">می‌خواهید در این مورد کمک کنید؟</h2>
+                    <p className="mt-1 text-xs font-normal leading-6 text-[#505E50]">
+                      برای ثبت اعلام آمادگی و هماهنگی در گفت‌وگوی خصوصی با درخواست‌کننده، وارد حساب کاربری شوید.
+                    </p>
+                  </div>
+                  <Link
+                    to={`/auth/login?next=${encodeURIComponent(`/requests/${request.id}`)}`}
+                    className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-5 py-3 text-sm font-bold text-white hover:bg-[#26734B]"
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        {resp.volunteer?.avatar_url ? (
-                          <ProtectedImage
-                            src={resp.volunteer.avatar_url}
-                            alt={volName}
-                            wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#DCEBDD] text-xs font-extrabold text-[#174D35]">
-                            {getInitials(volName)}
-                          </div>
-                        )}
-                        <div>
-                          <div className="text-sm font-bold text-[#202820]">{volName}</div>
-                          <div className="text-xs text-[#556455]">
-                            {resp.volunteer?.city ? `${resp.volunteer.city}` : 'خراسان جنوبی'}
-                            {resp.volunteer?.completed_helps_count
-                              ? ` · ${toPersianDigits(resp.volunteer.completed_helps_count)} کمک تکمیل‌شده`
-                              : ''}
-                            {' · '}
-                            {formatRelativeTimeFa(resp.created_at)}
-                          </div>
-                        </div>
-                      </div>
+                    <HandHelping className="h-5 w-5 text-[#E9B949]" />
+                    <span>ورود و اعلام آمادگی</span>
+                  </Link>
+                </div>
+              ) : myResponse && myResponse.status !== 'cancelled' ? (
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-base font-bold text-[#174D35]">وضعیت اعلام آمادگی شما</h2>
+                    <ResponseStatusBadge status={myResponse.status} />
+                  </div>
 
-                      <ResponseStatusBadge status={resp.status} />
+                  <p className="text-xs font-normal leading-6 text-[#465346]">
+                    {RESPONSE_STATUS_META[myResponse.status].description}
+                  </p>
+
+                  {myResponse.message && (
+                    <div className="rounded-2xl bg-[#F6F7F2] p-3.5 text-xs font-normal leading-6 text-[#202820]">
+                      <strong className="font-semibold">پیام شما: </strong>
+                      {myResponse.message}
                     </div>
+                  )}
 
-                    {resp.volunteer?.skills && resp.volunteer.skills.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {resp.volunteer.skills.slice(0, 5).map((s) => (
-                          <span
-                            key={s}
-                            className="rounded-lg bg-white px-2.5 py-0.5 text-[11px] font-medium text-[#174D35]"
-                          >
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                  {myResponse.volunteer_confirmed && myResponse.status !== 'completed' && (
+                    <div className="rounded-2xl border border-[#78B98A]/50 bg-[#DCEBDD]/45 px-4 py-3 text-xs font-medium text-[#174D35]">
+                      شما انجام کمک را اعلام کرده‌اید؛ در انتظار تأیید نهایی ثبت‌کننده درخواست هستید.
+                    </div>
+                  )}
 
-                    {resp.message && (
-                      <p className="rounded-xl bg-white p-3 text-xs leading-6 text-[#202820]">
-                        {resp.message}
-                      </p>
-                    )}
+                  <div className="flex flex-col gap-2.5 pt-1">
+                    <button
+                      type="button"
+                      disabled={actionBusy}
+                      onClick={() => void handleOpenChat(myResponse.id, convByVolunteer[user.id]?.id)}
+                      className="inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                    >
+                      <MessageCircle className="h-4 w-4 text-[#E9B949]" />
+                      <span>گفت‌وگوی خصوصی با درخواست‌کننده</span>
+                      {(convByVolunteer[user.id]?.unread_count ?? 0) > 0 && (
+                        <span className="rounded-full bg-[#E9B949] px-2 py-0.5 text-[10px] font-bold text-[#174D35]">
+                          {toPersianDigits(convByVolunteer[user.id].unread_count)}
+                        </span>
+                      )}
+                    </button>
 
-                    {resp.volunteer_confirmed && resp.status !== 'completed' && (
-                      <div className="rounded-xl border border-[#78B98A] bg-[#DCEBDD]/50 px-3 py-2 text-xs font-semibold text-[#174D35]">
-                        داوطلب انجام کمک را اعلام کرده است. در صورت انجام صحیح کمک، تکمیل را تأیید کنید.
-                      </div>
-                    )}
+                    {(myResponse.status === 'accepted' || myResponse.status === 'in_progress') &&
+                      !myResponse.volunteer_confirmed && (
+                        <button
+                          type="button"
+                          disabled={actionBusy}
+                          onClick={() => handleMarkVolunteerDone(myResponse.id)}
+                          className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-2xl bg-[#26734B] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60"
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          <span>اعلام انجام کمک از طرف من</span>
+                        </button>
+                      )}
 
-                    {/* Owner Actions */}
-                    <div className="flex flex-wrap gap-2 pt-1">
+                    {(myResponse.status === 'pending' || myResponse.status === 'accepted') && (
                       <button
                         type="button"
                         disabled={actionBusy}
                         onClick={() =>
-                          void handleOpenChat(
-                            resp.id,
-                            convByVolunteer[resp.volunteer_id]?.id
-                          )
+                          setDialog({ type: 'withdraw_response', responseId: myResponse.id })
                         }
-                        className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-xl border border-[#174D35] bg-white px-3.5 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/50 disabled:opacity-60 sm:w-auto"
+                        className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-60"
                       >
-                        <MessageCircle className="h-3.5 w-3.5" />
-                        <span>گفت‌وگوی خصوصی</span>
-                        {(convByVolunteer[resp.volunteer_id]?.unread_count ?? 0) > 0 && (
-                          <span className="rounded-full bg-[#174D35] px-1.5 py-0.5 text-[10px] font-extrabold text-white">
-                            {toPersianDigits(convByVolunteer[resp.volunteer_id].unread_count)}
-                          </span>
-                        )}
+                        <XCircle className="h-4 w-4" />
+                        <span>لغو اعلام آمادگی</span>
                       </button>
-
-                      {resp.status === 'pending' && (
-                        <>
-                          <button
-                            type="button"
-                            disabled={actionBusy}
-                            onClick={() => handleAccept(resp.id)}
-                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:flex-initial"
-                          >
-                            <Check className="h-3.5 w-3.5" />
-                            پذیرفتن داوطلب
-                          </button>
-                          <button
-                            type="button"
-                            disabled={actionBusy}
-                            onClick={() =>
-                              setDialog({ type: 'reject_response', responseId: resp.id })
-                            }
-                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 disabled:opacity-60 sm:flex-initial"
-                          >
-                            <XCircle className="h-3.5 w-3.5" />
-                            رد کردن
-                          </button>
-                        </>
-                      )}
-
-                      {resp.status === 'accepted' && (
-                        <>
-                          <button
-                            type="button"
-                            disabled={actionBusy}
-                            onClick={() => handleStart(resp.id)}
-                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#26734B] bg-white px-4 py-2 text-xs font-bold text-[#174D35] hover:bg-[#DCEBDD]/40 disabled:opacity-60 sm:flex-initial"
-                          >
-                            <Play className="h-3.5 w-3.5" />
-                            شروع همکاری
-                          </button>
-                          <button
-                            type="button"
-                            disabled={actionBusy}
-                            onClick={() =>
-                              setDialog({
-                                type: 'confirm_completion',
-                                responseId: resp.id,
-                                volunteerName: volName,
-                              })
-                            }
-                            className="inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#26734B] px-4 py-2 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60 sm:flex-initial"
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            تأیید تکمیل کمک
-                          </button>
-                          <button
-                            type="button"
-                            disabled={actionBusy}
-                            onClick={() =>
-                              setDialog({ type: 'reject_response', responseId: resp.id })
-                            }
-                            className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 sm:w-auto"
-                          >
-                            لغو انتخاب
-                          </button>
-                        </>
-                      )}
-
-                      {resp.status === 'in_progress' && (
+                    )}
+                  </div>
+                </div>
+              ) : canVolunteerOffer ? (
+                <div className="space-y-4">
+                  {!showOfferForm ? (
+                    <div className="space-y-3.5">
+                      <div>
+                        <h2 className="text-base font-bold text-[#174D35]">آماده یاری هستید؟</h2>
+                        <p className="mt-1 text-xs font-normal leading-6 text-[#505E50]">
+                          با اعلام آمادگی، گفت‌وگوی خصوصی با درخواست‌کننده ساخته می‌شود تا با آرامش هماهنگ شوید.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowOfferForm(true)}
+                        className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#174D35] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#26734B]"
+                      >
+                        <HandHelping className="h-5 w-5 text-[#E9B949]" />
+                        <span>من می‌تونم کمک کنم</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmitOffer} className="space-y-3">
+                      <h2 className="text-base font-bold text-[#174D35]">ثبت اعلام آمادگی</h2>
+                      <p className="text-xs font-normal leading-6 text-[#556455]">
+                        پیام زیر به‌عنوان اولین پیام گفت‌وگوی خصوصی با درخواست‌کننده ارسال می‌شود (اختیاری):
+                      </p>
+                      <textarea
+                        rows={3}
+                        value={offerMessage}
+                        onChange={(e) => setOfferMessage(e.target.value)}
+                        placeholder="مثلاً: سلام، من در محدوده خیابان معلم هستم و فردا عصر می‌توانم کمک کنم."
+                        className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 p-3.5 text-[15px] font-normal leading-6 outline-none focus:border-[#26734B] focus:bg-white sm:text-sm"
+                      />
+                      <div className="flex flex-col gap-2">
+                        <button
+                          type="submit"
+                          disabled={actionBusy}
+                          className="inline-flex min-h-[46px] w-full items-center justify-center gap-1.5 rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                        >
+                          <Check className="h-4 w-4" />
+                          <span>{actionBusy ? 'در حال ثبت...' : 'تأیید و شروع گفت‌وگو'}</span>
+                        </button>
                         <button
                           type="button"
+                          onClick={() => setShowOfferForm(false)}
                           disabled={actionBusy}
-                          onClick={() =>
-                            setDialog({
-                              type: 'confirm_completion',
-                              responseId: resp.id,
-                              volunteerName: volName,
-                            })
-                          }
-                          className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60 sm:w-auto"
+                          className="min-h-[40px] w-full rounded-2xl border border-[#DCEBDD] px-4 py-2 text-xs font-semibold text-[#465346] hover:bg-[#F6F7F2]"
                         >
-                          <CheckCircle2 className="h-3.5 w-3.5 text-[#E9B949]" />
-                          تأیید نهایی تکمیل کمک
+                          انصراف
                         </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs font-normal leading-6 text-[#556455]">
+                  این درخواست در حال حاضر برای اعلام آمادگی جدید باز نیست.
+                </p>
+              )}
+            </section>
           )}
-        </section>
-      )}
+
+          {/* REQUEST OWNER VOLUNTEER MANAGEMENT PANEL */}
+          {isOwner && !fromOfflineCache && (
+            <section className="space-y-4 rounded-3xl border border-[#DCEBDD] bg-white p-4 shadow-[0_2px_10px_rgba(23,77,53,0.04)] sm:p-5">
+              <div>
+                <h2 className="text-base font-bold text-[#174D35]">
+                  داوطلبان ({toPersianDigits(responses.length)})
+                </h2>
+                <p className="mt-0.5 text-xs font-light text-[#556455]">
+                  مدیریت اعلام آمادگی‌ها و گفت‌وگوی خصوصی با داوطلبان
+                </p>
+              </div>
+
+              {responses.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[#DCEBDD] bg-[#F6F7F2]/60 p-5 text-center text-xs leading-6 text-[#556455]">
+                  هنوز داوطلبی برای این درخواست اعلام آمادگی نکرده است.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {responses.map((resp) => {
+                    const volName = resp.volunteer?.display_name ?? 'داوطلب دست‌به‌دست';
+                    return (
+                      <div
+                        key={resp.id}
+                        className="space-y-3 rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/55 p-3.5"
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-2.5">
+                          <div className="flex items-center gap-2.5">
+                            {resp.volunteer?.avatar_url ? (
+                              <ProtectedImage
+                                src={resp.volunteer.avatar_url}
+                                alt={volName}
+                                wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#DCEBDD] text-xs font-bold text-[#174D35]">
+                                {getInitials(volName)}
+                              </div>
+                            )}
+                            <div>
+                              <div className="text-sm font-semibold text-[#202820]">{volName}</div>
+                              <div className="text-[11px] font-normal text-[#556455]">
+                                {resp.volunteer?.city ? resp.volunteer.city : 'خراسان جنوبی'}
+                                {resp.volunteer?.completed_helps_count
+                                  ? ` · ${toPersianDigits(resp.volunteer.completed_helps_count)} کمک`
+                                  : ''}
+                              </div>
+                            </div>
+                          </div>
+
+                          <ResponseStatusBadge status={resp.status} />
+                        </div>
+
+                        {resp.volunteer?.skills && resp.volunteer.skills.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {resp.volunteer.skills.slice(0, 4).map((s) => (
+                              <span
+                                key={s}
+                                className="rounded-lg bg-white px-2 py-0.5 text-[11px] font-medium text-[#174D35]"
+                              >
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {resp.message && (
+                          <p className="rounded-xl bg-white p-3 text-xs font-normal leading-6 text-[#202820]">
+                            {resp.message}
+                          </p>
+                        )}
+
+                        {resp.volunteer_confirmed && resp.status !== 'completed' && (
+                          <div className="rounded-xl border border-[#78B98A] bg-[#DCEBDD]/50 px-3 py-2 text-xs font-medium text-[#174D35]">
+                            داوطلب انجام کمک را اعلام کرده است. در صورت انجام، تکمیل را تأیید کنید.
+                          </div>
+                        )}
+
+                        <div className="flex flex-col gap-2 pt-0.5">
+                          <button
+                            type="button"
+                            disabled={actionBusy}
+                            onClick={() =>
+                              void handleOpenChat(
+                                resp.id,
+                                convByVolunteer[resp.volunteer_id]?.id
+                              )
+                            }
+                            className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-xl border border-[#174D35] bg-white px-3.5 py-2 text-xs font-semibold text-[#174D35] hover:bg-[#DCEBDD]/50 disabled:opacity-60"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" />
+                            <span>گفت‌وگوی خصوصی</span>
+                            {(convByVolunteer[resp.volunteer_id]?.unread_count ?? 0) > 0 && (
+                              <span className="rounded-full bg-[#E9B949] px-1.5 py-0.5 text-[10px] font-bold text-[#174D35]">
+                                {toPersianDigits(convByVolunteer[resp.volunteer_id].unread_count)}
+                              </span>
+                            )}
+                          </button>
+
+                          {resp.status === 'pending' && (
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                disabled={actionBusy}
+                                onClick={() => handleAccept(resp.id)}
+                                className="inline-flex min-h-[40px] items-center justify-center gap-1 rounded-xl bg-[#174D35] px-3 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                              >
+                                <Check className="h-3.5 w-3.5" />
+                                <span>پذیرفتن</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={actionBusy}
+                                onClick={() =>
+                                  setDialog({ type: 'reject_response', responseId: resp.id })
+                                }
+                                className="inline-flex min-h-[40px] items-center justify-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                              >
+                                <XCircle className="h-3.5 w-3.5" />
+                                <span>رد کردن</span>
+                              </button>
+                            </div>
+                          )}
+
+                          {resp.status === 'accepted' && (
+                            <div className="space-y-2">
+                              <button
+                                type="button"
+                                disabled={actionBusy}
+                                onClick={() => handleStart(resp.id)}
+                                className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-xl border border-[#26734B] bg-white px-4 py-2 text-xs font-semibold text-[#174D35] hover:bg-[#DCEBDD]/40 disabled:opacity-60"
+                              >
+                                <Play className="h-3.5 w-3.5" />
+                                <span>شروع همکاری</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={actionBusy}
+                                onClick={() =>
+                                  setDialog({
+                                    type: 'confirm_completion',
+                                    responseId: resp.id,
+                                    volunteerName: volName,
+                                  })
+                                }
+                                className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#26734B] px-4 py-2 text-xs font-bold text-white hover:bg-[#174D35] disabled:opacity-60"
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                <span>تأیید تکمیل کمک</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={actionBusy}
+                                onClick={() =>
+                                  setDialog({ type: 'reject_response', responseId: resp.id })
+                                }
+                                className="inline-flex min-h-[38px] w-full items-center justify-center rounded-xl border border-stone-300 bg-white px-3.5 py-1.5 text-xs font-medium text-stone-600 hover:bg-stone-100"
+                              >
+                                لغو انتخاب
+                              </button>
+                            </div>
+                          )}
+
+                          {resp.status === 'in_progress' && (
+                            <button
+                              type="button"
+                              disabled={actionBusy}
+                              onClick={() =>
+                                setDialog({
+                                  type: 'confirm_completion',
+                                  responseId: resp.id,
+                                  volunteerName: volName,
+                                })
+                              }
+                              className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl bg-[#174D35] px-4 py-2 text-xs font-bold text-white hover:bg-[#26734B] disabled:opacity-60"
+                            >
+                              <CheckCircle2 className="h-4 w-4 text-[#E9B949]" />
+                              <span>تأیید نهایی تکمیل کمک</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          )}
+        </aside>
+      </div>
 
       <ConfirmDialog
         open={dialog !== null}
