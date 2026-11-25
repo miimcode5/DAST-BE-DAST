@@ -103,17 +103,17 @@ export function RegisterPage() {
   if (needsEmailConfirm) {
     return (
       <div className="mx-auto max-w-md py-6 animate-fade-up">
-        <div className="rounded-3xl border border-[#78B98A] bg-white p-7 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#DCEBDD] text-[#174D35]">
+        <div className="rounded-2xl border border-brand-soft bg-white p-7 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-surface text-brand-primary">
             <CheckCircle2 className="h-8 w-8" />
           </div>
-          <h1 className="mb-2 text-lg font-extrabold text-[#174D35]">ثبت‌نام اولیه انجام شد</h1>
-          <p className="mb-5 text-sm leading-7 text-[#4D5B4D]">
+          <h1 className="mb-2 text-lg font-extrabold text-brand-primary">ثبت‌نام اولیه انجام شد</h1>
+          <p className="mb-5 text-sm leading-7 text-brand-text/80">
             پیام تأیید به ایمیل <span className="font-bold" dir="ltr">{email}</span> ارسال شد. لطفاً پس از تأیید ایمیل وارد حساب خود شوید.
           </p>
           <Link
             to="/auth/login"
-            className="inline-flex w-full items-center justify-center rounded-2xl bg-[#174D35] py-3 text-sm font-bold text-white hover:bg-[#26734B]"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-brand-primary py-3 text-sm font-bold text-white hover:bg-brand-green"
           >
             رفتن به صفحه ورود
           </Link>
@@ -124,11 +124,11 @@ export function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-lg py-2 sm:py-4 animate-fade-up">
-      <div className="rounded-3xl border border-[#DCEBDD] bg-white p-5 shadow-sm sm:p-8">
+      <div className="rounded-2xl border border-brand-surface bg-white p-5 sm:p-8">
         <div className="mb-6 flex flex-col items-center text-center">
           <BrandLogo />
-          <h1 className="mt-4 text-xl font-bold text-[#174D35]">عضویت در دست‌به‌دست</h1>
-          <p className="mt-1.5 text-sm font-normal text-[#505E50]">
+          <h1 className="mt-4 text-xl font-extrabold text-brand-primary">عضویت در دست‌به‌دست</h1>
+          <p className="mt-1.5 text-sm text-brand-text/70">
             هرکس می‌تواند گرهی باز کند.
           </p>
         </div>
@@ -136,7 +136,7 @@ export function RegisterPage() {
         {errorMsg && (
           <div
             role="alert"
-            className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800"
+            className="mb-4 rounded-xl border border-brand-text/30 bg-brand-bg px-4 py-3 text-sm font-medium text-brand-text"
           >
             {errorMsg}
           </div>
@@ -144,7 +144,7 @@ export function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="reg-name" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+            <label htmlFor="reg-name" className="mb-1.5 block text-sm font-semibold text-brand-text">
               نام نمایشی (نام و نام خانوادگی یا نام مستعار محترمانه)
             </label>
             <input
@@ -153,17 +153,17 @@ export function RegisterPage() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
             placeholder="مثلاً: علی محمدی"
-            className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-[15px] text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white sm:text-sm"
+            className="min-h-[44px] w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-4 py-3 text-[15px] text-brand-text outline-none transition focus:border-brand-green focus:bg-white sm:text-sm"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="reg-email" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+            <label htmlFor="reg-email" className="mb-1.5 block text-sm font-semibold text-brand-text">
               ایمیل
             </label>
             <div className="relative">
-              <Mail className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-[#5A695A]" />
+              <Mail className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-brand-text/70" />
               <input
                 id="reg-email"
                 type="email"
@@ -172,7 +172,7 @@ export function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 py-3 pr-10 pl-4 text-left text-sm text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white"
+                className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 py-3 pr-10 pl-4 text-left text-sm text-brand-text outline-none transition focus:border-brand-green focus:bg-white"
                 required
               />
             </div>
@@ -180,14 +180,14 @@ export function RegisterPage() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label htmlFor="reg-province" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+              <label htmlFor="reg-province" className="mb-1.5 block text-sm font-semibold text-brand-text">
                 استان
               </label>
               <select
                 id="reg-province"
                 value={province}
                 onChange={(e) => handleProvinceChange(e.target.value)}
-                className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white"
+                className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-3.5 py-3 text-sm text-brand-text outline-none transition focus:border-brand-green focus:bg-white"
               >
                 {PROVINCES_LIST.map((prov) => (
                   <option key={prov} value={prov}>
@@ -198,14 +198,14 @@ export function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="reg-city" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+              <label htmlFor="reg-city" className="mb-1.5 block text-sm font-semibold text-brand-text">
                 شهر
               </label>
               <select
                 id="reg-city"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-3 text-sm text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white"
+                className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-3.5 py-3 text-sm text-brand-text outline-none transition focus:border-brand-green focus:bg-white"
               >
                 {cityOptions.map((c) => (
                   <option key={c} value={c}>
@@ -217,29 +217,29 @@ export function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="reg-neighborhood" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+            <label htmlFor="reg-neighborhood" className="mb-1.5 block text-sm font-semibold text-brand-text">
               محله یا محدوده تقریبی (اختیاری)
             </label>
             <div className="relative">
-              <MapPin className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-[#5A695A]" />
+              <MapPin className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-brand-text/70" />
               <input
                 id="reg-neighborhood"
                 type="text"
                 value={neighborhood}
                 onChange={(e) => setNeighborhood(e.target.value)}
                 placeholder="مثلاً: محدوده خیابان مدرس یا شهرک بعثت"
-                className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 py-3 pr-10 pl-4 text-sm text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white"
+                className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 py-3 pr-10 pl-4 text-sm text-brand-text outline-none transition focus:border-brand-green focus:bg-white"
               />
             </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label htmlFor="reg-pass" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+              <label htmlFor="reg-pass" className="mb-1.5 block text-sm font-semibold text-brand-text">
                 رمز عبور
               </label>
               <div className="relative">
-                <Lock className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-[#5A695A]" />
+                <Lock className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-brand-text/70" />
                 <input
                   id="reg-pass"
                   type={showPassword ? 'text' : 'password'}
@@ -248,13 +248,13 @@ export function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="حداقل ۶ کاراکتر"
-                  className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 py-3 pr-10 pl-10 text-left text-sm text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white"
+                  className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 py-3 pr-10 pl-10 text-left text-sm text-brand-text outline-none transition focus:border-brand-green focus:bg-white"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="absolute left-3 top-3 text-[#5A695A]"
+                  className="absolute left-3 top-3 text-brand-text/70"
                   aria-label="تغییر نمایش رمز"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -263,7 +263,7 @@ export function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="reg-pass-confirm" className="mb-1.5 block text-sm font-semibold text-[#202820]">
+              <label htmlFor="reg-pass-confirm" className="mb-1.5 block text-sm font-semibold text-brand-text">
                 تکرار رمز عبور
               </label>
               <input
@@ -274,7 +274,7 @@ export function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="تکرار رمز"
-                className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-4 py-3 text-left text-sm text-[#202820] outline-none transition focus:border-[#26734B] focus:bg-white"
+                className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-4 py-3 text-left text-sm text-brand-text outline-none transition focus:border-brand-green focus:bg-white"
                 required
               />
             </div>
@@ -283,16 +283,16 @@ export function RegisterPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#174D35] py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#26734B] disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-primary py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-green disabled:opacity-60"
           >
             <UserPlus className="h-4 w-4" />
             {submitting ? 'در حال ایجاد حساب...' : 'ثبت‌نام و ادامه'}
           </button>
         </form>
 
-        <div className="mt-6 border-t border-[#F6F7F2] pt-5 text-center text-sm text-[#505E50]">
+        <div className="mt-6 border-t border-brand-bg pt-5 text-center text-sm text-brand-text/70">
           قبلاً ثبت‌نام کرده‌اید؟{' '}
-          <Link to="/auth/login" className="font-bold text-[#174D35] hover:underline">
+          <Link to="/auth/login" className="font-bold text-brand-primary hover:underline">
             وارد شوید
           </Link>
         </div>

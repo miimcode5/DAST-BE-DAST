@@ -56,23 +56,40 @@
   font-display: swap;
 }
 
-@theme {
+:root {
+  --color-primary: #174D35;
+  --color-green: #26734B;
+  --color-soft-green: #78B98A;
+  --color-surface-green: #DCEBDD;
+  --color-bg: #F6F7F2;
+  --color-text: #202820;
+  --color-gold: #E9B949;
+  --color-white: #FFFFFF;
+}
+
+@theme inline {
   --font-sans: 'Pinar FD', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
-  --color-brand-dark: #174D35;
-  --color-brand-medium: #26734B;
-  --color-brand-light: #78B98A;
-  --color-brand-mist: #DCEBDD;
-  --color-brand-bg: #F6F7F2;
-  --color-brand-ink: #202820;
-  --color-brand-gold: #E9B949;
+  --color-brand-primary: var(--color-primary);
+  --color-brand-dark: var(--color-primary);
+  --color-brand-green: var(--color-green);
+  --color-brand-medium: var(--color-green);
+  --color-brand-soft: var(--color-soft-green);
+  --color-brand-light: var(--color-soft-green);
+  --color-brand-surface: var(--color-surface-green);
+  --color-brand-mist: var(--color-surface-green);
+  --color-brand-bg: var(--color-bg);
+  --color-brand-text: var(--color-text);
+  --color-brand-ink: var(--color-text);
+  --color-brand-gold: var(--color-gold);
+  --color-brand-white: var(--color-white);
 }
 
 @layer base {
   html {
     direction: rtl;
     font-family: 'Pinar FD', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
-    background-color: #F6F7F2;
-    color: #202820;
+    background-color: var(--color-bg);
+    color: var(--color-text);
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
     -webkit-tap-highlight-color: transparent;
@@ -81,8 +98,8 @@
   body {
     min-height: 100dvh;
     font-family: 'Pinar FD', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
-    background-color: #F6F7F2;
-    color: #202820;
+    background-color: var(--color-bg);
+    color: var(--color-text);
     overflow-x: hidden;
     overscroll-behavior-y: contain;
   }
@@ -109,7 +126,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid #26734B;
+    outline: 2px solid var(--color-green);
     outline-offset: 2px;
   }
 }
@@ -126,39 +143,11 @@
 @keyframes fadeSlideUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes sheetSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes chainDash {
-  to {
-    stroke-dashoffset: -28;
   }
 }
 
@@ -179,19 +168,7 @@
 }
 
 .animate-fade-up {
-  animation: fadeSlideUp 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-sheet-up {
-  animation: sheetSlideUp 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-pop-in {
-  animation: popIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-chain-dash {
-  animation: chainDash 3.6s linear infinite;
+  animation: fadeSlideUp 0.28s ease-out both;
 }
 
 .animate-pulse-ring {
@@ -239,9 +216,6 @@
   }
   .animate-soft-float,
   .animate-fade-up,
-  .animate-sheet-up,
-  .animate-pop-in,
-  .animate-chain-dash,
   .animate-pulse-ring {
     animation: none !important;
   }

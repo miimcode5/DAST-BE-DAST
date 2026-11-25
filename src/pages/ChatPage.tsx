@@ -25,7 +25,6 @@ import {
   X,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { ConversationListPane } from '../components/ConversationListPane';
 import { LoadingState } from '../components/LoadingState';
 import { ProtectedImage } from '../components/ProtectedImage';
 import { ConversationStatusBadge, RequestStatusBadge } from '../components/StatusBadge';
@@ -53,7 +52,6 @@ import {
   getConversationDetails,
   getMessagesPage,
   getMessagesSince,
-  getMyConversations,
   markConversationMessagesRead,
   mergeSortedMessages,
   sendChatMessage,
@@ -78,28 +76,12 @@ export function ChatPage() {
   const { showToast } = useToast();
 
   const [conversation, setConversation] = useState<ConversationItem | null>(null);
-  const [sidebarConversations, setSidebarConversations] = useState<ConversationItem[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pendingOutbox, setPendingOutbox] = useState<PendingOutgoingMessage[]>([]);
   const [hasMoreOlder, setHasMoreOlder] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    let active = true;
-    getMyConversations(user.id)
-      .then((res) => {
-        if (active) setSidebarConversations(res.items);
-      })
-      .catch(() => {
-        /* non-blocking desktop sidebar */
-      });
-    return () => {
-      active = false;
-    };
-  }, [user, conversationId, messages.length]);
 
   const [draft, setDraft] = useState('');
   const [firstUnreadMessageId, setFirstUnreadMessageId] = useState<string | null>(null);
@@ -501,15 +483,15 @@ export function ChatPage() {
 
   if (errorMsg || !conversation) {
     return (
-      <div className="mx-auto max-w-lg rounded-3xl border border-[#DCEBDD] bg-white p-8 text-center">
-        <AlertCircle className="mx-auto mb-3 h-10 w-10 text-rose-600" />
-        <h1 className="mb-2 text-lg font-extrabold text-[#174D35]">دسترسی به گفت‌وگو امکان‌پذیر نیست</h1>
-        <p className="mb-5 text-sm leading-7 text-[#505E50]">
+      <div className="mx-auto max-w-lg rounded-2xl border border-brand-surface bg-white p-8 text-center">
+        <AlertCircle className="mx-auto mb-3 h-10 w-10 text-brand-text" />
+        <h1 className="mb-2 text-lg font-extrabold text-brand-primary">دسترسی به گفت‌وگو امکان‌پذیر نیست</h1>
+        <p className="mb-5 text-sm leading-7 text-brand-text/75">
           {errorMsg ?? 'این گفت‌وگو وجود ندارد یا شما مجاز به مشاهده آن نیستید.'}
         </p>
         <Link
           to="/messages"
-          className="inline-flex items-center gap-2 rounded-2xl bg-[#174D35] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#26734B]"
+          className="inline-flex items-center gap-2 rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-green"
         >
           <ArrowRight className="h-4 w-4" />
           بازگشت به پیام‌ها
@@ -526,79 +508,56 @@ export function ChatPage() {
   const statusMeta = CONVERSATION_STATUS_META[conversation.status];
 
   return (
-    <div className="mx-auto flex min-h-0 w-full flex-1 flex-col lg:grid lg:h-[calc(100dvh-8.5rem)] lg:grid-cols-[310px_1fr] lg:gap-4 animate-fade-up">
-      {/* Desktop Conversations Sidebar */}
-      <aside className="hidden min-h-0 flex-col overflow-hidden rounded-3xl border border-[#DCEBDD] bg-white lg:flex">
-        <div className="flex items-center justify-between border-b border-[#DCEBDD] px-4 py-3.5">
-          <h2 className="text-sm font-bold text-[#174D35]">همه گفت‌وگوها</h2>
-          <Link to="/messages" className="text-xs font-medium text-[#26734B] hover:underline">
-            مشاهده همه
-          </Link>
-        </div>
-        <div className="flex-1 overflow-y-auto p-3">
-          <ConversationListPane
-            items={sidebarConversations}
-            loading={false}
-            currentUserId={user?.id}
-            activeId={conversationId}
-            compact
-          />
-        </div>
-      </aside>
+    <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden bg-white md:h-[calc(100dvh-9.5rem)] md:flex-none md:rounded-2xl md:border md:border-brand-surface animate-fade-up">
+      {/* Chat Header */}
+      <header className="shrink-0 border-b border-brand-surface bg-white px-3 py-2.5 sm:px-5 sm:py-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+            <Link
+              to="/messages"
+              aria-label="بازگشت به فهرست پیام‌ها"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-surface bg-brand-bg text-brand-primary hover:bg-brand-surface/60 sm:h-9 sm:w-9"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </Link>
 
-      {/* Main Chat Pane */}
-      <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-white md:h-[calc(100dvh-9.5rem)] md:flex-none md:rounded-3xl md:border md:border-[#DCEBDD] md:shadow-xs lg:h-full">
-        {/* Chat Header */}
-        <header className="shrink-0 border-b border-[#DCEBDD] bg-white px-3 py-2.5 sm:px-5 sm:py-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-              <Link
-                to="/messages"
-                aria-label="بازگشت به فهرست پیام‌ها"
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] text-[#174D35] hover:bg-[#DCEBDD]/60 sm:h-9 sm:w-9 lg:hidden"
-              >
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+            {conversation.other_user_avatar ? (
+              <ProtectedImage
+                src={conversation.other_user_avatar}
+                alt={conversation.other_user_name}
+                wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-brand-surface"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-surface text-xs font-extrabold text-brand-primary">
+                {getInitials(conversation.other_user_name)}
+              </div>
+            )}
 
-              {conversation.other_user_avatar ? (
-                <ProtectedImage
-                  src={conversation.other_user_avatar}
-                  alt={conversation.other_user_name}
-                  wrapperClassName="relative block h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-[#DCEBDD]"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#DCEBDD] text-xs font-bold text-[#174D35]">
-                  {getInitials(conversation.other_user_name)}
-                </div>
-              )}
-
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <h1 className="truncate text-sm font-bold text-[#202820] sm:text-base">
-                    {conversation.other_user_name}
-                  </h1>
-                  <span className="shrink-0 rounded-lg bg-[#DCEBDD]/70 px-2 py-0.5 text-[10px] font-semibold text-[#174D35]">
-                    {partnerRoleLabel}
-                  </span>
-                </div>
-              <div className="flex items-center gap-2 text-[11px] text-[#556455]">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h1 className="truncate text-sm font-extrabold text-brand-text sm:text-base">
+                  {conversation.other_user_name}
+                </h1>
+                <span className="shrink-0 rounded-lg bg-brand-surface/70 px-2 py-0.5 text-[10px] font-bold text-brand-primary">
+                  {partnerRoleLabel}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] text-brand-text/70">
                 <span
                   className={`inline-flex items-center gap-1 font-medium ${
                     realtimeState === 'connected'
-                      ? 'text-[#26734B]'
-                      : realtimeState === 'offline'
-                        ? 'text-rose-600'
-                        : 'text-amber-700'
+                      ? 'text-brand-green'
+                      : 'text-brand-text/75'
                   }`}
                 >
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${
                       realtimeState === 'connected'
-                        ? 'bg-[#26734B]'
+                        ? 'bg-brand-green'
                         : realtimeState === 'offline'
-                          ? 'bg-rose-500'
-                          : 'bg-amber-500 animate-pulse'
+                          ? 'bg-brand-text/60'
+                          : 'bg-brand-gold animate-pulse'
                     }`}
                   />
                   {realtimeState === 'connected'
@@ -616,7 +575,7 @@ export function ChatPage() {
             type="button"
             onClick={() => setReportOpen(true)}
             title="گزارش گفت‌وگو یا رفتار نامناسب"
-            className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-[#DCEBDD] bg-[#F6F7F2] px-2.5 py-2 text-[11px] font-bold text-[#556455] hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+            className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-brand-surface bg-brand-bg px-2.5 py-2 text-[11px] font-bold text-brand-text/75 hover:border-brand-text/30 hover:text-brand-text"
           >
             <Flag className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">گزارش</span>
@@ -624,10 +583,10 @@ export function ChatPage() {
         </div>
 
         {/* Linked Request Bar */}
-        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#F6F7F2] px-3 py-2">
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-brand-bg px-3 py-2">
           <Link
             to={`/requests/${conversation.request_id}`}
-            className="min-w-0 flex-1 truncate text-xs font-bold text-[#174D35] hover:underline"
+            className="min-w-0 flex-1 truncate text-xs font-bold text-brand-primary hover:underline"
           >
             درخواست مرتبط: {conversation.request_title}
           </Link>
@@ -640,8 +599,8 @@ export function ChatPage() {
 
       {/* Disconnected / Reconnecting Bar */}
       {!isOnline && (
-        <div className="flex shrink-0 items-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-xs font-medium text-amber-900">
-          <WifiOff className="h-4 w-4 shrink-0" />
+        <div className="flex shrink-0 items-center gap-2 border-b border-brand-surface bg-brand-bg px-4 py-2 text-xs font-medium text-brand-text">
+          <WifiOff className="h-4 w-4 shrink-0 text-brand-green" />
           <span>ارتباط با اینترنت قطع است؛ پیام‌های جدید پس از اتصال مجدد همگام‌سازی می‌شوند.</span>
         </div>
       )}
@@ -650,10 +609,10 @@ export function ChatPage() {
       <div
         ref={scrollBoxRef}
         onScroll={handleScrollBox}
-        className="relative flex-1 space-y-3 overflow-y-auto bg-[#F6F7F2]/80 px-3 py-4 sm:px-5"
+        className="relative flex-1 space-y-3 overflow-y-auto bg-brand-bg/80 px-3 py-4 sm:px-5"
       >
-        <div className="mx-auto flex max-w-md items-center justify-center gap-1.5 rounded-2xl border border-[#DCEBDD] bg-white/90 px-3 py-2 text-center text-[11px] text-[#556455]">
-          <ShieldAlert className="h-3.5 w-3.5 shrink-0 text-[#26734B]" />
+        <div className="mx-auto flex max-w-md items-center justify-center gap-1.5 rounded-2xl border border-brand-surface bg-white/90 px-3 py-2 text-center text-[11px] text-brand-text/70">
+          <ShieldAlert className="h-3.5 w-3.5 shrink-0 text-brand-green" />
           <span>این گفت‌وگو خصوصی است. تا پیش از اطمینان از هماهنگی، نشانی دقیق یا اطلاعات حساس ارسال نکنید.</span>
         </div>
 
@@ -663,7 +622,7 @@ export function ChatPage() {
               type="button"
               onClick={() => void handleLoadOlder()}
               disabled={loadingOlder}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#DCEBDD] bg-white px-4 py-1.5 text-xs font-bold text-[#174D35] shadow-2xs hover:bg-[#DCEBDD]/40 disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-full border border-brand-surface bg-white px-4 py-1.5 text-xs font-bold text-brand-primary shadow-2xs hover:bg-brand-surface/40 disabled:opacity-60"
             >
               {loadingOlder ? (
                 <>
@@ -679,7 +638,7 @@ export function ChatPage() {
 
         {messages.length === 0 && pendingOutbox.length === 0 ? (
           <div className="py-10 text-center">
-            <div className="mx-auto max-w-xs rounded-3xl border border-dashed border-[#78B98A]/60 bg-white/80 p-5 text-xs leading-6 text-[#505E50]">
+            <div className="mx-auto max-w-xs rounded-2xl border border-dashed border-brand-soft/60 bg-white p-5 text-xs leading-6 text-brand-text/75">
               هنوز پیامی ردوبدل نشده است. برای هماهنگی زمان، نحوه کمک یا پرسش‌های مرتبط نخستین پیام را ارسال کنید.
             </div>
           </div>
@@ -696,7 +655,7 @@ export function ChatPage() {
               <div key={msg.id} className="space-y-2.5">
                 {showDayDivider && (
                   <div className="flex justify-center py-1">
-                    <span className="rounded-full bg-[#DCEBDD]/75 px-3 py-0.5 text-[11px] font-semibold text-[#174D35]">
+                    <span className="rounded-full bg-brand-surface/75 px-3 py-0.5 text-[11px] font-semibold text-brand-primary">
                       {currentDay}
                     </span>
                   </div>
@@ -704,11 +663,11 @@ export function ChatPage() {
 
                 {showUnreadDivider && (
                   <div className="flex items-center gap-2 py-1">
-                    <div className="h-px flex-1 bg-[#E9B949]" />
-                    <span className="rounded-full bg-[#E9B949]/25 px-3 py-0.5 text-[11px] font-bold text-[#7A5807]">
+                    <div className="h-px flex-1 bg-brand-gold/70" />
+                    <span className="rounded-full border border-brand-gold/60 bg-white px-3 py-0.5 text-[11px] font-bold text-brand-text">
                       پیام‌های خوانده‌نشده
                     </span>
-                    <div className="h-px flex-1 bg-[#E9B949]" />
+                    <div className="h-px flex-1 bg-brand-gold/70" />
                   </div>
                 )}
 
@@ -717,8 +676,8 @@ export function ChatPage() {
                   <div
                     className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 shadow-2xs sm:max-w-[74%] ${
                       isMine
-                        ? 'rounded-br-sm bg-[#174D35] text-white'
-                        : 'rounded-bl-sm border border-[#DCEBDD] bg-white text-[#202820]'
+                        ? 'rounded-br-sm bg-brand-primary text-white'
+                        : 'rounded-bl-sm border border-brand-surface bg-white text-brand-text'
                     }`}
                   >
                     <p className="whitespace-pre-wrap break-words text-sm leading-6">
@@ -726,13 +685,13 @@ export function ChatPage() {
                     </p>
                     <div
                       className={`mt-1 flex items-center justify-end gap-1.5 text-[10px] ${
-                        isMine ? 'text-[#DCEBDD]/90' : 'text-[#667466]'
+                        isMine ? 'text-brand-surface/90' : 'text-brand-text/70'
                       }`}
                     >
                       <span>{formatTimeFa(msg.created_at)}</span>
                       {isMine &&
                         (msg.read_at ? (
-                          <span className="inline-flex items-center gap-0.5 text-[#78B98A]" title="خوانده شده">
+                          <span className="inline-flex items-center gap-0.5 text-brand-soft" title="خوانده شده">
                             <CheckCheck className="h-3.5 w-3.5" />
                             <span>خوانده شد</span>
                           </span>
@@ -753,22 +712,22 @@ export function ChatPage() {
         {pendingOutbox.map((item) => (
           <div key={item.clientTempId} className="flex w-full justify-start">
             <div
-              className={`max-w-[82%] rounded-2xl rounded-br-sm px-3.5 py-2.5 shadow-2xs sm:max-w-[74%] ${
+              className={`max-w-[82%] rounded-2xl rounded-br-sm px-3.5 py-2.5 sm:max-w-[74%] ${
                 item.status === 'failed'
-                  ? 'border border-rose-300 bg-rose-50 text-rose-950'
-                  : 'bg-[#26734B]/80 text-white'
+                  ? 'border border-brand-text/35 bg-white text-brand-text'
+                  : 'bg-brand-green/80 text-white'
               }`}
             >
               <p className="whitespace-pre-wrap break-words text-sm leading-6">{item.content}</p>
               <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-[10px]">
                 {item.status === 'sending' ? (
-                  <span className="inline-flex items-center gap-1 text-[#DCEBDD]">
+                  <span className="inline-flex items-center gap-1 text-brand-surface">
                     <Clock className="h-3 w-3 animate-pulse" />
                     در حال ارسال...
                   </span>
                 ) : (
                   <>
-                    <span className="inline-flex items-center gap-1 font-bold text-rose-700">
+                    <span className="inline-flex items-center gap-1 font-bold text-brand-text">
                       <AlertCircle className="h-3 w-3" />
                       ارسال نشد
                     </span>
@@ -776,7 +735,7 @@ export function ChatPage() {
                       <button
                         type="button"
                         onClick={() => void dispatchMessage(item.content, item.clientTempId)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-[#174D35] px-2 py-0.5 font-bold text-white hover:bg-[#26734B]"
+                        className="inline-flex items-center gap-1 rounded-lg bg-brand-primary px-2 py-0.5 font-bold text-white hover:bg-brand-green"
                       >
                         <RefreshCw className="h-3 w-3" />
                         تلاش مجدد
@@ -788,7 +747,7 @@ export function ChatPage() {
                             prev.filter((m) => m.clientTempId !== item.clientTempId)
                           )
                         }
-                        className="rounded-lg p-1 text-rose-700 hover:bg-rose-100"
+                        className="rounded-lg p-1 text-brand-text/70 hover:bg-brand-bg hover:text-brand-text"
                         title="حذف پیام ارسال‌نشده"
                       >
                         <Trash2 className="h-3 w-3" />
@@ -808,7 +767,7 @@ export function ChatPage() {
           <button
             type="button"
             onClick={() => scrollToBottom('smooth')}
-            className="pointer-events-auto absolute bottom-2 inline-flex items-center gap-1 rounded-full border border-[#78B98A] bg-[#174D35] px-3.5 py-1.5 text-xs font-bold text-white shadow-md hover:bg-[#26734B]"
+            className="pointer-events-auto absolute bottom-2 inline-flex items-center gap-1 rounded-full border border-brand-soft bg-brand-primary px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-brand-green"
           >
             <ArrowDown className="h-3.5 w-3.5" />
             {hasUnseenBelow ? 'پیام جدید' : 'آخرین پیام‌ها'}
@@ -817,16 +776,16 @@ export function ChatPage() {
       )}
 
       {/* Composer or Lifecycle Status Lock */}
-      <footer className="shrink-0 border-t border-[#DCEBDD] bg-white px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))] sm:p-4">
+      <footer className="shrink-0 border-t border-brand-surface bg-white px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))] sm:p-4">
         {!canSendMessage ? (
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2] px-3.5 py-2.5 text-xs text-[#465346] sm:px-4 sm:py-3">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-brand-surface bg-brand-bg px-3.5 py-2.5 text-xs text-brand-text/80 sm:px-4 sm:py-3">
             <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4 shrink-0 text-[#174D35]" />
+              <Lock className="h-4 w-4 shrink-0 text-brand-primary" />
               <span>{statusMeta.helperNote}</span>
             </div>
             <Link
               to={`/requests/${conversation.request_id}`}
-              className="shrink-0 font-bold text-[#174D35] hover:underline"
+              className="shrink-0 font-bold text-brand-primary hover:underline"
             >
               صفحه درخواست
             </Link>
@@ -834,7 +793,7 @@ export function ChatPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-1.5 sm:space-y-2">
             {(privacyHint.hasPhoneNumber || privacyHint.hasExactAddressHint) && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-medium text-amber-900">
+              <div className="rounded-xl border border-brand-gold/60 bg-brand-bg px-3 py-1.5 text-[11px] font-medium text-brand-text">
                 توجه: متن شما شامل شماره تماس یا جزئیات دقیق نشانی است؛ تنها در صورت اطمینان برای هماهنگی ارسال کنید.
               </div>
             )}
@@ -852,21 +811,21 @@ export function ChatPage() {
                     ? 'پیام خود را بنویسید...'
                     : 'اتصال اینترنت قطع است...'
                 }
-                className="max-h-36 min-h-[44px] flex-1 resize-none rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/70 px-3.5 py-2.5 text-[15px] leading-6 outline-none focus:border-[#26734B] focus:bg-white sm:px-4 sm:text-sm"
+                className="max-h-36 min-h-[44px] flex-1 resize-none rounded-2xl border border-brand-surface bg-brand-bg/70 px-3.5 py-2.5 text-[15px] leading-6 outline-none focus:border-brand-green focus:bg-white sm:px-4 sm:text-sm"
               />
 
               <button
                 type="submit"
                 disabled={!draft.trim()}
                 aria-label="ارسال پیام"
-                className="inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-[#174D35] px-3.5 text-sm font-bold text-white shadow-xs transition hover:bg-[#26734B] disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
+                className="inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-brand-primary px-3.5 text-sm font-bold text-white shadow-xs transition hover:bg-brand-green disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
               >
                 <Send className="h-4 w-4" />
                 <span className="hidden sm:inline">ارسال</span>
               </button>
             </div>
 
-            <div className="hidden items-center justify-between px-1 text-[10px] text-[#667466] sm:flex">
+            <div className="hidden items-center justify-between px-1 text-[10px] text-brand-text/70 sm:flex">
               <span>ارسال با Enter · خط جدید با Shift + Enter</span>
               {draft.length > 1400 && (
                 <span>
@@ -875,7 +834,7 @@ export function ChatPage() {
               )}
             </div>
             {draft.length > 1400 && (
-              <div className="px-1 text-left text-[10px] text-[#667466] sm:hidden">
+              <div className="px-1 text-left text-[10px] text-brand-text/70 sm:hidden">
                 {toPersianDigits(draft.length)} / {toPersianDigits(MAX_CHAT_MESSAGE_LENGTH)}
               </div>
             )}
@@ -886,20 +845,20 @@ export function ChatPage() {
       {/* Report Modal — Native bottom sheet on mobile */}
       {reportOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-[#202820]/50 p-0 backdrop-blur-xs sm:items-center sm:p-4"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-brand-text/50 p-0 backdrop-blur-xs sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-md rounded-t-3xl border border-[#DCEBDD] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-xl animate-fade-up sm:rounded-3xl sm:p-6">
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#DCEBDD] sm:hidden" />
+          <div className="w-full max-w-md rounded-t-2xl border border-brand-surface bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-sm animate-fade-up sm:rounded-2xl sm:p-6">
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-brand-surface sm:hidden" />
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-extrabold text-[#174D35]">
+              <h2 className="text-base font-extrabold text-brand-primary">
                 گزارش گفت‌وگو یا رفتار نامناسب
               </h2>
               <button
                 type="button"
                 onClick={() => setReportOpen(false)}
-                className="rounded-xl p-1 text-[#556455] hover:bg-[#F6F7F2]"
+                className="rounded-xl p-1 text-brand-text/70 hover:bg-brand-bg"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -907,13 +866,13 @@ export function ChatPage() {
 
             <form onSubmit={handleSubmitReport} className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-bold text-[#202820]">
+                <label className="mb-1.5 block text-xs font-bold text-brand-text">
                   علت گزارش
                 </label>
                 <select
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value as ConversationReportReason)}
-                  className="min-h-[44px] w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-[#26734B] sm:text-sm"
+                  className="min-h-[44px] w-full rounded-2xl border border-brand-surface bg-brand-bg/60 px-3.5 py-2.5 text-[15px] outline-none focus:border-brand-green sm:text-sm"
                 >
                   {CONVERSATION_REPORT_REASONS.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -924,7 +883,7 @@ export function ChatPage() {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold text-[#202820]">
+                <label className="mb-1.5 block text-xs font-bold text-brand-text">
                   توضیحات تکمیلی (اختیاری)
                 </label>
                 <textarea
@@ -933,7 +892,7 @@ export function ChatPage() {
                   maxLength={1000}
                   onChange={(e) => setReportDetails(e.target.value)}
                   placeholder="توضیح مختصری درباره مورد پیش‌آمده بنویسید..."
-                  className="w-full rounded-2xl border border-[#DCEBDD] bg-[#F6F7F2]/60 p-3 text-[15px] outline-none focus:border-[#26734B] sm:text-sm"
+                  className="w-full rounded-2xl border border-brand-surface bg-brand-bg/60 p-3 text-[15px] outline-none focus:border-brand-green sm:text-sm"
                 />
               </div>
 
@@ -942,14 +901,14 @@ export function ChatPage() {
                   type="button"
                   onClick={() => setReportOpen(false)}
                   disabled={reportBusy}
-                  className="min-h-[42px] rounded-xl border border-[#DCEBDD] px-4 py-2 text-xs font-bold text-[#465346]"
+                  className="min-h-[42px] rounded-xl border border-brand-surface px-4 py-2 text-xs font-bold text-brand-text/80"
                 >
                   انصراف
                 </button>
                 <button
                   type="submit"
                   disabled={reportBusy}
-                  className="min-h-[42px] rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 disabled:opacity-60"
+                  className="min-h-[42px] rounded-xl bg-brand-text px-4 py-2 text-xs font-bold text-white hover:bg-brand-text/90 disabled:opacity-60"
                 >
                   {reportBusy ? 'در حال ثبت...' : 'ثبت گزارش'}
                 </button>
@@ -958,7 +917,6 @@ export function ChatPage() {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 }
