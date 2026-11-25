@@ -1,25 +1,160 @@
-import { BookOpen, HandHelping, HeartHandshake, MapPin, ShieldCheck, Smartphone } from 'lucide-react';
+import { useState } from 'react';
+import {
+  BookOpen,
+  HandHelping,
+  HeartHandshake,
+  MapPin,
+  ShieldCheck,
+  Smartphone,
+  Sparkles,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BrandLogo } from '../components/BrandLogo';
+import { getInitials } from '../lib/formatters';
+
+interface RassaMember {
+  id: string;
+  name: string;
+  photoUrl: string;
+}
+
+const RASSA_TEAM_MEMBERS: RassaMember[] = [
+  {
+    id: 'mojtaba',
+    name: 'مجتبی میدانی',
+    photoUrl:
+      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/mojtaba.jpg',
+  },
+  {
+    id: 'mohammad',
+    name: 'محمد صحرانورد',
+    photoUrl:
+      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/mohammad.jpg',
+  },
+  {
+    id: 'abolfazl',
+    name: 'سید ابوالفضل میرزازاده',
+    photoUrl:
+      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/abolfazl.jpg',
+  },
+  {
+    id: 'alireza',
+    name: 'علیرضا حاجی‌زاده',
+    photoUrl:
+      'https://raw.githubusercontent.com/gk99boys-collab/RASSA/main/public/member-photos/alireza.jpg',
+  },
+];
+
+function MemberPortraitCard({ member }: { member: RassaMember }) {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  return (
+    <article
+      dir="rtl"
+      className="group/card relative w-[184px] shrink-0 overflow-hidden rounded-3xl border border-[#DCEBDD] bg-[#F6F7F2] shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#78B98A] hover:shadow-md sm:w-[214px]"
+    >
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-b from-[#DCEBDD]/50 to-[#174D35]/15">
+        {!imgFailed ? (
+          <img
+            src={member.photoUrl}
+            alt={member.name}
+            loading="eager"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            onError={() => setImgFailed(true)}
+            className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover/card:scale-[1.04]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#174D35] to-[#26734B] text-2xl font-extrabold text-[#F6F7F2]">
+            {getInitials(member.name)}
+          </div>
+        )}
+
+        {/* Subtle bottom scrim to keep portrait edge refined */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#174D35]/35 via-[#174D35]/10 to-transparent"
+        />
+      </div>
+
+      <div className="flex items-center justify-center border-t border-[#DCEBDD] bg-white px-3 py-3 text-center">
+        <h3 className="truncate text-sm font-extrabold text-[#174D35] sm:text-[15px]">
+          {member.name}
+        </h3>
+      </div>
+    </article>
+  );
+}
 
 export function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 animate-fade-up">
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-5 shadow-xs sm:p-8">
-        <BrandLogo />
-        <h1 className="mt-4 text-xl font-extrabold text-[#174D35] sm:text-2xl">
-          درباره دست‌به‌دست و راهنمای استفاده
-        </h1>
-        <p className="mt-3 text-sm leading-8 text-[#3A473A]">
-          «دست‌به‌دست» یک پلتفرم اجتماعی کمک متقابل و مشارکت مردمی است که با شعار{' '}
-          <strong className="font-bold text-[#174D35]">«توان ما، کنار هم معنا پیدا می‌کند»</strong>{' '}
-          و در راستای موضوع <strong className="font-bold text-[#174D35]">«ایران به توان مردم»</strong>{' '}
-          طراحی شده است. نقطه شروع این شبکه استان خراسان جنوبی است و زیرساخت آن قابلیت گسترش به تمام شهرهای ایران را دارد.
-        </p>
+      {/* Main About & RASSA Team Showcase */}
+      <section className="overflow-hidden rounded-3xl border border-[#DCEBDD] bg-white shadow-xs">
+        {/* Top Intro Header */}
+        <div className="space-y-4 p-5 sm:p-8 sm:pb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <BrandLogo />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#78B98A]/50 bg-[#DCEBDD]/55 px-3 py-1 text-[11px] font-bold text-[#174D35] sm:text-xs">
+              <Sparkles className="h-3.5 w-3.5 text-[#E9B949]" />
+              گروه رَسا · رویداد هشتم
+            </span>
+          </div>
+
+          <div className="space-y-2.5 pt-1">
+            <h1 className="text-xl font-extrabold text-[#174D35] sm:text-2xl">
+              درباره ما
+            </h1>
+            <p className="rounded-2xl border border-[#DCEBDD]/80 bg-[#F6F7F2]/85 px-4 py-3.5 text-sm leading-8 text-[#202820] sm:px-5 sm:text-[15px]">
+              دست‌به‌دست، حاصل تلاش <strong className="font-extrabold text-[#174D35]">گروه رَسا</strong> در{' '}
+              <strong className="font-bold text-[#174D35]">هشتمین رویداد تولید محتوای دیجیتال بسیج</strong> است؛ با هدف بهره‌گیری از توان مردم برای ایجاد همدلی، مشارکت و کمک به یکدیگر.
+            </p>
+          </div>
+        </div>
+
+        {/* Team Members Seamless Infinite Loop Carousel */}
+        <div className="border-t border-[#DCEBDD]/70 bg-gradient-to-b from-[#F6F7F2]/60 to-white py-5 sm:py-6">
+          <div className="mb-4 flex items-center justify-between px-5 sm:px-8">
+            <h2 className="text-sm font-extrabold text-[#174D35] sm:text-base">
+              اعضای گروه رَسا
+            </h2>
+            <span className="text-[11px] font-medium text-[#556455]">
+              تیم طراحی و توسعه دست‌به‌دست
+            </span>
+          </div>
+
+          {/* LTR wrapper guarantees uniform continuous horizontal scroll in RTL pages without jump */}
+          <div
+            dir="ltr"
+            className="rassa-marquee-viewport relative w-full overflow-hidden py-1"
+            aria-label="اعضای گروه رَسا"
+          >
+            <div className="rassa-marquee-track flex w-max">
+              <div className="flex shrink-0 gap-4 pr-4">
+                {RASSA_TEAM_MEMBERS.map((member) => (
+                  <MemberPortraitCard key={`primary-${member.id}`} member={member} />
+                ))}
+              </div>
+              <div className="flex shrink-0 gap-4 pr-4" aria-hidden="true">
+                {RASSA_TEAM_MEMBERS.map((member) => (
+                  <MemberPortraitCard key={`loop-${member.id}`} member={member} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Closing Signature */}
+          <div className="mt-5 px-5 text-center sm:px-8">
+            <p className="inline-flex items-center justify-center rounded-full border border-[#DCEBDD] bg-[#F6F7F2] px-4 py-1.5 text-[11px] font-semibold text-[#3A4A3A] sm:text-xs">
+              ساخته‌شده با همت گروه رَسا | هشتمین رویداد تولید محتوای دیجیتال بسیج
+            </p>
+          </div>
+        </div>
       </section>
 
+      {/* Usage Guide Cards */}
       <section className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-6 space-y-2.5">
+        <div className="space-y-2.5 rounded-3xl border border-[#DCEBDD] bg-white p-5 sm:p-6">
           <div className="flex items-center gap-2 text-base font-extrabold text-[#174D35]">
             <HandHelping className="h-5 w-5 text-[#26734B]" />
             <span>راهنمای درخواست‌کنندگان</span>
@@ -32,7 +167,7 @@ export function AboutPage() {
           </ul>
         </div>
 
-        <div className="rounded-3xl border border-[#DCEBDD] bg-white p-6 space-y-2.5">
+        <div className="space-y-2.5 rounded-3xl border border-[#DCEBDD] bg-white p-5 sm:p-6">
           <div className="flex items-center gap-2 text-base font-extrabold text-[#174D35]">
             <HeartHandshake className="h-5 w-5 text-[#26734B]" />
             <span>راهنمای داوطلبان و متخصصان</span>
@@ -46,7 +181,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-[#DCEBDD] bg-white p-6 space-y-3">
+      <section className="space-y-3 rounded-3xl border border-[#DCEBDD] bg-white p-5 sm:p-6">
         <div className="flex items-center gap-2 text-base font-extrabold text-[#174D35]">
           <ShieldCheck className="h-5 w-5 text-[#26734B]" />
           <span>اصول امنیت و حریم خصوصی</span>
@@ -56,7 +191,7 @@ export function AboutPage() {
         </p>
       </section>
 
-      <section className="rounded-3xl border border-[#DCEBDD] bg-[#DCEBDD]/40 p-6 space-y-3">
+      <section className="space-y-3 rounded-3xl border border-[#DCEBDD] bg-[#DCEBDD]/40 p-5 sm:p-6">
         <div className="flex items-center gap-2 text-base font-extrabold text-[#174D35]">
           <Smartphone className="h-5 w-5 text-[#26734B]" />
           <span>نصب نسخه موبایل روی اندروید (PWA)</span>
