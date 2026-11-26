@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
 interface ConfirmDialogProps {
@@ -23,6 +24,15 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  useEffect(() => {
+    if (!open) return;
+    const handleNativeBack = () => {
+      if (!busy) onCancel();
+    };
+    window.addEventListener('dast:native-back', handleNativeBack);
+    return () => window.removeEventListener('dast:native-back', handleNativeBack);
+  }, [open, busy, onCancel]);
+
   if (!open) return null;
 
   return (

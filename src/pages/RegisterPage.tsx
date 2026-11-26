@@ -5,6 +5,7 @@ import { BrandLogo } from '../components/BrandLogo';
 import { DEFAULT_PROVINCE, IRAN_PROVINCES_CITIES, PROVINCES_LIST } from '../constants/locations';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import { getAuthRedirectUrl } from '../lib/capacitorBridge';
 import { mapSupabaseErrorToPersian, supabase } from '../lib/supabase';
 import { validateDisplayName, validateEmail, validatePassword } from '../lib/validation';
 
@@ -76,7 +77,7 @@ export function RegisterPage() {
             city,
             neighborhood: neighborhood.trim() || null,
           },
-          emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}auth/login`,
+          emailRedirectTo: getAuthRedirectUrl('/auth/login'),
         },
       });
 

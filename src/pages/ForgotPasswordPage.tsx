@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle2, KeyRound, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getAuthRedirectUrl } from '../lib/capacitorBridge';
 import { mapSupabaseErrorToPersian, supabase } from '../lib/supabase';
 import { validateEmail } from '../lib/validation';
 
@@ -23,7 +24,7 @@ export function ForgotPasswordPage() {
     setSubmitting(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}auth/reset-password`,
+        redirectTo: getAuthRedirectUrl('/auth/reset-password'),
       });
       if (error) {
         setErrorMsg(mapSupabaseErrorToPersian(error, 'ارسال لینک بازیابی ناموفق بود.'));

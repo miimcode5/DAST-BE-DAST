@@ -20,6 +20,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePwa } from '../contexts/PwaContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatRelativeTimeFa, getInitials, toPersianDigits } from '../lib/formatters';
+import { isNativeAndroid } from '../lib/capacitorBridge';
 import { clearOfflineCache, getOfflineCacheStats } from '../lib/offlineDb';
 import { getMyBlockedUsers, unblockUser } from '../services/safetyService';
 import type { BlockedUserItem } from '../types/database';
@@ -103,26 +104,30 @@ export function SettingsPage() {
     showToast('حافظه موقت آفلاین با موفقیت پاک شد.', 'success');
   };
 
+  const isAndroidApp = isNativeAndroid();
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 animate-fade-up">
       <div>
         <h1 className="text-xl font-extrabold text-brand-primary">تنظیمات و وضعیت برنامه</h1>
         <p className="mt-1 text-sm text-brand-text/70">
-          مدیریت نصب اپلیکیشن (PWA)، حافظه آفلاین و امنیت حساب کاربری
+          مدیریت وضعیت اپلیکیشن، حافظه آفلاین و امنیت حساب کاربری
         </p>
       </div>
 
-      {/* PWA Install Card */}
+      {/* App / PWA Install Card */}
       <section className="space-y-4 rounded-2xl border border-brand-surface bg-white p-4 sm:p-6">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
             <Smartphone className="h-5 w-5 text-brand-primary" />
-            <h2 className="text-base font-bold text-brand-text">نصب روی دستگاه (PWA)</h2>
+            <h2 className="text-base font-bold text-brand-text">
+              {isAndroidApp ? 'نسخه اپلیکیشن اندروید' : 'نصب روی دستگاه (PWA)'}
+            </h2>
           </div>
           {isInstalled ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-surface px-3 py-1 text-xs font-bold text-brand-primary">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              در حالت اپلیکیشن نصب‌شده
+              {isAndroidApp ? 'اپلیکیشن اندروید فعال (نسخه ۱.۰.۰)' : 'در حالت اپلیکیشن نصب‌شده'}
             </span>
           ) : (
             <span className="rounded-full bg-brand-bg px-3 py-1 text-xs font-semibold text-brand-text/70">
@@ -132,7 +137,9 @@ export function SettingsPage() {
         </div>
 
         <p className="text-xs leading-6 text-brand-text/75 sm:text-sm">
-          دست‌به‌دست به‌عنوان یک وب‌اپلیکیشن پیش‌رونده (PWA) طراحی شده است تا در گوشی‌های اندروید مانند یک اپلیکیشن مستقل اجرا شود و صفحات اصلی در نبود اینترنت نیز در دسترس باشند.
+          {isAndroidApp
+            ? 'شما در حال استفاده از نسخه مستقل اندروید دست‌به‌دست هستید. تمام صفحات اصلی از حافظه داخلی بسته اجرا می‌شوند و داده‌های خواندنی برای دسترسی در زمان قطعی اینترنت ذخیره می‌گردند.'
+            : 'دست‌به‌دست به‌عنوان یک وب‌اپلیکیشن پیش‌رونده (PWA) طراحی شده است تا در گوشی‌های اندروید مانند یک اپلیکیشن مستقل اجرا شود و صفحات اصلی در نبود اینترنت نیز در دسترس باشند.'}
         </p>
 
         {!isInstalled && (
