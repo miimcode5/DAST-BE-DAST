@@ -1,5 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { ArrowRight, ImagePlus, Save, Send, ShieldCheck, X } from 'lucide-react';
+import { ArrowRight, ImagePlus, MapPin, Save, Send, ShieldCheck, Sparkles, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { LoadingState } from '../components/LoadingState';
 import { ProtectedImage } from '../components/ProtectedImage';
@@ -14,9 +14,42 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { usePwa } from '../contexts/PwaContext';
 import { useToast } from '../contexts/ToastContext';
+import { toPersianDigits } from '../lib/formatters';
 import { MAX_REQUEST_IMAGE_BYTES, validateImageFile, validateRequestFields } from '../lib/validation';
 import { createHelpRequest, getRequestById, updateHelpRequest } from '../services/requestsService';
 import type { HelpCategory, HelpType } from '../types/database';
+
+const TITLE_QUICK_STARTERS: Array<{
+  label: string;
+  title: string;
+  category: HelpCategory;
+  helpType: HelpType;
+}> = [
+  {
+    label: 'همراهی سالمند',
+    title: 'نیاز به همراهی برای خرید روزانه یا کار اداری سالمند',
+    category: 'elderly',
+    helpType: 'companionship',
+  },
+  {
+    label: 'آموزش و رفع اشکال',
+    title: 'نیاز به کمک درسی و رفع اشکال دانش‌آموز',
+    category: 'education',
+    helpType: 'education',
+  },
+  {
+    label: 'کار فنی و تعمیر',
+    title: 'نیاز به همیاری برای تعمیر ساده وسایل یا برق منزل',
+    category: 'repair',
+    helpType: 'service',
+  },
+  {
+    label: 'نیاز به وسیله',
+    title: 'نیاز به اهدای کتاب، لباس یا وسیله آموزشی قابل استفاده',
+    category: 'donation',
+    helpType: 'donation',
+  },
+];
 
 export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
   const { id } = useParams<{ id: string }>();
@@ -236,6 +269,28 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
           <label htmlFor="req-title" className="mb-1.5 block text-sm font-semibold text-brand-text">
             عنوان درخواست *
           </label>
+          {mode === 'create' && !title.trim() && (
+            <div className="no-scrollbar mb-2 flex items-center gap-1.5 overflow-x-auto pb-0.5">
+              <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold text-brand-text/65">
+                <Sparkles className="h-3 w-3 text-brand-gold" />
+                الگوی سریع:
+              </span>
+              {TITLE_QUICK_STARTERS.map((starter) => (
+                <button
+                  key={starter.label}
+                  type="button"
+                  onClick={() => {
+                    setTitle(starter.title);
+                    setCategory(starter.category);
+                    setHelpType(starter.helpType);
+                  }}
+                  className="shrink-0 rounded-full border border-brand-surface bg-brand-bg px-2.5 py-1 text-[11px] font-semibold text-brand-primary transition hover:border-brand-soft hover:bg-brand-surface/50"
+                >
+                  {starter.label}
+                </button>
+              ))}
+            </div>
+          )}
           <input
             id="req-title"
             type="text"
@@ -251,9 +306,14 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
         </div>
 
         <div>
-          <label htmlFor="req-desc" className="mb-1.5 block text-sm font-semibold text-brand-text">
-            توضیحات کامل *
-          </label>
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <label htmlFor="req-desc" className="block text-sm font-semibold text-brand-text">
+              توضیحات کامل *
+            </label>
+            <span className="text-[11px] text-brand-text/60">
+              {toPersianDigits(description.length)} کاراکتر
+            </span>
+          </div>
           <textarea
             id="req-desc"
             rows={4}
@@ -362,9 +422,25 @@ export function RequestFormPage({ mode }: { mode: 'create' | 'edit' }) {
         </div>
 
         <div>
-          <label htmlFor="req-area" className="mb-1.5 block text-sm font-semibold text-brand-text">
-            محله یا محدوده مکانی تقریبی *
-          </label>
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+            <label htmlFor="req-area" className="block text-sm font-semibold text-brand-text">
+              محله یا محدوده مکانی تقریبی *
+            </label>
+            {profile?.neighborhood && area !== profile.neighborhood && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (profile.province) setProvince(profile.province);
+                  if (profile.city) setCity(profile.city);
+                  setArea(profile.neighborhood ?? '');
+                }}
+                className="inline-flex items-center gap-1 rounded-lg bg-brand-surface/70 px-2 py-0.5 text-[11px] font-bold text-brand-primary hover:bg-brand-surface"
+              >
+                <MapPin className="h-3 w-3 text-brand-green" />
+                استفاده از محله پروفایل ({profile.neighborhood})
+              </button>
+            )}
+          </div>
           <input
             id="req-area"
             type="text"

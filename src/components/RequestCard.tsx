@@ -1,4 +1,4 @@
-import { Bookmark, Clock, MapPin, Sparkles, Users } from 'lucide-react';
+import { ArrowLeft, Bookmark, Clock, MapPin, Sparkles, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HELP_TYPE_MAP } from '../constants/categories';
 import { formatRelativeTimeFa, getInitials, toPersianDigits } from '../lib/formatters';
@@ -24,7 +24,7 @@ export function RequestCard({
   const helpTypeLabel = HELP_TYPE_MAP[request.help_type]?.label ?? request.help_type;
 
   return (
-    <article className="group relative flex flex-col justify-between rounded-2xl border border-brand-surface bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-soft hover:shadow-xs sm:p-5">
+    <article className="group relative flex flex-col justify-between rounded-2xl border border-brand-surface bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-soft hover:shadow-xs focus-within:ring-2 focus-within:ring-brand-soft/60 sm:p-5">
       <div>
         <div className="mb-2.5 flex items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -40,7 +40,7 @@ export function RequestCard({
                 e.stopPropagation();
                 onToggleSave(request.id);
               }}
-              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+              className={`relative z-10 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
                 isSaved
                   ? 'bg-brand-surface text-brand-primary'
                   : 'text-brand-text/45 hover:bg-brand-bg hover:text-brand-primary'
@@ -60,17 +60,21 @@ export function RequestCard({
           </div>
         )}
 
-        <Link to={`/requests/${request.id}`} className="block">
+        <Link
+          to={`/requests/${request.id}`}
+          className="block rounded-lg outline-none after:absolute after:inset-0"
+        >
           <h3 className="mb-1.5 line-clamp-2 text-[15px] font-bold leading-7 text-brand-text transition-colors group-hover:text-brand-primary sm:text-base">
             {request.title}
           </h3>
-          <p className="mb-3.5 line-clamp-2 text-xs leading-6 text-brand-text/75 sm:line-clamp-3 sm:text-sm">
-            {request.description}
-          </p>
         </Link>
 
+        <p className="mb-3.5 line-clamp-2 text-xs leading-6 text-brand-text/75 sm:line-clamp-3 sm:text-sm">
+          {request.description}
+        </p>
+
         {request.image_url && (
-          <Link to={`/requests/${request.id}`} className="mb-3.5 block overflow-hidden rounded-xl border border-brand-surface">
+          <div className="mb-3.5 overflow-hidden rounded-xl border border-brand-surface">
             <ProtectedImage
               src={request.image_url}
               alt={request.title}
@@ -78,7 +82,7 @@ export function RequestCard({
               wrapperClassName="relative block h-36 w-full overflow-hidden"
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             />
-          </Link>
+          </div>
         )}
       </div>
 
@@ -86,7 +90,7 @@ export function RequestCard({
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-brand-text/75">
           <span className="inline-flex items-center gap-1 font-medium text-brand-primary">
             <MapPin className="h-3.5 w-3.5 shrink-0 text-brand-soft" />
-            <span className="truncate max-w-[180px] sm:max-w-none">
+            <span className="max-w-[180px] truncate sm:max-w-none">
               {request.city}، {request.area}
             </span>
           </span>
@@ -131,12 +135,10 @@ export function RequestCard({
               <Users className="h-3.5 w-3.5 text-brand-soft" />
               {toPersianDigits(request.responses_count)} داوطلب
             </span>
-            <Link
-              to={`/requests/${request.id}`}
-              className="inline-flex min-h-[34px] items-center rounded-xl bg-brand-surface/80 px-3 py-1.5 text-xs font-bold text-brand-primary transition-colors hover:bg-brand-primary hover:text-white"
-            >
-              جزئیات
-            </Link>
+            <span className="inline-flex min-h-[34px] items-center gap-1 rounded-xl bg-brand-surface/80 px-3 py-1.5 text-xs font-bold text-brand-primary transition-colors group-hover:bg-brand-primary group-hover:text-white">
+              <span>جزئیات</span>
+              <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+            </span>
           </div>
         </div>
       </div>

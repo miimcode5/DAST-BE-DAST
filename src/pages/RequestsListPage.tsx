@@ -15,7 +15,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../components/EmptyState';
 import { CardSkeleton } from '../components/LoadingState';
 import { RequestCard } from '../components/RequestCard';
-import { HELP_CATEGORIES, HELP_TYPES } from '../constants/categories';
+import { CATEGORY_MAP, HELP_CATEGORIES, HELP_TYPE_MAP, HELP_TYPES, REQUEST_STATUS_META } from '../constants/categories';
 import { SOUTH_KHORASAN_CITIES } from '../constants/locations';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -357,16 +357,14 @@ export function RequestsListPage() {
               <button
                 type="button"
                 onClick={() => setOnlyMatched((prev) => !prev)}
-                className={`${
-                  filtersExpanded ? 'inline-flex' : 'hidden sm:inline-flex'
-                } min-h-[34px] items-center gap-1.5 rounded-xl border px-3 py-1.5 font-semibold transition ${
+                className={`inline-flex min-h-[34px] items-center gap-1.5 rounded-xl border px-3 py-1.5 font-semibold transition ${
                   onlyMatched
-                    ? 'border-brand-gold/70 bg-brand-gold/15 text-brand-text'
+                    ? 'border-brand-gold/70 bg-brand-gold/15 text-brand-primary'
                     : 'border-brand-surface bg-brand-bg text-brand-text hover:border-brand-soft'
                 }`}
               >
                 <Sparkles className="h-3.5 w-3.5 text-brand-gold" />
-                متناسب با شهر و مهارت من
+                <span>متناسب با من</span>
               </button>
             )}
           </div>
@@ -382,6 +380,89 @@ export function RequestsListPage() {
             </button>
           )}
         </div>
+
+        {/* One-tap Active Filter Chips */}
+        {hasAnyFilter && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-[11px]">
+            {search.trim() && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch('');
+                  setDebouncedSearch('');
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-surface bg-brand-bg px-2.5 py-1 font-semibold text-brand-primary hover:border-brand-soft"
+              >
+                <span>عبارت: «{search.trim()}»</span>
+                <X className="h-3 w-3 text-brand-text/70" />
+              </button>
+            )}
+            {category !== 'all' && (
+              <button
+                type="button"
+                onClick={() => setCategory('all')}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-surface bg-brand-bg px-2.5 py-1 font-semibold text-brand-primary hover:border-brand-soft"
+              >
+                <span>دسته: {CATEGORY_MAP[category]?.shortLabel ?? category}</span>
+                <X className="h-3 w-3 text-brand-text/70" />
+              </button>
+            )}
+            {city !== 'all' && (
+              <button
+                type="button"
+                onClick={() => setCity('all')}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-surface bg-brand-bg px-2.5 py-1 font-semibold text-brand-primary hover:border-brand-soft"
+              >
+                <span>شهر: {city}</span>
+                <X className="h-3 w-3 text-brand-text/70" />
+              </button>
+            )}
+            {helpType !== 'all' && (
+              <button
+                type="button"
+                onClick={() => setHelpType('all')}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-surface bg-brand-bg px-2.5 py-1 font-semibold text-brand-primary hover:border-brand-soft"
+              >
+                <span>نوع: {HELP_TYPE_MAP[helpType]?.label ?? helpType}</span>
+                <X className="h-3 w-3 text-brand-text/70" />
+              </button>
+            )}
+            {status !== 'active' && (
+              <button
+                type="button"
+                onClick={() => setStatus('active')}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-surface bg-brand-bg px-2.5 py-1 font-semibold text-brand-primary hover:border-brand-soft"
+              >
+                <span>
+                  وضعیت: {status === 'all' ? 'همه' : REQUEST_STATUS_META[status]?.label ?? status}
+                </span>
+                <X className="h-3 w-3 text-brand-text/70" />
+              </button>
+            )}
+            {sort !== 'newest' && (
+              <button
+                type="button"
+                onClick={() => setSort('newest')}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-surface bg-brand-bg px-2.5 py-1 font-semibold text-brand-primary hover:border-brand-soft"
+              >
+                <span>
+                  مرتب‌سازی: {sort === 'oldest' ? 'قدیمی‌ترین' : 'در حال انجام اول'}
+                </span>
+                <X className="h-3 w-3 text-brand-text/70" />
+              </button>
+            )}
+            {onlyMatched && (
+              <button
+                type="button"
+                onClick={() => setOnlyMatched(false)}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-gold/60 bg-brand-gold/15 px-2.5 py-1 font-semibold text-brand-primary"
+              >
+                <span>متناسب با من</span>
+                <X className="h-3 w-3 text-brand-text/70" />
+              </button>
+            )}
+          </div>
+        )}
       </section>
 
       {fromOfflineCache && (

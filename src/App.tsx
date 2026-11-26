@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ScrollToTop } from './components/ScrollToTop';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
@@ -67,6 +68,7 @@ export function App() {
           <NotificationsProvider>
             <ChatProvider>
               <PwaProvider>
+                <ScrollToTop />
                 <RecoveryWatcher />
                 <Routes>
                   <Route element={<Layout />}>

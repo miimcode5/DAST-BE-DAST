@@ -888,6 +888,29 @@ export function ChatPage() {
               </div>
             )}
 
+            {isOnline && !draft.trim() && (
+              <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto pb-0.5">
+                {[
+                  'سلام، وقت بخیر؛ چه ساعتی برای هماهنگی مناسب است؟',
+                  'آماده همکاری هستم؛ لطفاً جزئیات بیشتر را بفرمایید.',
+                  'محدوده تقریبی قرار کجاست؟',
+                  'سپاسگزارم، همکاری با موفقیت انجام شد.',
+                ].map((quickText) => (
+                  <button
+                    key={quickText}
+                    type="button"
+                    onClick={() => {
+                      handleDraftChange(quickText);
+                      textareaRef.current?.focus();
+                    }}
+                    className="shrink-0 rounded-full border border-brand-surface bg-brand-bg/90 px-3 py-1 text-[11px] font-semibold text-brand-primary transition hover:border-brand-soft hover:bg-brand-surface/60"
+                  >
+                    {quickText}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="flex items-end gap-2">
               <textarea
                 ref={textareaRef}
