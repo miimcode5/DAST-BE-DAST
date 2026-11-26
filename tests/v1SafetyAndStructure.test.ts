@@ -110,4 +110,19 @@ describe('V1.0 safety, deterrent protection & architectural invariants', () => {
     expect(aboutSource).not.toContain('SpotlightPanel');
     expect(aboutSource).not.toMatch(/<img\b/);
   });
+  it('provides UX comfort navigation: ScrollToTop, skip link, scroll-to-top button, quick search & active filter chips', () => {
+    const appSource = fs.readFileSync(path.join(ROOT, 'src/App.tsx'), 'utf8');
+    expect(appSource).toContain('<ScrollToTop />');
+
+    const layoutSource = fs.readFileSync(path.join(ROOT, 'src/components/Layout.tsx'), 'utf8');
+    expect(layoutSource).toContain('href="#main-content"');
+    expect(layoutSource).toContain('بازگشت به بالای صفحه');
+    expect(layoutSource).toContain('to="/saved"');
+
+    const homeSource = fs.readFileSync(path.join(ROOT, 'src/pages/HomePage.tsx'), 'utf8');
+    expect(homeSource).toContain('handleQuickSearch');
+
+    const listSource = fs.readFileSync(path.join(ROOT, 'src/pages/RequestsListPage.tsx'), 'utf8');
+    expect(listSource).toContain('One-tap Active Filter Chips');
+  });
 });

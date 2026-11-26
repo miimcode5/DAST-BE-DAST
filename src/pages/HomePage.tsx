@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import {
   ArrowLeft,
   CheckCircle2,
   HandHelping,
   HeartHandshake,
   MapPin,
+  MessageCircle,
   Plus,
   Search,
   Sparkles,
   Users,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BrandMark } from '../components/BrandLogo';
 import { EmptyState } from '../components/EmptyState';
 import { CardSkeleton } from '../components/LoadingState';
@@ -29,7 +30,9 @@ import type { HelpRequestFeedItem, PlatformStats } from '../types/database';
 export function HomePage() {
   const { user, profile } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
+  const [quickQuery, setQuickQuery] = useState('');
   const [requests, setRequests] = useState<HelpRequestFeedItem[]>([]);
   const [fromOfflineCache, setFromOfflineCache] = useState(false);
   const [stats, setStats] = useState<PlatformStats | null>(null);
@@ -87,6 +90,12 @@ export function HomePage() {
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'خطا در ذخیره درخواست', 'error');
     }
+  };
+
+  const handleQuickSearch = (e: FormEvent) => {
+    e.preventDefault();
+    const trimmed = quickQuery.trim();
+    navigate(trimmed ? `/requests?q=${encodeURIComponent(trimmed)}` : '/requests');
   };
 
   return (
@@ -185,6 +194,99 @@ export function HomePage() {
                 {stats ? toPersianDigits(stats.total_requests) : '—'}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Instant Quick Search & Shortcut Chips */}
+        <div className="mt-5 border-t border-brand-surface/80 pt-4">
+          <form onSubmit={handleQuickSearch} className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-text/60" />
+              <input
+                type="search"
+                value={quickQuery}
+                onChange={(e) => setQuickQuery(e.target.value)}
+                placeholder="جست‌وجوی سریع نیاز، مهارت یا محله (مثلاً: تدریس، خرید، بیرجند)..."
+                className="min-h-[42px] w-full rounded-xl border border-brand-surface bg-brand-bg/75 py-2 pr-10 pl-3 text-[15px] outline-none transition focus:border-brand-green focus:bg-white sm:text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              className="inline-flex min-h-[42px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-brand-surface px-4 py-2 text-xs font-extrabold text-brand-primary transition hover:bg-brand-primary hover:text-white"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span>جست‌وجو</span>
+            </button>
+          </form>
+
+          <div className="no-scrollbar mt-2.5 flex items-center gap-2 overflow-x-auto pb-0.5 text-[11px]">
+            <span className="shrink-0 font-semibold text-brand-text/65">دسترسی سریع:</span>
+            {profile?.city && (
+              <Link
+                to={`/requests?city=${encodeURIComponent(profile.city)}`}
+                className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-surface bg-brand-bg px-3 py-1 font-bold text-brand-primary transition hover:border-brand-soft hover:bg-brand-surface/50"
+              >
+                <MapPin className="h-3 w-3 text-brand-green" />
+                نیازهای {profile.city}
+              </Link>
+            )}
+            <Link
+              to="/requests?category=elderly"
+              className="shrink-0 rounded-full border border-brand-surface bg-brand-bg px-3 py-1 font-semibold text-brand-text transition hover:border-brand-soft hover:text-brand-primary"
+            >
+              کمک به سالمندان
+            </Link>
+            <Link
+              to="/requests?category=education"
+              className="shrink-0 rounded-full border border-brand-surface bg-brand-bg px-3 py-1 font-semibold text-brand-text transition hover:border-brand-soft hover:text-brand-primary"
+            >
+              آموزش و یادگیری
+            </Link>
+            <Link
+              to="/requests?category=repair"
+              className="shrink-0 rounded-full border border-brand-surface bg-brand-bg px-3 py-1 font-semibold text-brand-text transition hover:border-brand-soft hover:text-brand-primary"
+            >
+              فنی و تعمیرات
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Compact 3-Step Quick Guide */}
+      <section className="grid gap-2.5 sm:grid-cols-3 sm:gap-3">
+        <div className="flex items-start gap-3 rounded-2xl border border-brand-surface bg-white p-3.5 sm:p-4">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-surface text-xs font-black text-brand-primary">
+            ۱
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-xs font-extrabold text-brand-primary sm:text-sm">نیاز را ثبت یا پیدا کنید</h2>
+            <p className="mt-0.5 text-[11px] leading-5 text-brand-text/75">
+              بدون شماره تماس عمومی و تنها با ذکر محدوده تقریبی محله.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 rounded-2xl border border-brand-surface bg-white p-3.5 sm:p-4">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-surface text-xs font-black text-brand-primary">
+            <MessageCircle className="h-4 w-4 text-brand-green" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-xs font-extrabold text-brand-primary sm:text-sm">هماهنگی در گفت‌وگوی خصوصی</h2>
+            <p className="mt-0.5 text-[11px] leading-5 text-brand-text/75">
+              پس از اعلام آمادگی، هر داوطلب گفت‌وگوی امن و مجزا دارد.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 rounded-2xl border border-brand-surface bg-white p-3.5 sm:p-4">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-surface text-xs font-black text-brand-primary">
+            <Sparkles className="h-4 w-4 text-brand-gold" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-xs font-extrabold text-brand-primary sm:text-sm">تأیید انجام و زنجیره مهربانی</h2>
+            <p className="mt-0.5 text-[11px] leading-5 text-brand-text/75">
+              با تأیید درخواست‌کننده، امتیاز و نشان افتخار مشارکت ثبت می‌شود.
+            </p>
           </div>
         </div>
       </section>

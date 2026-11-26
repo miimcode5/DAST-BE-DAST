@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  ArrowUp,
   Bell,
   BookOpen,
+  Bookmark,
   ClipboardList,
   Download,
   HandHelping,
@@ -45,6 +47,7 @@ export function Layout() {
   } = usePwa();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const protectedRootRef = useRef<HTMLDivElement | null>(null);
 
   useContentProtection(protectedRootRef);
@@ -57,8 +60,21 @@ export function Layout() {
   const isChatRoomRoute = /^\/messages\/[^/]+$/.test(location.pathname);
   const isCreateRequestRoute = location.pathname === '/requests/new';
 
+  useEffect(() => {
+    if (isChatRoomRoute) {
+      setShowScrollTop(false);
+      return;
+    }
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 380);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isChatRoomRoute]);
+
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+    `inline-flex items-center gap-1.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-colors lg:px-3 lg:text-sm ${
       isActive
         ? 'bg-brand-surface text-brand-primary'
         : 'text-brand-text/80 hover:bg-brand-surface/50 hover:text-brand-primary'
@@ -76,6 +92,12 @@ export function Layout() {
         isChatRoomRoute ? 'h-dvh overflow-hidden md:h-auto md:min-h-dvh md:overflow-visible' : 'min-h-dvh'
       }`}
     >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:right-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-brand-primary focus:px-4 focus:py-2 focus:text-xs focus:font-bold focus:text-white focus:shadow-md"
+      >
+        پرش به محتوای اصلی
+      </a>
       {!isSupabaseConfigured && (
         <div className="border-b border-brand-surface bg-brand-surface px-4 py-2 text-center text-xs font-semibold text-brand-primary">
           پیکربندی اتصال Supabase تکمیل نشده است (متغیرهای VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY را تنظیم کنید).
@@ -178,10 +200,11 @@ export function Layout() {
 
             <Link
               to="/requests/new"
-              className="hidden items-center gap-1.5 rounded-xl bg-brand-primary px-4 py-2 text-sm font-bold text-white shadow-xs transition hover:bg-brand-green md:inline-flex"
+              className="hidden items-center gap-1.5 rounded-xl bg-brand-primary px-3 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-brand-green md:inline-flex lg:px-4 lg:text-sm"
             >
-              <Plus className="h-4 w-4" />
-              ثبت درخواست کمک
+              <Plus className="h-4 w-4 shrink-0" />
+              <span className="lg:hidden">ثبت درخواست</span>
+              <span className="hidden lg:inline">ثبت درخواست کمک</span>
             </Link>
 
             {user && (
@@ -254,14 +277,29 @@ export function Layout() {
 
       {/* Main Content — Edge-to-edge full-viewport flex container on mobile inside active chat room */}
       <main
+        id="main-content"
+        tabIndex={-1}
         className={
           isChatRoomRoute
-            ? 'mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-0 py-0 pb-0 md:block md:px-6 md:py-6 md:pb-8'
-            : 'mx-auto w-full max-w-6xl flex-1 px-3.5 py-4 pb-[calc(5.75rem+env(safe-area-inset-bottom))] sm:px-6 md:py-8 md:pb-12'
+            ? 'mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-0 py-0 pb-0 outline-none md:block md:px-6 md:py-6 md:pb-8'
+            : 'mx-auto w-full max-w-6xl flex-1 px-3.5 py-4 pb-[calc(5.75rem+env(safe-area-inset-bottom))] outline-none sm:px-6 md:py-8 md:pb-12'
         }
       >
         <Outlet />
       </main>
+
+      {/* Comfort Scroll-To-Top Floating Action */}
+      {showScrollTop && !isChatRoomRoute && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="بازگشت به بالای صفحه"
+          title="بازگشت به بالای صفحه"
+          className="fixed left-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-30 inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-surface bg-white/95 text-brand-primary shadow-md backdrop-blur-xs transition hover:-translate-y-0.5 hover:border-brand-soft hover:bg-brand-surface md:bottom-6 md:left-6"
+        >
+          <ArrowUp className="h-4.5 w-4.5" />
+        </button>
+      )}
 
       {/* Desktop Footer */}
       <footer className="hidden border-t border-brand-surface bg-white/75 py-6 text-xs text-brand-text/70 md:block">
@@ -459,6 +497,14 @@ export function Layout() {
               >
                 <ClipboardList className="h-4 w-4 shrink-0 text-brand-green" />
                 <span>فعالیت‌های من</span>
+              </Link>
+
+              <Link
+                to="/saved"
+                className="flex items-center gap-2.5 rounded-2xl border border-brand-surface bg-brand-bg/75 p-3.5 text-xs font-bold text-brand-primary active:scale-[0.98]"
+              >
+                <Bookmark className="h-4 w-4 shrink-0 text-brand-green" />
+                <span>ذخیره‌شده‌ها</span>
               </Link>
 
               <Link
