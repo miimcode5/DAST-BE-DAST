@@ -129,13 +129,14 @@ jobs:
             exit 1
           fi
 
-          BADGING=$("$AAPT2" dump badging "$OUT_APK")
-          echo "$BADGING" | head -n 20
+          BADGING_FILE="${RUNNER_TEMP}/apk-badging.txt"
+          "$AAPT2" dump badging "$OUT_APK" > "$BADGING_FILE"
+          head -n 25 "$BADGING_FILE"
 
-          echo "$BADGING" | grep -q "package: name='com.rassa.dastbedast'" || { echo "ERROR: Unexpected package name"; exit 1; }
-          echo "$BADGING" | grep -q "versionName='1.0.0'" || { echo "ERROR: Unexpected versionName"; exit 1; }
-          echo "$BADGING" | grep -q "sdkVersion:'24'" || { echo "ERROR: minSdkVersion inside APK is not 24!"; exit 1; }
-          echo "$BADGING" | grep -qE "targetSdkVersion:'3[56]'" || { echo "ERROR: Unexpected targetSdkVersion inside APK"; exit 1; }
+          grep -Fq "package: name='com.rassa.dastbedast'" "$BADGING_FILE" || { echo "ERROR: Unexpected package name"; exit 1; }
+          grep -Fq "versionName='1.0.0'" "$BADGING_FILE" || { echo "ERROR: Unexpected versionName"; exit 1; }
+          grep -Fq "sdkVersion:'24'" "$BADGING_FILE" || { echo "ERROR: minSdkVersion inside APK is not 24!"; exit 1; }
+          grep -Eq "targetSdkVersion:'3[56]'" "$BADGING_FILE" || { echo "ERROR: Unexpected targetSdkVersion inside APK"; exit 1; }
 
           SHA256=$(sha256sum "$OUT_APK" | awk '{print $1}')
           SIZE_BYTES=$(wc -c < "$OUT_APK")
