@@ -4,23 +4,42 @@ import { describe, expect, it } from 'vitest';
 
 const ROOT = process.cwd();
 
-describe('V1.0 safety, privacy & architectural invariants', () => {
-  it('does not globally disable text selection or right-click inside Layout.tsx', () => {
+describe('V1.0 safety, deterrent protection & architectural invariants', () => {
+  it('activates deterrent content protection hook and CSS scope inside Layout.tsx', () => {
     const layoutSource = fs.readFileSync(
       path.join(ROOT, 'src/components/Layout.tsx'),
       'utf8'
     );
-    expect(layoutSource).not.toContain('useContentProtection');
-    expect(layoutSource).not.toContain('content-protected');
+    expect(layoutSource).toContain('useContentProtection(protectedRootRef)');
+    expect(layoutSource).toContain('content-protected');
     expect(layoutSource).toContain('/notifications');
   });
 
-  it('defaults ProtectedImage shield to false', () => {
+  it('protects images with draggable=false, WebKit rules, and visual shield while preserving alt text', () => {
     const protectedImageSource = fs.readFileSync(
       path.join(ROOT, 'src/components/ProtectedImage.tsx'),
       'utf8'
     );
-    expect(protectedImageSource).toContain('shield = false');
+    expect(protectedImageSource).toContain('shield = true');
+    expect(protectedImageSource).toContain('draggable={false}');
+    expect(protectedImageSource).toContain('content-image-shield');
+    expect(protectedImageSource).toContain('alt={alt}');
+
+    const cssSource = fs.readFileSync(path.join(ROOT, 'src/index.css'), 'utf8');
+    expect(cssSource).toContain('-webkit-user-select: none');
+    expect(cssSource).toContain('-webkit-touch-callout: none');
+    expect(cssSource).toContain('-webkit-user-drag: none');
+    expect(cssSource).toContain('.content-protected textarea');
+    expect(cssSource).toContain('-webkit-user-select: text');
+  });
+
+  it('does not include invasive DevTools-blocking or full keyboard lock scripts', () => {
+    const protectionSrc = fs.readFileSync(
+      path.join(ROOT, 'src/lib/contentProtection.ts'),
+      'utf8'
+    );
+    expect(protectionSrc).not.toContain('F12');
+    expect(protectionSrc).not.toContain('debugger');
   });
 
   it('includes notifications_cache in IndexedDB offline storage and clearOfflineCache', () => {

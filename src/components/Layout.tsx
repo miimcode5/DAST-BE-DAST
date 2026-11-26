@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Bell,
   BookOpen,
@@ -24,6 +24,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
 import { useNotifications } from '../contexts/NotificationsContext';
 import { usePwa } from '../contexts/PwaContext';
+import { useContentProtection } from '../hooks/useContentProtection';
 import { toPersianDigits } from '../lib/formatters';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { BrandLogo } from './BrandLogo';
@@ -44,6 +45,9 @@ export function Layout() {
   } = usePwa();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const protectedRootRef = useRef<HTMLDivElement | null>(null);
+
+  useContentProtection(protectedRootRef);
 
   // Close mobile drawer automatically on route changes
   useEffect(() => {
@@ -67,7 +71,8 @@ export function Layout() {
 
   return (
     <div
-      className={`flex flex-col bg-brand-bg text-brand-text ${
+      ref={protectedRootRef}
+      className={`content-protected flex flex-col bg-brand-bg text-brand-text ${
         isChatRoomRoute ? 'h-dvh overflow-hidden md:h-auto md:min-h-dvh md:overflow-visible' : 'min-h-dvh'
       }`}
     >

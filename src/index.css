@@ -237,8 +237,10 @@
 }
 
 .content-protected img,
-.content-protected svg {
+.content-protected svg,
+.content-protected picture {
   -webkit-user-drag: none;
+  user-drag: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -247,6 +249,7 @@
 .content-protected input,
 .content-protected textarea,
 .content-protected select,
+.content-protected option,
 .content-protected [contenteditable=''],
 .content-protected [contenteditable='true'],
 .content-protected [contenteditable='plaintext-only'],
@@ -266,6 +269,7 @@
   user-select: none;
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
+  user-drag: none;
 }
 
 

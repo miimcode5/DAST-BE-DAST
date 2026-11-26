@@ -8,19 +8,24 @@ interface ProtectedImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 /**
  * Displays a content/avatar image with deterrent browser protections:
  * - `draggable={false}` and WebKit drag/callout suppression
- * - optional transparent shield overlay (`shield=true`) that intercepts long-press
- *   and context-menu hit testing without altering the image look or blocking clicks
+ * - transparent visual shield overlay (`shield=true` by default) that intercepts
+ *   desktop right-click and mobile long-press hit testing without altering the image look
+ *   or blocking parent buttons/links
  * - keeps `alt` completely accessible to screen readers
  */
 export function ProtectedImage({
   wrapperClassName = 'relative block overflow-hidden',
   className = '',
-  shield = false,
+  shield = true,
   alt = '',
   ...rest
 }: ProtectedImageProps) {
   return (
-    <span className={wrapperClassName}>
+    <span
+      className={wrapperClassName}
+      onContextMenu={shield ? (e) => e.preventDefault() : undefined}
+      onDragStart={shield ? (e) => e.preventDefault() : undefined}
+    >
       <img
         {...rest}
         alt={alt}
@@ -32,6 +37,8 @@ export function ProtectedImage({
           aria-hidden="true"
           data-protected-media="true"
           className="content-image-shield"
+          onContextMenu={(e) => e.preventDefault()}
+          onDragStart={(e) => e.preventDefault()}
         />
       )}
     </span>

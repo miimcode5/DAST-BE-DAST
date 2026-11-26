@@ -5,6 +5,7 @@ import {
   isCopyOrCutShortcut,
   isEditableTarget,
   isProtectedMediaTarget,
+  isSelectionInsideEditable,
   PROTECTED_MEDIA_SELECTOR,
 } from '../contentProtection';
 
@@ -13,16 +14,33 @@ interface MockEl {
   isContentEditable?: boolean;
   attrs?: Record<string, string>;
   ownerDocument?: Document;
+  selectionStart?: number;
+  selectionEnd?: number;
   closest: (selector: string) => MockEl | null;
 }
 
 function makeMockEl(
   tag: string,
-  opts: { isContentEditable?: boolean; attrs?: Record<string, string>; activeEl?: MockEl | null } = {}
+  opts: {
+    isContentEditable?: boolean;
+    attrs?: Record<string, string>;
+    activeEl?: MockEl | null;
+    selectionCollapsed?: boolean;
+    selectionAnchor?: MockEl | null;
+    selectionFocus?: MockEl | null;
+    selectionStart?: number;
+    selectionEnd?: number;
+  } = {}
 ): MockEl {
+  const selectionRangeCount = opts.selectionAnchor || opts.selectionFocus ? 1 : 0;
   const ownerDoc = {
     activeElement: opts.activeEl ?? null,
-    getSelection: () => ({ rangeCount: 0, anchorNode: null, focusNode: null }),
+    getSelection: () => ({
+      rangeCount: selectionRangeCount,
+      isCollapsed: opts.selectionCollapsed ?? (selectionRangeCount === 0),
+      anchorNode: opts.selectionAnchor ?? null,
+      focusNode: opts.selectionFocus ?? null,
+    }),
   } as unknown as Document;
 
   const el: MockEl = {
@@ -30,6 +48,8 @@ function makeMockEl(
     isContentEditable: opts.isContentEditable,
     attrs: opts.attrs,
     ownerDocument: ownerDoc,
+    selectionStart: opts.selectionStart,
+    selectionEnd: opts.selectionEnd,
     closest(selector: string) {
       const tokens = selector.split(',').map((s) => s.trim());
       for (const token of tokens) {
@@ -63,15 +83,18 @@ function makeMockEvent(target: MockEl, extra: Record<string, unknown> = {}) {
   };
 }
 
-describe('content protection utilities & handlers', () => {
-  it('recognizes copy/cut shortcuts on English and Persian keyboard layouts without blocking paste/nav', () => {
+describe('deterrent content protection utilities & handlers', () => {
+  it('recognizes copy/cut shortcuts on Windows/Mac/Persian layouts without blocking DevTools or normal keys', () => {
     expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: false, key: 'c', code: 'KeyC' })).toBe(true);
     expect(isCopyOrCutShortcut({ ctrlKey: false, metaKey: true, altKey: false, key: 'C', code: 'KeyC' })).toBe(true);
     expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: false, key: 'ز', code: 'KeyC' })).toBe(true);
     expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: false, key: 'x', code: 'KeyX' })).toBe(true);
+    expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: false, key: 'Insert', code: 'Insert' })).toBe(true);
 
+    // Must never block paste, select-all, DevTools (F12 / Ctrl+Shift+I), or normal navigation keys
     expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: false, key: 'v', code: 'KeyV' })).toBe(false);
     expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: false, key: 'a', code: 'KeyA' })).toBe(false);
+    expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: false, key: 'I', code: 'KeyI' })).toBe(false);
     expect(isCopyOrCutShortcut({ ctrlKey: false, metaKey: false, altKey: false, key: 'F12', code: 'F12' })).toBe(false);
     expect(isCopyOrCutShortcut({ ctrlKey: true, metaKey: false, altKey: true, key: 'c', code: 'KeyC' })).toBe(false);
   });
@@ -79,6 +102,7 @@ describe('content protection utilities & handlers', () => {
   it('detects editable controls vs protected media/content targets accurately', () => {
     const input = makeMockEl('input');
     const textarea = makeMockEl('textarea');
+    const select = makeMockEl('select');
     const editableDiv = makeMockEl('div', { isContentEditable: true });
     const allowCopySpan = makeMockEl('span', { attrs: { 'data-allow-copy': 'true' } });
     const img = makeMockEl('img');
@@ -87,6 +111,7 @@ describe('content protection utilities & handlers', () => {
 
     expect(isEditableTarget(input as unknown as EventTarget)).toBe(true);
     expect(isEditableTarget(textarea as unknown as EventTarget)).toBe(true);
+    expect(isEditableTarget(select as unknown as EventTarget)).toBe(true);
     expect(isEditableTarget(editableDiv as unknown as EventTarget)).toBe(true);
     expect(isEditableTarget(allowCopySpan as unknown as EventTarget)).toBe(true);
     expect(isEditableTarget(img as unknown as EventTarget)).toBe(false);
@@ -121,6 +146,10 @@ describe('content protection utilities & handlers', () => {
     handlers.handleDragStart(dragImg as unknown as Event);
     expect(dragImg.defaultPrevented).toBe(true);
 
+    const dragShield = makeMockEvent(shield);
+    handlers.handleDragStart(dragShield as unknown as Event);
+    expect(dragShield.defaultPrevented).toBe(true);
+
     const selText = makeMockEvent(text);
     handlers.handleSelectStart(selText as unknown as Event);
     expect(selText.defaultPrevented).toBe(true);
@@ -140,9 +169,35 @@ describe('content protection utilities & handlers', () => {
     expect(keyCopyText.defaultPrevented).toBe(true);
   });
 
+  it('does not leak editable copy permission when focus was previously in an input without selection', () => {
+    const inputNoSelection = makeMockEl('input', { selectionStart: 0, selectionEnd: 0 });
+    const protectedText = makeMockEl('p', {
+      activeEl: inputNoSelection,
+      selectionAnchor: makeMockEl('p'),
+      selectionFocus: makeMockEl('p'),
+      selectionCollapsed: false,
+    });
+    const scopeElements = new Set<unknown>([inputNoSelection, protectedText]);
+    const handlers = createContentProtectionHandlers(() => ({
+      contains: (el) => scopeElements.has(el),
+    }));
+
+    expect(isSelectionInsideEditable(protectedText.ownerDocument)).toBe(false);
+
+    const keyCopyOutside = makeMockEvent(protectedText, {
+      ctrlKey: true,
+      metaKey: false,
+      altKey: false,
+      key: 'c',
+      code: 'KeyC',
+    });
+    handlers.handleKeyDown(keyCopyOutside as unknown as KeyboardEvent);
+    expect(keyCopyOutside.defaultPrevented).toBe(true);
+  });
+
   it('never blocks contextmenu, selection, copy, or Ctrl+C inside form inputs and chat textareas', () => {
-    const emailInput = makeMockEl('input');
-    const chatTextarea = makeMockEl('textarea');
+    const emailInput = makeMockEl('input', { selectionStart: 0, selectionEnd: 5 });
+    const chatTextarea = makeMockEl('textarea', { selectionStart: 2, selectionEnd: 10 });
     const scopeElements = new Set<unknown>([emailInput, chatTextarea]);
 
     const handlers = createContentProtectionHandlers(() => ({
