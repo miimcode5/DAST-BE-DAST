@@ -6,6 +6,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { Network } from '@capacitor/network';
+import { isNativePlatform } from '../lib/capacitorBridge';
 import { getPendingOfflineRequests } from '../lib/offlineDb';
 import { syncPendingOfflineRequests } from '../services/requestsService';
 import { useAuth } from './AuthContext';
@@ -38,6 +40,7 @@ export function PwaProvider({ children }: { children: ReactNode }) {
   );
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(() => {
+    if (isNativePlatform()) return true;
     if (typeof window === 'undefined') return false;
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
@@ -85,13 +88,21 @@ export function PwaProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleOnline = () => {
-      setIsOnline(true);
-      showToast('اتصال اینترنت دوباره برقرار شد.', 'info');
+      setIsOnline((prev) => {
+        if (!prev) {
+          showToast('اتصال اینترنت دوباره برقرار شد.', 'info');
+        }
+        return true;
+      });
       void triggerSync();
     };
     const handleOffline = () => {
-      setIsOnline(false);
-      showToast('اتصال اینترنت قطع شد؛ داده‌های ذخیره‌شده محلی همچنان قابل مشاهده‌اند.', 'warning');
+      setIsOnline((prev) => {
+        if (prev) {
+          showToast('اتصال اینترنت قطع شد؛ داده‌های ذخیره‌شده محلی همچنان قابل مشاهده‌اند.', 'warning');
+        }
+        return false;
+      });
     };
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
@@ -108,11 +119,33 @@ export function PwaProvider({ children }: { children: ReactNode }) {
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     window.addEventListener('appinstalled', handleAppInstalled);
 
+    let nativeListenerCleanup: (() => void) | undefined;
+    if (isNativePlatform()) {
+      void Network.getStatus()
+        .then((status) => {
+          setIsOnline(status.connected);
+        })
+        .catch(() => {});
+
+      const listenerPromise = Network.addListener('networkStatusChange', (status) => {
+        if (status.connected) {
+          handleOnline();
+        } else {
+          handleOffline();
+        }
+      });
+
+      nativeListenerCleanup = () => {
+        void listenerPromise.then((h) => h.remove());
+      };
+    }
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      nativeListenerCleanup?.();
     };
   }, [showToast, triggerSync]);
 

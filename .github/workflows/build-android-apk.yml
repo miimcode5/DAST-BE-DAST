@@ -1,0 +1,257 @@
+name: Build Android APK (Dast Be Dast)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-android-apk:
+    name: Build Android 7.0+ APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Setup JDK 21 (Temurin)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK (Platform 36 & Build-Tools 36.0.0)
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+
+          SDKMANAGER=$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f 2>/dev/null | sort -V | tail -n 1 || true)
+          if [ -z "$SDKMANAGER" ]; then
+            echo "ERROR: sdkmanager not found in $SDK_ROOT/cmdline-tools"
+            ls -la "$SDK_ROOT" || true
+            exit 1
+          fi
+
+          set +o pipefail
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null 2>&1 || true
+          set -o pipefail
+
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Cache Gradle packages and wrapper
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-android-${{ runner.os }}-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties', 'android/build.gradle', 'android/app/build.gradle', 'android/variables.gradle') }}
+          restore-keys: |
+            gradle-android-${{ runner.os }}-
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run TypeScript check and Vitest suite
+        run: |
+          npm run typecheck
+          npm test
+
+      - name: Build production web bundle (dist/)
+        env:
+          VITE_BASE_PATH: /
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_URL || 'https://tnlskswcdacgtejgixbc.supabase.co' }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHNrc3djZGFjZ3RlamdpeGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTEwMjcsImV4cCI6MjExMTEyNzAyN30.7daG4Gy1_xh8hRq-VWsifddU1dTQVnvTUHi-teD5U9E' }}
+        run: npm run build
+
+      - name: Verify web bundle safety and required local assets
+        run: |
+          test -f dist/index.html
+          test -f dist/fonts/pinar/Pinar-FD-Regular.woff2
+          test -f dist/fonts/pinar/Pinar-FD-Bold.woff2
+          if grep -rn "service_role" dist/; then
+            echo "ERROR: Found potential service_role string in client dist bundle!"
+            exit 1
+          fi
+
+      - name: Sync Capacitor web bundle and plugins into Android
+        run: |
+          npx cap sync android
+          test -f android/app/src/main/assets/public/index.html
+          test -f android/app/src/main/assets/capacitor.config.json
+          if grep -q '"url"' android/app/src/main/assets/capacitor.config.json; then
+            echo "ERROR: capacitor.config.json unexpectedly contains server.url!"
+            exit 1
+          fi
+
+      - name: Build Debug APK with Gradle
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Verify Debug APK, inspect minSdkVersion/targetSdkVersion, and compute SHA-256
+        id: verify_debug
+        run: |
+          set -euo pipefail
+          DEBUG_APK=$(find android/app/build/outputs/apk/debug -maxdepth 1 -type f -name '*.apk' | head -n 1 || true)
+          if [ -z "$DEBUG_APK" ] || [ ! -s "$DEBUG_APK" ]; then
+            echo "::error::No Debug APK found in android/app/build/outputs/apk/debug/"
+            ls -la android/app/build/outputs/apk/ || true
+            exit 1
+          fi
+
+          mkdir -p artifacts/debug
+          OUT_APK="artifacts/debug/DastBeDast-v1.0.0-debug.apk"
+          cp "$DEBUG_APK" "$OUT_APK"
+
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          AAPT2=$(find "$SDK_ROOT/build-tools" -name aapt2 -type f 2>/dev/null | sort -V | tail -n 1 || true)
+          if [ -z "$AAPT2" ]; then
+            echo "::error::aapt2 not found under $SDK_ROOT/build-tools"
+            ls -la "$SDK_ROOT/build-tools" || true
+            exit 1
+          fi
+
+          BADGING_FILE="${RUNNER_TEMP}/apk-badging.txt"
+          if ! "$AAPT2" dump badging "$OUT_APK" > "$BADGING_FILE" 2>&1; then
+            ERR_OUT=$(tr '\n' ' ' < "$BADGING_FILE" | head -c 500)
+            echo "::error::aapt2 dump badging failed: $ERR_OUT"
+            exit 1
+          fi
+
+          head -n 25 "$BADGING_FILE"
+
+          SUMMARY_HEAD=$(head -n 15 "$BADGING_FILE" | tr '\n' ' ')
+          if ! grep -Fq "package: name='com.rassa.dastbedast'" "$BADGING_FILE"; then
+            echo "::error::Unexpected package name in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
+          if ! grep -Fq "versionName='1.0.0'" "$BADGING_FILE"; then
+            echo "::error::Unexpected versionName in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
+          if ! grep -Eq "(minSdkVersion|sdkVersion):'24'" "$BADGING_FILE"; then
+            echo "::error::minSdkVersion is not 24 in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
+          if ! grep -Eq "targetSdkVersion:'(3[56]|Baklava)'" "$BADGING_FILE"; then
+            echo "::error::Unexpected targetSdkVersion in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
+
+          SHA256=$(sha256sum "$OUT_APK" | awk '{print $1}')
+          SIZE_BYTES=$(wc -c < "$OUT_APK")
+          (cd artifacts/debug && sha256sum DastBeDast-v1.0.0-debug.apk > DastBeDast-v1.0.0-debug.apk.sha256)
+
+          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+          echo "size_bytes=$SIZE_BYTES" >> "$GITHUB_OUTPUT"
+          echo "::notice::Debug APK ready: $OUT_APK ($SIZE_BYTES bytes, SHA-256: $SHA256)"
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DastBeDast-v1.0.0-debug-apk
+          path: |
+            artifacts/debug/DastBeDast-v1.0.0-debug.apk
+            artifacts/debug/DastBeDast-v1.0.0-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Check optional Release signing secrets
+        id: check_release_secrets
+        env:
+          HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+          HAS_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD != '' }}
+          HAS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS != '' }}
+          HAS_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD != '' }}
+        run: |
+          if [ "$HAS_KEYSTORE" = "true" ] && [ "$HAS_STORE_PASS" = "true" ] && [ "$HAS_ALIAS" = "true" ] && [ "$HAS_KEY_PASS" = "true" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Release signing secrets are not all configured; skipping signed Release APK build."
+          fi
+
+      - name: Build Signed Release APK (when signing secrets are configured)
+        if: steps.check_release_secrets.outputs.ready == 'true'
+        id: build_release
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          KEYSTORE_FILE="${RUNNER_TEMP}/dastbedast-release.jks"
+          trap 'rm -f "$KEYSTORE_FILE"' EXIT
+
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_FILE"
+          export ANDROID_KEYSTORE_PATH="$KEYSTORE_FILE"
+
+          cd android
+          ./gradlew --no-daemon assembleRelease
+          cd ..
+
+          RELEASE_APK=$(find android/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' ! -name '*unsigned*' | head -n 1 || true)
+          if [ -z "$RELEASE_APK" ] || [ ! -s "$RELEASE_APK" ]; then
+            echo "ERROR: Signed Release APK not found in android/app/build/outputs/apk/release/"
+            exit 1
+          fi
+
+          mkdir -p artifacts/release
+          OUT_RELEASE="artifacts/release/DastBeDast-v1.0.0-release.apk"
+          cp "$RELEASE_APK" "$OUT_RELEASE"
+          (cd artifacts/release && sha256sum DastBeDast-v1.0.0-release.apk > DastBeDast-v1.0.0-release.apk.sha256)
+
+          RELEASE_SHA256=$(sha256sum "$OUT_RELEASE" | awk '{print $1}')
+          echo "sha256=$RELEASE_SHA256" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Signed Release APK Artifact
+        if: steps.check_release_secrets.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DastBeDast-v1.0.0-release-apk
+          path: |
+            artifacts/release/DastBeDast-v1.0.0-release.apk
+            artifacts/release/DastBeDast-v1.0.0-release.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Write build summary
+        if: always()
+        run: |
+          {
+            echo "## Android APK Build Summary (دست‌به‌دست)"
+            echo "- **Package ID:** \`com.rassa.dastbedast\`"
+            echo "- **Version:** \`1.0.0\` (versionCode \`1\`)"
+            echo "- **minSdkVersion:** \`24\` (Android 7.0+)"
+            echo "- **Debug APK:** \`DastBeDast-v1.0.0-debug.apk\`"
+            if [ -n "${{ steps.verify_debug.outputs.sha256 }}" ]; then
+              echo "- **Debug Size:** \`${{ steps.verify_debug.outputs.size_bytes }}\` bytes"
+              echo "- **Debug SHA-256:** \`${{ steps.verify_debug.outputs.sha256 }}\`"
+            fi
+            if [ "${{ steps.check_release_secrets.outputs.ready }}" = "true" ]; then
+              echo "- **Signed Release APK:** Built & uploaded (\`${{ steps.build_release.outputs.sha256 }}\`)"
+            else
+              echo "- **Signed Release APK:** Not configured yet (GitHub Secrets for keystore are unset; see \`README-ANDROID.md\`)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import { NativeAppBridge } from './components/NativeAppBridge';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ScrollToTop } from './components/ScrollToTop';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -68,6 +69,7 @@ export function App() {
           <NotificationsProvider>
             <ChatProvider>
               <PwaProvider>
+                <NativeAppBridge />
                 <ScrollToTop />
                 <RecoveryWatcher />
                 <Routes>

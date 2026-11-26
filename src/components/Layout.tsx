@@ -52,10 +52,17 @@ export function Layout() {
 
   useContentProtection(protectedRootRef);
 
-  // Close mobile drawer automatically on route changes
+  // Close mobile drawer automatically on route changes or Android hardware back
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleNativeBack = () => setMobileMenuOpen(false);
+    window.addEventListener('dast:native-back', handleNativeBack);
+    return () => window.removeEventListener('dast:native-back', handleNativeBack);
+  }, [mobileMenuOpen]);
 
   const isChatRoomRoute = /^\/messages\/[^/]+$/.test(location.pathname);
   const isCreateRequestRoute = location.pathname === '/requests/new';
