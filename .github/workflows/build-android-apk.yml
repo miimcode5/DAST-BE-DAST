@@ -114,7 +114,7 @@ jobs:
           set -euo pipefail
           DEBUG_APK=$(find android/app/build/outputs/apk/debug -maxdepth 1 -type f -name '*.apk' | head -n 1 || true)
           if [ -z "$DEBUG_APK" ] || [ ! -s "$DEBUG_APK" ]; then
-            echo "ERROR: No Debug APK found in android/app/build/outputs/apk/debug/"
+            echo "::error::No Debug APK found in android/app/build/outputs/apk/debug/"
             ls -la android/app/build/outputs/apk/ || true
             exit 1
           fi
@@ -123,20 +123,40 @@ jobs:
           OUT_APK="artifacts/debug/DastBeDast-v1.0.0-debug.apk"
           cp "$DEBUG_APK" "$OUT_APK"
 
-          AAPT2=$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -name aapt2 -type f 2>/dev/null | sort -V | tail -n 1 || true)
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          AAPT2=$(find "$SDK_ROOT/build-tools" -name aapt2 -type f 2>/dev/null | sort -V | tail -n 1 || true)
           if [ -z "$AAPT2" ]; then
-            echo "ERROR: aapt2 not found under Android SDK build-tools"
+            echo "::error::aapt2 not found under $SDK_ROOT/build-tools"
+            ls -la "$SDK_ROOT/build-tools" || true
             exit 1
           fi
 
           BADGING_FILE="${RUNNER_TEMP}/apk-badging.txt"
-          "$AAPT2" dump badging "$OUT_APK" > "$BADGING_FILE"
+          if ! "$AAPT2" dump badging "$OUT_APK" > "$BADGING_FILE" 2>&1; then
+            ERR_OUT=$(tr '\n' ' ' < "$BADGING_FILE" | head -c 500)
+            echo "::error::aapt2 dump badging failed: $ERR_OUT"
+            exit 1
+          fi
+
           head -n 25 "$BADGING_FILE"
 
-          grep -Fq "package: name='com.rassa.dastbedast'" "$BADGING_FILE" || { echo "ERROR: Unexpected package name"; exit 1; }
-          grep -Fq "versionName='1.0.0'" "$BADGING_FILE" || { echo "ERROR: Unexpected versionName"; exit 1; }
-          grep -Fq "sdkVersion:'24'" "$BADGING_FILE" || { echo "ERROR: minSdkVersion inside APK is not 24!"; exit 1; }
-          grep -Eq "targetSdkVersion:'3[56]'" "$BADGING_FILE" || { echo "ERROR: Unexpected targetSdkVersion inside APK"; exit 1; }
+          SUMMARY_HEAD=$(head -n 15 "$BADGING_FILE" | tr '\n' ' ')
+          if ! grep -Fq "package: name='com.rassa.dastbedast'" "$BADGING_FILE"; then
+            echo "::error::Unexpected package name in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
+          if ! grep -Fq "versionName='1.0.0'" "$BADGING_FILE"; then
+            echo "::error::Unexpected versionName in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
+          if ! grep -Eq "sdkVersion:'24'" "$BADGING_FILE"; then
+            echo "::error::minSdkVersion is not 24 in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
+          if ! grep -Eq "targetSdkVersion:'(3[56]|Baklava)'" "$BADGING_FILE"; then
+            echo "::error::Unexpected targetSdkVersion in APK badging: $SUMMARY_HEAD"
+            exit 1
+          fi
 
           SHA256=$(sha256sum "$OUT_APK" | awk '{print $1}')
           SIZE_BYTES=$(wc -c < "$OUT_APK")
@@ -144,7 +164,7 @@ jobs:
 
           echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
           echo "size_bytes=$SIZE_BYTES" >> "$GITHUB_OUTPUT"
-          echo "Debug APK ready: $OUT_APK ($SIZE_BYTES bytes, SHA-256: $SHA256)"
+          echo "::notice::Debug APK ready: $OUT_APK ($SIZE_BYTES bytes, SHA-256: $SHA256)"
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
