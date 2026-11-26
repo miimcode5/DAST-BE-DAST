@@ -184,7 +184,7 @@
   scrollbar-width: none;
 }
 
-/* Seamless infinite loop carousel for AboutPage team showcase */
+/* Seamless infinite loop carousel & graphical showcase for AboutPage RASSA team */
 @keyframes rassaMarquee {
   0% {
     transform: translate3d(0, 0, 0);
@@ -194,18 +194,181 @@
   }
 }
 
+@keyframes rassaCardFloatEven {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes rassaCardFloatOdd {
+  0%, 100% {
+    transform: translateY(-4px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes rassaHaloSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rassaHaloSpinReverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes rassaOrbDrift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.48;
+  }
+  50% {
+    transform: translate3d(14px, -10px, 0) scale(1.08);
+    opacity: 0.72;
+  }
+}
+
+@keyframes rassaSheenSweep {
+  0%, 62% {
+    transform: translateX(-145%) skewX(-18deg);
+    opacity: 0;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  88%, 100% {
+    transform: translateX(240%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes rassaEqPulse {
+  0%, 100% {
+    transform: scaleY(0.45);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rassaSpotlightIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rassa-stage {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(circle at 88% 12%, rgba(233, 185, 73, 0.14) 0%, transparent 42%),
+    radial-gradient(circle at 12% 88%, rgba(120, 185, 138, 0.22) 0%, transparent 48%);
+}
+
+.rassa-dot-grid {
+  background-image: radial-gradient(rgba(23, 77, 53, 0.14) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.rassa-orb-slow {
+  animation: rassaOrbDrift 9s ease-in-out infinite;
+}
+
+.rassa-orb-reverse {
+  animation: rassaOrbDrift 11s ease-in-out infinite reverse;
+}
+
+.rassa-halo-spin {
+  animation: rassaHaloSpin 20s linear infinite;
+}
+
+.rassa-halo-spin-reverse {
+  animation: rassaHaloSpinReverse 28s linear infinite;
+}
+
+.rassa-spotlight-enter {
+  animation: rassaSpotlightIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.rassa-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.rassa-sheen::after {
+  content: '';
+  position: absolute;
+  inset-block: -20%;
+  inset-inline-start: 0;
+  width: 36%;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.32) 50%,
+    transparent 100%
+  );
+  animation: rassaSheenSweep 6.5s ease-in-out infinite;
+}
+
+.rassa-card-float-even {
+  animation: rassaCardFloatEven 5.2s ease-in-out infinite;
+}
+
+.rassa-card-float-odd {
+  animation: rassaCardFloatOdd 5.2s ease-in-out infinite;
+}
+
+.rassa-eq-bar {
+  transform-origin: bottom;
+  animation: rassaEqPulse 1.5s ease-in-out infinite;
+}
+
 .rassa-marquee-viewport {
   mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
 }
 
 .rassa-marquee-track {
-  animation: rassaMarquee 22s linear infinite;
+  animation: rassaMarquee 24s linear infinite;
   will-change: transform;
+}
+
+.rassa-marquee-paused .rassa-marquee-track {
+  animation-play-state: paused;
+}
+
+.rassa-marquee-paused .rassa-card-float-even,
+.rassa-marquee-paused .rassa-card-float-odd {
+  animation-play-state: paused;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .rassa-marquee-viewport:hover .rassa-marquee-track {
+    animation-play-state: paused;
+  }
+  .rassa-marquee-viewport:hover .rassa-card-float-even,
+  .rassa-marquee-viewport:hover .rassa-card-float-odd {
     animation-play-state: paused;
   }
 }
@@ -216,8 +379,19 @@
   }
   .animate-soft-float,
   .animate-fade-up,
-  .animate-pulse-ring {
+  .animate-pulse-ring,
+  .rassa-orb-slow,
+  .rassa-orb-reverse,
+  .rassa-halo-spin,
+  .rassa-halo-spin-reverse,
+  .rassa-spotlight-enter,
+  .rassa-card-float-even,
+  .rassa-card-float-odd,
+  .rassa-eq-bar {
     animation: none !important;
+  }
+  .rassa-sheen::after {
+    display: none;
   }
   .rassa-marquee-viewport {
     overflow-x: auto;
