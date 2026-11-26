@@ -149,7 +149,7 @@ jobs:
             echo "::error::Unexpected versionName in APK badging: $SUMMARY_HEAD"
             exit 1
           fi
-          if ! grep -Eq "sdkVersion:'24'" "$BADGING_FILE"; then
+          if ! grep -Eq "(minSdkVersion|sdkVersion):'24'" "$BADGING_FILE"; then
             echo "::error::minSdkVersion is not 24 in APK badging: $SUMMARY_HEAD"
             exit 1
           fi
