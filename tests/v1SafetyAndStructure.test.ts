@@ -95,4 +95,17 @@ describe('V1.0 safety, deterrent protection & architectural invariants', () => {
     expect(achSql).toContain("'voluntary'");
     expect(achSql).toContain("'specialized'");
   });
+
+  it('renders graphical and animated RASSA team showcase using ProtectedImage', () => {
+    const aboutSource = fs.readFileSync(
+      path.join(ROOT, 'src/pages/AboutPage.tsx'),
+      'utf8'
+    );
+    expect(aboutSource).toContain('RASSA_TEAM_MEMBERS');
+    expect(aboutSource).toContain('SpotlightPanel');
+    expect(aboutSource).toContain('ProtectedImage');
+    expect(aboutSource).toContain('rassa-stage');
+    expect(aboutSource).toContain('rassa-marquee-track');
+    expect(aboutSource).not.toMatch(/<img\b/);
+  });
 });
