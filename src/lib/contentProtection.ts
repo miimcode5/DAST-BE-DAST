@@ -1,5 +1,5 @@
 export const EDITABLE_TARGET_SELECTOR =
-  'input, textarea, select, [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [data-allow-copy="true"]';
+  'input, textarea, select, option, [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [data-allow-copy="true"]';
 
 export const PROTECTED_MEDIA_SELECTOR =
   'img, picture, svg, [data-protected-media="true"]';
@@ -49,21 +49,38 @@ export function isEditableTarget(target: EventTarget | null): boolean {
 }
 
 /**
- * Checks whether the current active element or active DOM selection sits inside
- * an editable input/textarea/contenteditable field.
+ * Checks whether the current active selection sits inside an editable input,
+ * textarea, or contenteditable control (never leaking permission to non-editable text).
  */
-export function isSelectionInsideEditable(doc: Document | null = typeof document !== 'undefined' ? document : null): boolean {
+export function isSelectionInsideEditable(
+  doc: Document | null = typeof document !== 'undefined' ? document : null
+): boolean {
   if (!doc) return false;
-  if (isEditableTarget(doc.activeElement)) {
+
+  const selection = doc.getSelection?.();
+  if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+    return (
+      isEditableTarget(selection.anchorNode) &&
+      isEditableTarget(selection.focusNode)
+    );
+  }
+
+  // Native <input> and <textarea> selections are exposed via activeElement/selectionStart
+  const active = doc.activeElement as
+    | (Element & { selectionStart?: number | null; selectionEnd?: number | null })
+    | null;
+  if (isEditableTarget(active)) {
+    if (
+      active &&
+      typeof active.selectionStart === 'number' &&
+      typeof active.selectionEnd === 'number'
+    ) {
+      return active.selectionStart !== active.selectionEnd;
+    }
     return true;
   }
 
-  const selection = doc.getSelection?.();
-  if (!selection || selection.rangeCount === 0) {
-    return false;
-  }
-
-  return isEditableTarget(selection.anchorNode) || isEditableTarget(selection.focusNode);
+  return false;
 }
 
 /**
@@ -76,7 +93,7 @@ export function isProtectedMediaTarget(target: EventTarget | null): boolean {
 }
 
 /**
- * Detects Ctrl+C / Cmd+C / Ctrl+X / Cmd+X copy/cut shortcuts across layouts,
+ * Detects Ctrl+C / Cmd+C / Ctrl+X / Cmd+X / Ctrl+Insert copy/cut shortcuts across layouts,
  * including Persian keyboard layout on Windows where physical KeyC maps to 'ز'.
  */
 export function isCopyOrCutShortcut(
@@ -87,6 +104,10 @@ export function isCopyOrCutShortcut(
   }
 
   if (event.code === 'KeyC' || event.code === 'KeyX') {
+    return true;
+  }
+
+  if (event.ctrlKey && !event.metaKey && event.code === 'Insert') {
     return true;
   }
 
@@ -114,8 +135,9 @@ export interface ScopeContainer {
 }
 
 /**
- * Builds deterministic event handlers scoped to `getContainer()` (or full document).
- * Never interferes with editable controls, forms, buttons, links, or screen readers.
+ * Builds deterministic deterrent event handlers scoped to `getContainer()` (or full document).
+ * Never interferes with editable controls, forms, buttons, links, keyboard navigation,
+ * PWA behavior, or screen readers.
  */
 export function createContentProtectionHandlers(
   getContainer: () => ScopeContainer | null,
