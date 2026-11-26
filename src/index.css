@@ -221,15 +221,6 @@
   }
 }
 
-@keyframes rassaHaloSpinReverse {
-  0% {
-    transform: rotate(360deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
 @keyframes rassaOrbDrift {
   0%, 100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -266,17 +257,6 @@
   }
 }
 
-@keyframes rassaSpotlightIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 .rassa-stage {
   background-color: var(--color-bg);
   background-image:
@@ -299,14 +279,6 @@
 
 .rassa-halo-spin {
   animation: rassaHaloSpin 20s linear infinite;
-}
-
-.rassa-halo-spin-reverse {
-  animation: rassaHaloSpinReverse 28s linear infinite;
-}
-
-.rassa-spotlight-enter {
-  animation: rassaSpotlightIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .rassa-sheen {
@@ -354,15 +326,6 @@
   will-change: transform;
 }
 
-.rassa-marquee-paused .rassa-marquee-track {
-  animation-play-state: paused;
-}
-
-.rassa-marquee-paused .rassa-card-float-even,
-.rassa-marquee-paused .rassa-card-float-odd {
-  animation-play-state: paused;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .rassa-marquee-viewport:hover .rassa-marquee-track {
     animation-play-state: paused;
@@ -383,8 +346,6 @@
   .rassa-orb-slow,
   .rassa-orb-reverse,
   .rassa-halo-spin,
-  .rassa-halo-spin-reverse,
-  .rassa-spotlight-enter,
   .rassa-card-float-even,
   .rassa-card-float-odd,
   .rassa-eq-bar {

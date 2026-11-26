@@ -102,10 +102,12 @@ describe('V1.0 safety, deterrent protection & architectural invariants', () => {
       'utf8'
     );
     expect(aboutSource).toContain('RASSA_TEAM_MEMBERS');
-    expect(aboutSource).toContain('SpotlightPanel');
+    expect(aboutSource).toContain('MemberPortraitCard');
     expect(aboutSource).toContain('ProtectedImage');
     expect(aboutSource).toContain('rassa-stage');
     expect(aboutSource).toContain('rassa-marquee-track');
+    expect(aboutSource).toContain('rassa-sheen');
+    expect(aboutSource).not.toContain('SpotlightPanel');
     expect(aboutSource).not.toMatch(/<img\b/);
   });
 });
